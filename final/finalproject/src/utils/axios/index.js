@@ -1,4 +1,4 @@
-
+import axios  from "axios";
 
 //axios setting
 axios.defaults.baseURL = "http://localhost:8080";//앞으로 모든 통신에 이 주소를 접두사로 추가
