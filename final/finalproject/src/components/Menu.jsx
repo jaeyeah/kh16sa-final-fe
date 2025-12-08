@@ -87,6 +87,16 @@ return(<>
                         </Link>
                     </li>
                     <li className="nav-item" onClick={closeMenu}>
+                        <Link className="nav-link"  to="/contents/test">
+                            <span>영화</span>
+                        </Link>
+                    </li>
+                    <li className="nav-item" onClick={closeMenu}>
+                        <Link className="nav-link"  to="/contents/test2">
+                            <span>영화2</span>
+                        </Link>
+                    </li>
+                    <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link"  to="/review/insert">
                             <span>리뷰등록</span>
                         </Link>
@@ -94,6 +104,11 @@ return(<>
                     <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link"  to="/review/search">
                             <span>리뷰검색</span>
+                        </Link>
+                    </li>
+                     <li className="nav-item" onClick={closeMenu}>
+                        <Link className="nav-link"  to="#">
+                            <span>퀴즈</span>
                         </Link>
                     </li>
 
