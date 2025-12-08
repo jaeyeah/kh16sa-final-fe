@@ -32,9 +32,6 @@ export default function Content() {
                     <Route path="/contents/test2" element={<SearchAndSave/>}>
                         <Route path="/contents/test2/review/:contentsId" element={<ReviewWrite/>}></Route>
                     </Route>
-                    <Route path="/contents/test2" element={<SearchAndSave/>}>
-                      <Route path="/contents/test2/review/:contentsId" element={<ReviewWrite/>}></Route>
-                    </Route>
                     <Route path="/contents/genreList" element={<GenreList/>}></Route>
                     <Route path="/contents/genreList" element={<ContentsListByGenre/>}></Route>
 
