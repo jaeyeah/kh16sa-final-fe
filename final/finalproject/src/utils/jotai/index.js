@@ -33,3 +33,16 @@ export const clearLoginState = atom(
 
 //로그인 판정 확인용 데이터
 export const loginCompleteState = atom(false);
+
+//퀴즈 관련
+//현재 풀고 있는 퀴즈 목록 (서버에서 받아온 5문제)
+export const quizListAtom = atom([]);
+
+//현재 문제 번호 (0 ~ 4)
+export const currentQuizIndexAtom = atom(0);
+
+//사용자 답안 저장소 { quizId: "정답값" }
+export const userAnswersAtom = atom({});
+
+// 4. 퀴즈 게임 모달 표시 여부 (전역에서 제어하고 싶을 때 사용)
+export const quizModalShowAtom = atom(false);
