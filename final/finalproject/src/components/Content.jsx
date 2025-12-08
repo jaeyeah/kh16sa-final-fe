@@ -6,8 +6,11 @@ import SearchAndSave from "./Contents/SearchAndSave";
 import MemberJoinFinish from "./member/MemberJoinFinish";
 import MemberLogin from "./member/MemberLogin";
 import ReviewWrite from "./review/ReviewWrite";
-import ReviewSearch from "./review/ReviewSearch";
+import ReviewUpdate from "./review/ReviewUpdate";
+import NeedPermission from "./error/NeedPermission";
+import TargetNotfound from "./error/TargetNotfound";
 import WriteReview from "./review/WriteReview";
+
 import GenreList from "./Contents/GenreList";
 import ContentsListByGenre from "./Contents/ContentsListByGenre";
 import ContentsDetail from "./Contents/ContentsDetail";
@@ -19,6 +22,7 @@ import MemberMyinfo from "./member/MemberMyinfo";
 import MemberMyreview from "./member/MemberMyreview";
 import MemberEdit from "./member/MemberEdit";
 import MemberEditPassword from "./member/MemberEditPassword";
+
 
 
 export default function Content() {
@@ -57,12 +61,18 @@ export default function Content() {
 
                     {/* 리뷰 페이지 */} 
                     <Route path="/review/insert" element={<ReviewWrite/>}></Route>
+                    <Route path="/review/:reviewNo" element={<ReviewUpdate/>}></Route>
+
                     <Route path="/review/search" element={<ReviewSearch/>}></Route>
                     <Route path="/review/write/:contentsId" element={<WriteReview/>}></Route>
                     <Route path="/contents/searchForReview" element={<SearchAndSave/>}>
                         <Route path="/contents/searchForReview/review/:contentsId" element={<ReviewWrite/>}></Route>
                     </Route>
 
+
+                    {/* 에러 페이지 */}
+                        <Route path="/error/403" element={<NeedPermission/>}></Route>
+                        <Route path="*" element={<TargetNotfound/>}></Route>
                 </Routes>
             </div>
         </div>
