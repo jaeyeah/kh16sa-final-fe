@@ -2,7 +2,7 @@ import { useAtom } from "jotai"
 import { loginIdState, loginLevelState } from "../../utils/jotai"
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import "./MemberMypage.css";
 
 
 export default function MemberMypage(){
@@ -22,7 +22,8 @@ export default function MemberMypage(){
 
     return(<>
         <h1> {loginid}님의 정보</h1>
-        <table className="table table-hover">
+        <div className="mypage-table-wrapper">
+        <table className="table table-hover mypage-table">
             <tbody>
                 <tr>
                     <td>아이디</td>
@@ -32,15 +33,28 @@ export default function MemberMypage(){
                     <td>닉네임</td>
                     <td>{memberData.memberNickname}</td>
                 </tr>
+                 <tr>
+                    <td>등급</td>
+                    <td>{memberData.memberLevel}</td>
+                </tr>
                 <tr>
                     <td>생년월일</td>
                     <td>{memberData.memberBirth}</td>
                 </tr>
                 <tr>
+                    <td>전화번호</td>
+                    <td>{memberData.memberContact}</td>
+                </tr>
+                                <tr>
                     <td>이메일</td>
                     <td>{memberData.memberEmail}</td>
                 </tr>
+                <tr>
+                    <td>포인트</td>
+                    <td>{memberData.memberPoint}</td>
+                </tr>
             </tbody>
         </table>
+        </div>
     </>)
 }
