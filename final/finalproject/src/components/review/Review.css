@@ -10,6 +10,11 @@
     margin-right: 0.2em;
     margin-right: 0.2em;
 }
+
+.review-wrapper{
+    background-color: #f1f2f6;
+}
+
 .my_review {
     font-weight: bold;
     font-size: 20px;
@@ -58,3 +63,4 @@
 .cate_btn {
     border-radius: 1.5em !important;
 }
+

@@ -83,26 +83,33 @@ return(<>
             <div className={`collapse navbar-collapse ${open && 'show'}`} id="menu-body">
                 {/* 좌측 메뉴 (화면이 좁아지면 합쳐짐) */}
                 <ul className="navbar-nav me-auto">
+                    {/* home */}
                     <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link"  to="/">
                             <span>홈</span>
                         </Link>
                     </li>
+
+                    {/* contents */}
                     <li className="nav-item dropdown ">
                         <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                            aria-haspopup="true" aria-expanded="false"><span>영화</span></a>
+                            aria-haspopup="true" aria-expanded="false"><span><MdMovie /></span></a>
                         <div className="dropdown-menu">
-                            <Link className="nav-link"  to="/contents/genreList"><span>장르</span> </Link>
+                            <Link className="nav-link"  to="/contents/searchTitle"><span>검색</span> </Link>
+                            <Link className="nav-link"  to="/contents/genreList"><span>장르</span></Link>
                         </div>
                     </li>
+                    {/* 리뷰 */}
                     <li className="nav-item dropdown ">
                         <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                             aria-haspopup="true" aria-expanded="false"><span>리뷰</span></a>
                         <div className="dropdown-menu">
+                            <Link className="nav-link"  to="/contents/searchForReview"><span>제목검색</span> </Link>
                             <Link className="nav-link"  to="/review/insert"><span>리뷰등록</span> </Link>
                             <Link className="nav-link"  to="/review/search"><span>리뷰검색</span></Link>
                         </div>
                     </li>
+                    {/* 퀴즈 */}
                      <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link"  to="#">
                             <span>퀴즈</span>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
@@ -50,8 +50,10 @@ export default function ContentsListByGenre() {
                     </div>
                 ) : (
                     contentsList.map((content)=>(
-                       <div className="col-3 mb-4" key={content.contentsId}>
+                        
+                        <div className="col-3 mb-4" key={content.contentsId}>
                             <div className="card h-100 bg-dark text-white border-secondary">
+                                <Link className="text-decoration-none link-body-emphasis" to={`/contents/detail/${content.contentsId}`} >
                                 <img 
                                     src={getPosterUrl(content.contentsPosterPath)} 
                                     className="card-img-top"
@@ -59,7 +61,7 @@ export default function ContentsListByGenre() {
                                     style={{ height: "350px", objectFit: "cover" }}
                                 />
                                 <div className="card-body">
-                                    <h5 className="card-title text-truncate">{content.contentsTitle}</h5>
+                                    <h5 className="card-title text-truncate text-light">{content.contentsTitle}</h5>
                                     <p className="card-text">
                                         <small className="text-secondary">{content.contentsReleaseDate}</small>
                                         <br />
@@ -74,8 +76,10 @@ export default function ContentsListByGenre() {
                                         ))}
                                     </p>
                                 </div>
+                                </Link>
                             </div>
                         </div>
+                        
                     ))
                 )}
         </div>
