@@ -7,8 +7,11 @@ import MemberJoinFinish from "./member/MemberJoinFinish";
 import MemberLogin from "./member/MemberLogin";
 import ReviewWrite from "./review/ReviewWrite";
 import ReviewSearch from "./review/ReviewSearch";
+import WriteReview from "./review/WriteReview";
 import GenreList from "./Contents/GenreList";
 import ContentsListByGenre from "./Contents/ContentsListByGenre";
+import ContentsDetail from "./Contents/ContentsDetail";
+import SearchContents from "./Contents/SearchContents";
 
 export default function Content() {
     return (<>
@@ -25,10 +28,11 @@ export default function Content() {
                     
                     {/* contents */}
                     <Route path="/contents/test" element={<Test/>}></Route>
-                    <Route path="/contents/test2" element={<SearchAndSave/>}></Route>
+                    <Route path="/contents/searchTitle" element={<SearchContents/>}></Route>
                     <Route path="/contents/genreList" element={<GenreList/>}></Route>
                     <Route path="/contents/listByGenre/:genreName" element={<ContentsListByGenre/>}></Route>
-                    <Route path="/contents/test2/review" element={<ReviewWrite/>}></Route>
+                    <Route path="/contents/detail/:contentsId" element={<ContentsDetail/>}></Route>
+
 
                     {/* 회원 페이지 */}
                     <Route path="/member/join" element={<MemberJoin/>}></Route>
@@ -38,6 +42,10 @@ export default function Content() {
                     {/* 리뷰 페이지 */} 
                     <Route path="/review/insert" element={<ReviewWrite/>}></Route>
                     <Route path="/review/search" element={<ReviewSearch/>}></Route>
+                    <Route path="/review/write/:contentsId" element={<WriteReview/>}></Route>
+                    <Route path="/contents/searchForReview" element={<SearchAndSave/>}>
+                        <Route path="/contents/searchForReview/review/:contentsId" element={<ReviewWrite/>}></Route>
+                    </Route>
 
                 </Routes>
             </div>
