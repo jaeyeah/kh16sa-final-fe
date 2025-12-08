@@ -1,60 +1,32 @@
 import { useAtom } from "jotai"
 import { loginIdState, loginLevelState } from "../../utils/jotai"
-import { useEffect, useState } from "react";
-import axios from "axios";
 import "./MemberMypage.css";
+import { Link, Outlet, useParams } from "react-router-dom";
 
 
 export default function MemberMypage(){
     //통합 state
-    const [loginid, setLoginId] = useAtom(loginIdState);
+    const {loginId} = useParams();
     const [loginLevel, setLoginLevel] = useAtom(loginLevelState);
-    const [memberData, setMemberData] = useState({});
 
-    useEffect(()=>{
-            if(loginid === null) return;
-            axios.get(`/member/mypage/${loginid}`)
-            .then(response=>{
-                console.log(response.data);
-                setMemberData(response.data);
-            })
-    },[]);
+
 
     return(<>
-        <h1> {loginid}님의 정보</h1>
-        <div className="mypage-table-wrapper">
-        <table className="table table-hover mypage-table">
-            <tbody>
-                <tr>
-                    <td>아이디</td>
-                    <td>{memberData.memberId}</td>
-                </tr>
-                <tr>
-                    <td>닉네임</td>
-                    <td>{memberData.memberNickname}</td>
-                </tr>
-                 <tr>
-                    <td>등급</td>
-                    <td>{memberData.memberLevel}</td>
-                </tr>
-                <tr>
-                    <td>생년월일</td>
-                    <td>{memberData.memberBirth}</td>
-                </tr>
-                <tr>
-                    <td>전화번호</td>
-                    <td>{memberData.memberContact}</td>
-                </tr>
-                                <tr>
-                    <td>이메일</td>
-                    <td>{memberData.memberEmail}</td>
-                </tr>
-                <tr>
-                    <td>포인트</td>
-                    <td>{memberData.memberPoint}</td>
-                </tr>
-            </tbody>
-        </table>
+<div className="row mt-4">
+    <div className="col d-flex justify-content-center flex-wrap">
+        <Link to={`/member/mypage/myinfo/${loginId}`} className="btn btn-secondary me-2 mt-2">내 정보</Link>
+        <Link to={`/member/mypage/mymovie/${loginId}`} className="btn btn-secondary me-2 mt-2">내 영화</Link>
+        <Link to={`/member/mypage/myquiz/${loginId}`} className="btn btn-secondary me-2 mt-2">내 퀴즈</Link>
+        <Link to={`/member/mypage/myreview/${loginId}`} className="btn btn-secondary me-2 mt-2">내 리뷰</Link>
+    </div>
+</div>
+
+     
+                {/* 중첩 라우팅이 되어있기때문에 해당 영역을 표시할 수 있도록 <Outlet/>을 생성해야함 */}
+        <div className="row mt-4">
+            <div className="col">
+                <Outlet/>
+            </div>
         </div>
     </>)
 }

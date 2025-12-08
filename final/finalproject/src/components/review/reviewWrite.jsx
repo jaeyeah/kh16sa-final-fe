@@ -3,9 +3,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FaStar } from "react-icons/fa";
 import "./review.css";
+import { useParams } from "react-router-dom";
 
 
 export default function ReviewWriter() {
+
+    const { contentsId } = useParams();
 
     //state
     const [review, setReview] = useState({
@@ -22,14 +25,19 @@ export default function ReviewWriter() {
             return;
         }
 
-        if(invalidRating) {
+        if (invalidRating) {
             return;
         }
+
+        const reviewData = {
+            ...review,
+            contentsId: contentsId
+        };
 
         axios({
             url: "/review/",
             method: "post",
-            data: review
+            data: reviewData
         })
             .then(response => {
                 toast.success("등록 완료");
@@ -52,7 +60,7 @@ export default function ReviewWriter() {
         return invalidRegex.test(review.reviewText);
     }, [review.reviewText]);
 
-    const invalidRating = useMemo(() => 
+    const invalidRating = useMemo(() =>
         review.reviewRating < 1, [review.reviewRating]);
 
 
@@ -71,57 +79,93 @@ export default function ReviewWriter() {
 
     //render
     return (<>
-        <div className="row mt-4">
-            <div className="col text-center">
-                <span>시청하신 콘텐츠는 어떠셨나요?</span><br />
-                <span>평점을 남겨주세요</span><br />
-
-                <div className="mt-3" value={review.reviewRating}>
-                    {[1, 2, 3, 4, 5].map((num) => (
-                        <FaStar
-                            key={num}
-                            className={num <= rating ? "fullStar" : "emptyStar"}
-                            onClick={() => handleStarClick(num)}
-                            style={{ cursor: "pointer" }}
-                        />
-                    ))}
-                </div>
-            </div>
+        <div className="container-md">
             <div className="row mt-4">
-                <div className="col text-center">
-                    <br />
-                    <input type="checkbox" className="me-2"
-                        checked={review.reviewSpoiler === "Y"}
-                        onChange={e => {
-                            setReview({
-                                ...review,
-                                reviewSpoiler: e.target.checked ? "Y" : "N"
-                            })
-                        }} />
-                    <span>감상평에 스포일러가 포함되어있나요?</span><br />
+                <div className="col">
+                    <span className="my_review">내가 쓴 리뷰</span>
+
+                    <div className="row border mt-4 rounded-4">
+                        <div className="col">
+
+                            <div className="row mt-5">
+                                <div className="col text-center">
+                                    <span className="how">이 작품 어떠셨나요?</span><br />
+
+                                    <div className="mt-3" value={review.reviewRating}>
+                                        {[1, 2, 3, 4, 5].map((num) => (
+                                            <FaStar
+                                                key={num}
+                                                className={num <= rating ? "fullStar" : "emptyStar"}
+                                                onClick={() => handleStarClick(num)}
+                                                style={{ cursor: "pointer" }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="row mt-2">
+                                    <div className="col text-center">
+                                        <br />
+                                        <div className="form-check form-switch d-inline-block mx-auto">
+                                            <input type="checkbox" className="me-2 form-check-input spo"
+                                                role="switch"
+                                                id="reviewSpoilerCheck"
+                                                checked={review.reviewSpoiler === "Y"}
+                                                onChange={e => {
+                                                    setReview({
+                                                        ...review,
+                                                        reviewSpoiler: e.target.checked ? "Y" : "N"
+                                                    })
+                                                }} />
+                                            <label className="form-check-label spo" for="reviewSpoilerCheck">스포일러 포함</label><br />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row mt-2">
+                                <div className="col">
+                                    <br />
+                                    <textarea className={`col-6 form-control mx-auto textAA ${reviewClass}`}
+                                        placeholder="영화와 상관 없는 내용은 약관에 의해 제재를 받을 수 있습니다"
+                                        value={review.reviewText}
+                                        onChange={e => {
+                                            setReview({
+                                                ...review,
+                                                reviewText: e.target.value
+                                            })
+                                        }}
+                                        onBlur={() => {
+                                            setReviewClass(
+                                                reviewClassInValid ? "is-invalid" : ""
+                                            );
+                                        }}
+                                    />
+                                    <div className="invalid-feedback">무의미한 자음/모음의 연속입력은 불가능합니다</div>
+                                </div>
+                            </div>
+                            <button className="mt-5 btn btn-success col-4 mx-auto mb-4 d-block"
+                                disabled={!reviewValid || invalidRating} onClick={sendData}>리뷰 작성하기</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div className="row mt-3 text-center">
-                <br />
-                <textarea className={`col-8 mx-auto d-block ${reviewClass}`}
-                    placeholder="영화와 상관 없는 내용은 약관에 의해 제재를 받을 수 있습니다"
-                    value={review.reviewText}
-                    onChange={e => {
-                        setReview({
-                            ...review,
-                            reviewText: e.target.value
-                        })
-                    }}
-                    onBlur={() => {
-                        setReviewClass(
-                            reviewClassInValid ? "is-invalid" : ""
-                        );
-                    }}
-                />
-                <div className="invalid-feedback">무의미한 자음/모음의 연속입력은 불가능합니다</div>
+
+            <div className="row mt-4">
+                <div className="col">
+                    <span className="my_review">모든 리뷰</span><br />
+                    <button type="button" className="cate_btn btn btn-primary me-2 mt-3">전체</button>
+                    <button type="button" className="cate_btn btn btn-primary mt-3">
+                        
+                        신뢰회원
+                    </button>
+                </div>
+            
             </div>
-            <button className="mt-4 btn btn-success d-grid gap-2 col-8 mx-auto"
-                disabled={!reviewValid || invalidRating} onClick={sendData}>등록하기</button>
         </div>
+
+
+
+
     </>)
 }

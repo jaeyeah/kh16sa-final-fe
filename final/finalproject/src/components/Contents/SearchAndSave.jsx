@@ -2,6 +2,7 @@ import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import "./SearchAndSave.css";
 import { Outlet, useNavigate } from "react-router-dom";
+import "./contents.css";
 
 
 
@@ -90,7 +91,10 @@ export default function SearchAndSave() {
             //응답 데이터 상세정보 업데이트
             setContentsDetail(response.data);
             setIsSelect(true);
-            navigate("review");
+
+            //선택한 영화에 따른 리뷰화면
+            const newContentsId = response.data.contentsId;
+            navigate(`review/${newContentsId}`)
         }
         catch (error) {
             console.error("저장 API 오류 : ", error);
@@ -138,6 +142,7 @@ export default function SearchAndSave() {
     //render
     return (<>
         {/* 검색/검색 결과 영역 (isSelect가 false 일 때만 표시) */}
+        <div className="container">
         {!isSelect && (
             <div>
 
@@ -236,12 +241,13 @@ export default function SearchAndSave() {
                     </div>
                 </div>
             )}
-        </div>
 
-        {/* 리뷰 중첩라우팅 적용 */}
-        <div className="row mt-4">
-            <div className="col">
-                <Outlet/>
+            {/* 리뷰 중첩라우팅 적용 */}
+            <div className="row mt-4">
+                <div className="col">
+                    <Outlet/>
+                </div>
+            </div>
             </div>
         </div>
     </>)

@@ -10,6 +10,12 @@ import ReviewSearch from "./review/ReviewSearch";
 import GenreList from "./Contents/GenreList";
 import ContentsListByGenre from "./Contents/ContentsListByGenre";
 import MemberMypage from "./member/MemberMypage";
+import MemberMyquiz from "./member/MemberMyquiz";
+import MemberMymovie from "./member/MemberMymovie";
+import MemberMyinfo from "./member/MemberMyinfo";
+import MemberMyreview from "./member/MemberMyreview";
+import MemberEdit from "./member/MemberEdit";
+import MemberEditPassword from "./member/MemberEditPassword";
 
 export default function Content() {
     return (<>
@@ -26,16 +32,27 @@ export default function Content() {
                     
                     {/* contents */}
                     <Route path="/contents/test" element={<Test/>}></Route>
-                    <Route path="/contents/test2" element={<SearchAndSave/>}></Route>
+                    <Route path="/contents/test2" element={<SearchAndSave/>}>
+                        <Route path="/contents/test2/review/:contentsId" element={<ReviewWrite/>}></Route>
+                    </Route>
+                    <Route path="/contents/test2" element={<SearchAndSave/>}>
+                      <Route path="/contents/test2/review/:contentsId" element={<ReviewWrite/>}></Route>
+                    </Route>
                     <Route path="/contents/genreList" element={<GenreList/>}></Route>
                     <Route path="/contents/genreList" element={<ContentsListByGenre/>}></Route>
-                    <Route path="/contents/test2/review" element={<ReviewWrite/>}></Route>
 
                     {/* 회원 페이지 */}
                     <Route path="/member/join" element={<MemberJoin/>}></Route>
                     <Route path="/member/joinFinish" element={<MemberJoinFinish/>}></Route>
                     <Route path="/member/login" element={<MemberLogin/>}></Route>
-                    <Route path="/member/mypage" element={<MemberMypage/>}></Route>
+                    <Route path="/member/edit/:loginId" element={<MemberEdit/>}></Route>
+                    <Route path="/member/password/:loginId" element={<MemberEditPassword/>}></Route>
+                    <Route path="/member/mypage/" element={<MemberMypage/>}>
+                        <Route path="/member/mypage/myinfo/:loginId" element={<MemberMyinfo/>}> </Route>
+                        <Route path="/member/mypage/myquiz/:loginId" element={<MemberMyquiz/>}> </Route>
+                        <Route path="/member/mypage/mymovie/:loginId" element={<MemberMymovie/>}> </Route>
+                        <Route path="/member/mypage/myreview/:loginId" element={<MemberMyreview/>}> </Route>
+                    </Route>
 
                     {/* 리뷰 페이지 */} 
                     <Route path="/review/insert" element={<ReviewWrite/>}></Route>

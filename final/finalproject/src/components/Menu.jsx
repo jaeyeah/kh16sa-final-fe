@@ -114,9 +114,11 @@ return(<>
                 {/* 우측 메뉴 (화면이 좁아지면 합쳐짐) */}
                     {isLogin === true ? (<>  {/* 로그인 시 나와야 하는 화면 */}
                     <li className="nav-item" onClick={closeMenu}>
-                        <Link className="nav-link" to="/member/mypage">
+                        <Link className="nav-link" to={`/member/mypage/myinfo/${loginId}`}>
                             <span>마이페이지</span>
                         </Link>
+                    </li>
+                    <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link" onClick={logout}>
                             <span>로그아웃</span>
                         </Link>
