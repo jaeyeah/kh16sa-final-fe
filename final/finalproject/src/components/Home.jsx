@@ -3,6 +3,24 @@
 
 
 export default function Home() {
+
+    //장르 리스트 state
+    const [genre, setGenre] = useState([]);
+
+    //effect
+    useEffect(()=>{
+        loadData();
+    }, []);
+
+    //callback
+    const loadData = useCallback(async ()=>{
+        const {data} = await axios.get("/api/tmdb/genre");
+        const genreList = data.map(genre=>({
+            ...genre,
+        }));
+        setGenre(genreList);
+    }, []);
+
     return(<>
         <div className="row mt-4">
             <div className="col">
