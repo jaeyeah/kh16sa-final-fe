@@ -155,8 +155,10 @@ export default function ReviewWriter() {
                                     <div className="invalid-feedback">무의미한 자음/모음의 연속입력은 불가능합니다</div>
                                 </div>
                             </div>
-                            <button className="mt-5 btn btn-success col-4 mx-auto mb-4 d-block"
+                            <div className="success">
+                                <button className="mt-5 btn btn-success col-4 mx-auto mb-4 d-block"
                                 disabled={!reviewValid || invalidRating} onClick={sendData}>리뷰 작성하기</button>
+                            </div>
                         </div>
                     </div>
                 </div>

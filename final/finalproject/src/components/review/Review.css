@@ -28,7 +28,7 @@
 .spo {
     font-size: 18px;
 }
-.btn-success, .d-grid {
+.success > .btn-success {
     padding: 1em !important;
     font-size: 20px !important;
     font-weight: bold !important;
@@ -36,7 +36,7 @@
     background-color: rgb(15, 126, 0) !important;
     border-color: rgb(15, 126, 0) !important;
 }
-.btn-success:active {
+.success > .btn-success:active {
     filter: brightness(85%) !important;
     transform: translateY(1px);
 }
