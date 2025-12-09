@@ -69,10 +69,10 @@ return(<>
     <nav className="navbar navbar-expand-lg  text-light cinema-navbar fixed-top" data-be-theme="dark"
         ref={menuRef}>
         <div className="container-fluid">
-
+            
             {/* 브랜딩 텍스트(이미지) : 메뉴 가장 좌측에 나오는 로고 또는 텍스트 */}
             <Link className="navbar-brand cinema-brand text-light" to="/" onClick={closeMenu}>로고 위치</Link>
-
+        
             {/* 토글버튼 */}
             <button className="navbar-toggler " type="button" 
                     aria-controls="menu-body"  aria-expanded="false" aria-label="Toggle navigation"

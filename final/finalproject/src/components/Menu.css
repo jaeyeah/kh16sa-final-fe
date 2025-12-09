@@ -3,7 +3,7 @@
 .dropdown-menu
  {
   background: #3d3d3d !important;
-  border-bottom: 1px solid rgba(255, 200, 100, 0.15);
+  /* border-bottom: 1px solid rgba(255, 200, 100, 0.15); */
   padding: 0.7rem 1rem;
   transition: all 0.3s ease;
 }

@@ -48,8 +48,9 @@
 }
 
 .search.btn.btn-success {
-  background-color: #00b894 !important;
-  border-color: transparent;
+  background-color: #ffffff !important;
+  border-color: #ffffff;
+  color: #7ed6df;
 }
 
 /* 버튼 스타일 */ 
