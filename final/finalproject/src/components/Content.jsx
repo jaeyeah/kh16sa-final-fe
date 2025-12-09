@@ -45,8 +45,9 @@ export default function Content() {
                         <Route path="/contents/test2/review/:contentsId" element={<ReviewWrite/>}></Route>
                     </Route>
                     <Route path="/contents/searchTitle" element={<SearchContents/>}></Route>
-                    <Route path="/contents/genreList" element={<GenreList/>}></Route>
-                    <Route path="/contents/listByGenre/:genreName" element={<ContentsListByGenre/>}></Route>
+                    <Route path="/contents/genreList" element={<GenreList/>}>
+                        <Route path="/contents/genreList/listByGenre/:genreName" element={<ContentsListByGenre/>}></Route>
+                    </Route>
                     <Route path="/contents/detail/:contentsId" element={<ContentsDetail/>}></Route>
 
                     {/* 회원 페이지 */}

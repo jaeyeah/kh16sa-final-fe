@@ -9,14 +9,18 @@ export default function ContentsListByGenre() {
     //경로변수 
     const { genreName } = useParams();//장르 id
 
+
     //state
     //contents 목록
     const [contentsList, setContentsList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
     //무한스크롤 페이지네이션
     const [page, setPage] = useState(1);//페이지번호
     const [info, setInfo] = useState({
         page: 0, size: 0, begin: 0, end: 0, count: 0, last: true
     });
+
 
     const loading = useRef(false);
 
@@ -54,24 +58,24 @@ export default function ContentsListByGenre() {
     const loadData = useCallback(async () => {
         //로딩 시작(flag on)
         loading.current = true;
-        
+
         try {
-            const response = await axios.get(`/api/tmdb/contents/list/${genreName}`, {params: { page: page }});
-            if(page === 1) {//첫페이지면
-            setContentsList(response.data);
+            const response = await axios.get(`/api/tmdb/contents/list/${genreName}`, { params: { page: page } });
+            if (page === 1) {//첫페이지면
+                setContentsList(response.data);
 
-        }
-        else {//첫페이지가 아니면
-            setContentsList(prev=>([...prev, ...response.data]));//연관항목 없이도 가능한 코드
-        }
-        //페이지 번호와 목록 데이터를 제외한 나머지를 info에 저장
-        
-        //response.data에서 list 빼고 others라고 부르겠다
-        const {list, ...others} = response.data;
-        setInfo(others);
+            }
+            else {//첫페이지가 아니면
+                setContentsList(prev => ([...prev, ...response.data]));//연관항목 없이도 가능한 코드
+            }
+            //페이지 번호와 목록 데이터를 제외한 나머지를 info에 저장
 
-        //로딩 종료(flag off)
-        loading.current = false;
+            //response.data에서 list 빼고 others라고 부르겠다
+            const { list, ...others } = response.data;
+            setInfo(others);
+
+            //로딩 종료(flag off)
+            loading.current = false;
 
         } catch (error) {
             console.error("데이터 로드 실패:", error);
@@ -85,10 +89,10 @@ export default function ContentsListByGenre() {
     const getScrollPercent = useCallback(() => {
         // 현재 스크롤 Y 위치
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        
+
         // 문서 전체의 스크롤 가능한 총 높이
         const scrollHeight = document.documentElement.scrollHeight;
-        
+
         // 브라우저 뷰포트(창)의 높이
         const clientHeight = document.documentElement.clientHeight;
 
@@ -105,10 +109,10 @@ export default function ContentsListByGenre() {
         if (scrollableHeight - scrollTop < 1) {
             return 100;
         }
-        
+
         // (현재 스크롤 위치 / 스크롤 가능한 최대 높이) * 100
         const percentage = (scrollTop / scrollableHeight) * 100;
-        
+
         return percentage;
     }, []); // 의존성 배열이 비어있으므로 컴포넌트 마운트 시 한 번만 생성됩니다.
 
@@ -126,54 +130,63 @@ export default function ContentsListByGenre() {
 
 
     return (<>
-        <div className="container m-4">
+        {loading.current ? (
             <div className="row mt-4">
                 <div className="col">
-                    <h3 className="text-muted">🎬 '{genreName}' 부문 컨텐츠 </h3>
+                    <span>로딩중...🏃‍♀️</span>
                 </div>
             </div>
-            <div className="row mt-4">
-                {contentsList.length === 0 ? (
+        ) : (
+            <div className="container m-4">
+                <div className="row mt-4">
                     <div className="col">
-                        <p>해당 장르의 콘텐츠가 없습니다.</p>
+                        <h3 className="text-muted">🎬 '{genreName}' 부문 컨텐츠 </h3>
                     </div>
-                ) : (
-                    contentsList.map((content) => (
-
-                        <div className="col-6 col-md-3 mb-3" key={content.contentsId}>
-                            <div className="card h-100 bg-dark text-white border-secondary">
-                                <Link className="text-decoration-none link-body-emphasis" to={`/contents/detail/${content.contentsId}`} >
-                                    <img
-                                        src={getPosterUrl(content.contentsPosterPath)}
-                                        className="card-img-top"
-                                        alt={content.contentsTitle}
-                                        style={{ height: "350px", objectFit: "cover" }}
-                                    />
-                                    <div className="card-body">
-                                        <h5 className="card-title text-truncate text-light">{content.contentsTitle}</h5>
-                                        <p className="card-text">
-                                            <small className="text-secondary">{getFormattedDate(content.contentsReleaseDate)}</small>
-                                            <br />
-                                            <span className="badge bg-warning text-dark me-1">
-                                                {content.contentsType}
-                                            </span>
-                                            {/* 장르 목록 표시 (collection으로 가져온 데이터) */}
-                                            {content.genreNames && content.genreNames.map((g, index) => (
-                                                <span key={index} className="badge bg-secondary me-1">
-                                                    {g}
-                                                </span>
-                                            ))}
-                                        </p>
-                                    </div>
-                                </Link>
-                            </div>
+                </div>
+                <div className="row mt-4">
+                    {contentsList.length === 0 ? (
+                        <div className="col">
+                            <p>해당 장르의 콘텐츠가 없습니다.</p>
                         </div>
+                    ) : (
+                        contentsList.map((content) => (
 
-                    ))
-                )}
+                            <div className="col-6 col-md-3 mb-3" key={content.contentsId}>
+                                <div className="card h-100 bg-dark text-white border-secondary">
+                                    <Link className="text-decoration-none link-body-emphasis" to={`/contents/detail/${content.contentsId}`} >
+                                        <img
+                                            src={getPosterUrl(content.contentsPosterPath)}
+                                            className="card-img-top"
+                                            alt={content.contentsTitle}
+                                            style={{ height: "350px", objectFit: "cover" }}
+                                        />
+                                        <div className="card-body">
+                                            <h5 className="card-title text-truncate text-light">{content.contentsTitle}</h5>
+                                            <p className="card-text">
+                                                <small className="text-secondary">{getFormattedDate(content.contentsReleaseDate)}</small>
+                                                <br />
+                                                <span className="badge bg-warning text-dark me-1">
+                                                    {content.contentsType}
+                                                </span>
+                                                {/* 장르 목록 표시 (collection으로 가져온 데이터) */}
+                                                {content.genreNames && content.genreNames.map((g, index) => (
+                                                    <span key={index} className="badge bg-secondary me-1">
+                                                        {g}
+                                                    </span>
+                                                ))}
+                                            </p>
+                                        </div>
+                                    </Link>
+                                </div>
+                            </div>
+
+                        ))
+                    )}
+                </div>
+
             </div>
 
-        </div>
+        )}
 
 
     </>)

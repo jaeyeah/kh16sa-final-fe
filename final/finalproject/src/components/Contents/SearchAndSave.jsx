@@ -206,11 +206,11 @@ export default function SearchAndSave() {
                     <div className="row mt-4 p-4 shadow rounded">
                         {/* 이미지 영역 */}
                         <div className="col-4 col-sm-3">
-                            <img src={getPosterUrl(contentsDetail.contentsPosterPath)} className="w-75 h-75"
-                                alt={`${contentsDetail.contentsTitle} 포스터`} />
+                            <img src={getPosterUrl(contentsDetail.contentsPosterPath)} style={{ height: "350px", objectFit: "cover", borderRadius: "4px", }}
+                                alt={`${contentsDetail.contentsTitle} 포스터`} className="text-center w-100"/>
                         </div>
                         {/* 텍스트 영역 */}
-                        <div className="col-7 col-sm-8">
+                        <div className="col-7 col-sm-9">
                             <div>
                                 <h3>{contentsDetail.contentsTitle}</h3>
                             </div>
