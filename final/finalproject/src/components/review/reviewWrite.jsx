@@ -4,11 +4,21 @@ import { toast } from "react-toastify";
 import { FaStar } from "react-icons/fa";
 import "./review.css";
 import { useParams } from "react-router-dom";
+import { FaShieldAlt } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
+import { FaShare } from "react-icons/fa6";
 
 
 export default function ReviewWriter() {
 
     const { contentsId } = useParams();
+
+    // //effect
+    // useEffect(()=>{
+    //     axios({
+    //         url:""
+    //     })
+    // })
 
     //state
     const [review, setReview] = useState({
@@ -117,7 +127,7 @@ export default function ReviewWriter() {
                                                         reviewSpoiler: e.target.checked ? "Y" : "N"
                                                     })
                                                 }} />
-                                            <label className="form-check-label spo" for="reviewSpoilerCheck">스포일러 포함</label><br />
+                                            <label className="form-check-label spo" htmlFor="reviewSpoilerCheck">스포일러 포함</label><br />
                                         </div>
                                     </div>
                                 </div>
@@ -144,8 +154,10 @@ export default function ReviewWriter() {
                                     <div className="invalid-feedback">무의미한 자음/모음의 연속입력은 불가능합니다</div>
                                 </div>
                             </div>
-                            <button className="mt-5 btn btn-success col-4 mx-auto mb-4 d-block"
+                            <div className="success">
+                                <button className="mt-5 btn btn-success col-4 mx-auto mb-4 d-block"
                                 disabled={!reviewValid || invalidRating} onClick={sendData}>리뷰 작성하기</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -156,12 +168,35 @@ export default function ReviewWriter() {
                     <span className="my_review">모든 리뷰</span><br />
                     <button type="button" className="cate_btn btn btn-primary me-2 mt-3">전체</button>
                     <button type="button" className="cate_btn btn btn-primary mt-3">
-                        
-                        신뢰회원
+                        <FaShieldAlt className="me-2" />신뢰회원
                     </button>
                 </div>
-            
             </div>
+
+            <div className="row">
+                <div className="col">
+
+                    <div className="row mt-4 border user-review">
+                        <div className="col-12">
+                            회원사진 닉네임
+                        </div>
+                        <div className="col-12 ms-5">몇일전</div>
+                        <div className="col-12">내용</div>
+                        <div className="col">
+                            <button className="mini-button me-4"><FaHeart />
+                                <span className="ms-2">좋아요 수</span>
+                            </button>
+                            <button className="mini-button"><FaShare />
+                                <span className="ms-2">공유하기</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
         </div>
 
 

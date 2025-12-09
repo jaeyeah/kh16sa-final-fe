@@ -15,11 +15,7 @@
     background-color: #f1f2f6;
 }
 
-.my_review {
-    font-weight: bold;
-    font-size: 20px;
-}
-.my_review > .border {
+.border {
     border-color: black;
 }
 .how {
@@ -49,18 +45,35 @@
     border-color: #ff7675 !important;
 }
 
+input:focus::placeholder,
+textarea:focus::placeholder {
+  color: transparent;
+}
+
 .textAA {
-    height: 250px;
-    font-size: 20px;
+    height: 200px;
+    font-size: 20px !important;
     border-radius: 0.8em;
     resize: none !important;
     padding: 1em !important;
+    margin-left: 0.5em !important;
 }
 .textAA:focus {
-    box-shadow: 0 0 0 0.15rem rgb(115, 179, 106) !important;
-    border: none;
+    box-shadow: 0 0 0 0.15rem #198754 !important;
+    border: none !important;
 } 
+
 .cate_btn {
     border-radius: 1.5em !important;
 }
+
+.mini-button {
+    border-color: transparent;
+    background-color: transparent;
+}
+.user-review {
+    padding: 10px;
+}
+
+
 
