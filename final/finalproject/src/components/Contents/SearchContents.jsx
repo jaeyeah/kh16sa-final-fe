@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Button } from "bootstrap";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FaQuestion } from "react-icons/fa";
+import { FaQuestion, FaSearch } from "react-icons/fa";
 import { FaBookmark, FaHeart, FaPencil } from "react-icons/fa6";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { Link, useNavigate } from "react-router-dom";
@@ -150,16 +150,19 @@ export default function SearchContents() {
 
                     {/* 검색영역 */}
                     <div className="row mt-4">
-                        <div className="col d-flex flex-wrap text-nowrap mt-2">
-                            {/* 검색창 */}
-                            <input type="text" className="form-control w-auto" value={query}
-                                placeholder="제목 입력" onChange={changeStrValue}
-                                onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }} />
-                            {/* 검색 버튼 */}
-                            <button className="search btn btn-success ms-2" onClick={handleSearch}
-                                disabled={isLoading || query.trim().length === 0}>
-                                검색
-                            </button>
+                        <div className="col-5 col-md-5 d-flex flex-wrap text-nowrap mt-2">
+                            <div className="input-group">
+
+                                {/* 검색창 */}  
+                                <input type="text" className="form-control" value={query}
+                                    placeholder="제목을 입력하고 컨텐츠를 찾아보세요" onChange={changeStrValue}
+                                    onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }} />
+                                {/* 검색 버튼 */}
+                                <button className="search btn btn-success" onClick={handleSearch}
+                                    >
+                                    <FaSearch className="fs-4"/>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -186,8 +189,8 @@ export default function SearchContents() {
                                                 className="me-3" />
                                             {/* 정보 */}
                                             <div style={{ flex: 1, minWidth: 0 }}> {/* minWidth: 0은 텍스트 말줄임표 필수 속성 */}
-                                                <div className="text-muted fw-bold text-truncate">{result.title}</div>
-                                                <div className="text-muted small">
+                                                <div className="text-light fw-bold text-truncate">{result.title}</div>
+                                                <div className="text-light small">
                                                     {result.type} • {result.releaseDate}
                                                 </div>
                                             </div>

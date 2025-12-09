@@ -178,8 +178,8 @@ export default function SearchAndSave() {
                                                 className="me-3" />
                                             {/* 정보 */}
                                             <div style={{ flex: 1, minWidth: 0 }}> {/* minWidth: 0은 텍스트 말줄임표 필수 속성 */}
-                                                <div className="text-muted fw-bold text-truncate">{result.title}</div>
-                                                <div className="text-muted small">
+                                                <div className="text-light fw-bold text-truncate">{result.title}</div>
+                                                <div className="text-light small">
                                                     {result.type} • {result.releaseDate}
                                                 </div>
                                             </div>

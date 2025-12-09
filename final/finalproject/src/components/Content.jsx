@@ -23,6 +23,7 @@ import MemberMyreview from "./member/MemberMyreview";
 import MemberEdit from "./member/MemberEdit";
 import MemberEditPassword from "./member/MemberEditPassword";
 import ReviewSearch from "./review/ReviewUpdate";
+import SearchResult from "./Contents/SearchResult";
 
 
 
@@ -49,6 +50,7 @@ export default function Content() {
                         <Route path="/contents/genreList/listByGenre/:genreName" element={<ContentsListByGenre/>}></Route>
                     </Route>
                     <Route path="/contents/detail/:contentsId" element={<ContentsDetail/>}></Route>
+                    <Route path="/contents/searchResult/:query" element={<SearchResult/>}></Route>
 
                     {/* 회원 페이지 */}
                     <Route path="/member/join" element={<MemberJoin/>}></Route>
