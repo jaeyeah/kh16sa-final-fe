@@ -122,7 +122,7 @@ return(<>
                     {isLogin === true ? (<>  {/* 로그인 시 나와야 하는 화면 */}
                     <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link" to={`/member/mypage/myinfo/${loginId}`}>
-                            <span>마이페이지</span>
+                            <span>MY</span>
                         </Link>
                     </li>
                     <li className="nav-item" onClick={closeMenu}>
