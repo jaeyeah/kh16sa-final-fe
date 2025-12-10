@@ -48,7 +48,7 @@ export default function ManuForSearch() {
                 {/* 검색영역 */}
                 <div className="row justify-content-center">
                     <div className="col-12 col-md-5 d-flex text-nowrap">
-                        <div className="input-group p-3" style={{backgroundColor:"#2C3A47"}}>
+                        <div className="mt-3 input-group search-wrapper">
                             {/* 검색창 */}
                             <input type="text" className="form-control" value={query}
                                 placeholder="제목" onChange={e => setQuery(e.target.value)}
