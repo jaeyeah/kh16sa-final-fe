@@ -5,6 +5,9 @@ import { FaQuestion } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { FcMoneyTransfer } from "react-icons/fc";
 import "./SearchAndSave.css"
+import { useAtom } from "jotai";
+import { loginIdState } from "../../utils/jotai";
+import { toast } from "react-toastify";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
@@ -18,8 +21,10 @@ const INITIAL_DETAIL = {
 
 export default function ContentsDetail() {
 
-    const { contentsId } = useParams();
+    //통합 state
+    const [loginId, setLoginId] = useAtom(loginIdState);
 
+    const {contentsId} = useParams();
     const navigate = useNavigate();
 
     //영화 정보 state
@@ -65,6 +70,29 @@ export default function ContentsDetail() {
         }
         setIsLoading(false);
     }, []);
+
+        
+    // 북마크 함수
+    const addWatchlist = useCallback(async(e)=>{
+        if(loginId ==="") {
+            toast.error("로그인이 필요한 기능입니다");
+            return;
+        }
+    const watchlistData = {
+        watchlistContent: contentsId,
+        watchlistMember: loginId,
+        watchlistType: "찜",
+    };
+     try{
+        await axios.post("/watchlist/",watchlistData);
+        console.log("성공");
+        toast.success("찜목록에 추가되었습니다");
+     }
+     catch(err){
+        console.error(err);
+        toast.error("찜목록 추가 실패");
+     }
+    },[contentsId, loginId]);
 
     //[포스터 이미지 url 생성 함수]
     const getPosterUrl = useCallback((path) => {
