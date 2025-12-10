@@ -197,10 +197,10 @@ export default function WriteReview() {
                     <span>{statusMessage}</span>
                 )}
 
-                <div className="row mt-4 p-4 shadow bg-light rounded">
+                <div className="row mt-4 p-4 shadow review-wrapper rounded">
                     {/* 이미지 영역 */}
                     <div className="col-4 col-sm-4">
-                        <img src={getPosterUrl(contentsDetail.contentsPosterPath)} style={{ height: "350px", objectFit: "cover", borderRadius: "4px", }}
+                        <img src={getPosterUrl(contentsDetail.contentsPosterPath)} style={{ height: "550px", objectFit: "cover", borderRadius: "4px", }}
                             alt={`${contentsDetail.contentsTitle} 포스터`} className="text-center w-100" />
                     </div>
                     {/* 텍스트 영역 */}
@@ -208,21 +208,21 @@ export default function WriteReview() {
                         <div>
                             <h3>{contentsDetail.contentsTitle}</h3>
                         </div>
-                        <div className="text-muted">
+                        <div className="text-light">
                             <span>{contentsDetail.contentsType} / {contentsDetail.contentsRuntime} 분</span>
                         </div>
-                        <div className="text-muted">
+                        <div className="text-light">
                             장르 : {renderGenres}
                         </div>
-                        <div className="text-muted">
+                        <div className="text-light">
                             방영일 : {contentsDetail.contentsReleaseDate}
                         </div>
-                        <div className="text-muted">
+                        <div className="text-light">
                             평점 : {contentsDetail.contentsVoteAverage.toFixed(1)} / 10
                         </div>
                         <div className="mt-3">
                             <h5>줄거리</h5>
-                            <span className="text-muted break-word">
+                            <span className="text-light break-word">
                                 {contentsDetail.contentsOverview}
                             </span>
                         </div>

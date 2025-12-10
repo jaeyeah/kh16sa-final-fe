@@ -1,13 +1,10 @@
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { FaBookmark, FaChevronUp, FaHeart, FaPencil } from "react-icons/fa6";
 import { FaQuestion } from "react-icons/fa";
 import { useNavigate, useParams, Outlet, useLocation } from "react-router-dom";
 
-import { FaBookmark, FaCheck, FaHeart, FaPencil, FaStar } from "react-icons/fa6";
-import { FaQuestion } from "react-icons/fa";
-import { useNavigate, useParams } from "react-router-dom";
+import { FaBookmark, FaChevronUp, FaHeart, FaPencil, FaStar } from "react-icons/fa6";
 import { FcMoneyTransfer } from "react-icons/fc";
 
 import "./SearchAndSave.css"
@@ -30,7 +27,7 @@ export default function ContentsDetail() {
     //통합 state
     const [loginId, setLoginId] = useAtom(loginIdState);
 
-    const {contentsId} = useParams();
+    const { contentsId } = useParams();
     const navigate = useNavigate();
 
 
@@ -66,11 +63,11 @@ export default function ContentsDetail() {
         }
     }, [isLoading]);
 
-    useEffect(()=>{
+    useEffect(() => {
         checkWatchlist();
-    },[loginId, contentsId]);
+    }, [loginId, contentsId]);
 
-    
+
     //callback
     const loadData = useCallback(async () => {
         setIsLoading(true);
@@ -95,16 +92,16 @@ export default function ContentsDetail() {
     }, []);
 
     // 북마크 확인(check) 함수
-    const checkWatchlist = useCallback(async()=>{
-        if(loginId ==="")  return;
+    const checkWatchlist = useCallback(async () => {
+        if (loginId === "") return;
         const watchlistCheckData = {
             watchlistContent: contentsId,
             watchlistMember: loginId,
         };
         console.log(watchlistCheckData);
-        try{
-            const {data} = await axios.post("/watchlist/check", watchlistCheckData);
-            if(data.hasWatchlist===true){
+        try {
+            const { data } = await axios.post("/watchlist/check", watchlistCheckData);
+            if (data.hasWatchlist === true) {
                 console.log("북마크 등록되어있음");
                 setHasWatchList(true);
                 // 기타 추가 기능 구현
@@ -113,54 +110,54 @@ export default function ContentsDetail() {
                 setHasWatchList(false);
             }
         }
-        catch(err){
+        catch (err) {
             console.log("북마크 확인 error");
             console.error(err);
         }
     }, [contentsId, loginId]);
 
-        
+
     // 북마크 등록/삭제 함수
-    const changeWatchlist = useCallback(async(e)=>{
-        if(loginId ==="") {
+    const changeWatchlist = useCallback(async (e) => {
+        if (loginId === "") {
             toast.error("로그인이 필요한 기능입니다");
             return;
         }
-    const watchlistData = {
-        watchlistContent: contentsId,
-        watchlistMember: loginId,
-        watchlistType: "찜",
-    };
+        const watchlistData = {
+            watchlistContent: contentsId,
+            watchlistMember: loginId,
+            watchlistType: "찜",
+        };
 
-    //state 먼저변경
-    const newHasWatchlist = !hasWatchlist;
-    setHasWatchList(newHasWatchlist);
+        //state 먼저변경
+        const newHasWatchlist = !hasWatchlist;
+        setHasWatchList(newHasWatchlist);
 
-    if(hasWatchlist === true){ // 이미 북마크 등록되어있다면
-        try{
-            await axios.delete(`/watchlist/${contentsId}/${loginId}`);
-            console.log("삭제성공");
-            toast.success("찜목록이 삭제되었습니다");
+        if (hasWatchlist === true) { // 이미 북마크 등록되어있다면
+            try {
+                await axios.delete(`/watchlist/${contentsId}/${loginId}`);
+                console.log("삭제성공");
+                toast.success("찜목록이 삭제되었습니다");
+            }
+            catch (err) {
+                console.error(err);
+                toast.error("찜목록 삭제 실패");
+                setHasWatchList(!newHasWatchlist);
+            }
         }
-        catch(err){
-            console.error(err);
-            toast.error("찜목록 삭제 실패");
-            setHasWatchList(!newHasWatchlist);
+        else { // 북마크가 되어있지 않다면
+            try {
+                await axios.post("/watchlist/", watchlistData);
+                console.log("등록성공");
+                toast.success("찜목록에 등록되었습니다");
+            }
+            catch (err) {
+                console.error(err);
+                toast.error("찜목록 등록 실패");
+                setHasWatchList(!newHasWatchlist);
+            }
         }
-    }
-    else{ // 북마크가 되어있지 않다면
-        try{
-            await axios.post("/watchlist/",watchlistData);
-            console.log("등록성공");
-            toast.success("찜목록에 등록되었습니다");
-        }
-        catch(err){
-            console.error(err);
-            toast.error("찜목록 등록 실패");
-            setHasWatchList(!newHasWatchlist);
-        }
-    }
-    },[contentsId, loginId, hasWatchlist]);
+    }, [contentsId, loginId, hasWatchlist]);
 
     //[포스터 이미지 url 생성 함수]
     const getPosterUrl = useCallback((path) => {
@@ -173,7 +170,7 @@ export default function ContentsDetail() {
             navigate(`/review/write/${contentsDetail.contentsId}`);
         }
     }, [navigate, isLoading, contentsDetail.contentsId]);
-    
+
     //퀴즈 버튼
     const goToQuiz = () => {
         if (isQuizOpen) {
@@ -208,158 +205,129 @@ export default function ContentsDetail() {
     const formattedDate = useMemo(() => {
         const formattedDate = contentsDetail.contentsReleaseDate.split(" ")[0];
         return formattedDate;
-        }, [contentsDetail.contentsReleaseDate]);
+    }, [contentsDetail.contentsReleaseDate]);
 
     const getFormattedDate = useCallback((text) => {
         return text.substr(0, 10);
     }, []);
 
     //render
-    return (<>
-        <div className="container">
-            {isLoading && (
-                <span>{statusMessage}</span>
-            )}
-            {/* 상세정보 카드 */}
-            {!isLoading && contentsDetail.contentsId && (
-                <div className="row p-3 shadow rounded dark-bg-wrapper">
-                    <div className="text-end mt-4"  onClick={changeWatchlist}>
-                        {hasWatchlist === false ? (
-                            <span className="badge bg-danger px-3 btn" style={{cursor: "pointer"}}><h5><FaBookmark className="text-light"/></h5></span>
-                            ) : (
-                            <span className="badge bg-danger px-3 btn" style={{cursor: "pointer"}}><h5><FaBookmark className="text-dark"/></h5></span>
-                        )}
-                           
-                     </div>
-                    {/* 이미지 영역 */}
-                    <div className="col-4 col-sm-3 p-4 black-bg-wrapper text-light rounded">
-                        <img src={getPosterUrl(contentsDetail.contentsPosterPath)} style={{ height: "350px", objectFit: "cover", borderRadius: "4px", }}
-                            alt={`${contentsDetail.contentsTitle} 포스터`} className="text-center w-100" />
-                        <div>
-                            <div className="mt-3">
-                                <span>{contentsDetail.contentsType} • {contentsDetail.contentsRuntime} 분</span>
-                            </div>
-                            <div>
-                                장르 : {renderGenres}
-                            </div>
-                            <div>
-                                방영일 : {formattedDate}
-                            </div>
-                            <div>
-                                평점 : {contentsDetail.contentsVoteAverage.toFixed(1)} / 10
-                            </div>
-                        </div>
-                    </div>
-                    {/* 텍스트 영역 */}
-                    <div className="col-7 col-sm-8 ms-4 mt-2 text-light">
+    return (
+        <>
+            <div className="container">
+                {isLoading && (
+                    <span>{statusMessage}</span>
+                )}
 
-                        <h3 className="text-light">{contentsDetail.contentsTitle}</h3>
+                {/* 상세정보 카드 */}
+                {!isLoading && contentsDetail.contentsId && (
+                    <>
+                        <div className="row p-3 shadow rounded dark-bg-wrapper">
+                            <div className="text-end mt-4" onClick={changeWatchlist}>
+                                {hasWatchlist === false ? (
+                                    <span className="badge bg-danger px-3 btn" style={{ cursor: "pointer" }}><h5><FaBookmark className="text-light" /></h5></span>
+                                ) : (
+                                    <span className="badge bg-danger px-3 btn" style={{ cursor: "pointer" }}><h5><FaBookmark className="text-dark" /></h5></span>
+                                )}
+                            </div>
 
-                        <div className="mt-4">
-                            <h5>줄거리</h5>
-                            <span className="break-word">
-                                {contentsDetail.contentsOverview}
-                            </span>
-                        </div>
-                        <div className="mt-3">
-                            <h5>감독</h5>
-                            <p>{contentsDetail.contentsDirector}</p>
-                        </div>
-                        <div className="mt-3">
-                            <h5>주연</h5>
-                            <p>{contentsDetail.contentsMainCast}</p>
-                        </div>
-                    </div>
-                    <div className="text-end mb-3">
-                        <button className="btn btn-success" onClick={writeReview}><FaPencil className="mb-1 me-1" />리뷰등록</button>
-                        <button className="btn btn-warning ms-2"><FaQuestion className="mb-1 me-1" /> 퀴즈</button>
-                    </div>
-                </div>
-                <div className="text-end mb-3">
-                    <button className="btn btn-success" onClick={writeReview}><FaPencil className="mb-1 me-1"/>리뷰등록</button>
-                    <button className="btn btn-warning ms-2" onClick={goToQuiz}>
-                        {isQuizOpen ? (
-                                <>
-                                    <FaChevronUp className="mb-1 me-1" /> 퀴즈 닫기
-                                </>
-                            ) : (
-                                <>
-                                    <FaQuestion className="mb-1 me-1" /> 퀴즈 풀기
-                                </>
-                            )}
-                    </button>
-                </div>    
-            </div>
-
-            {/* 중첩 라우팅 자리 */}
-            <div className="mt-4">
-                    <Outlet />
-                </div>
-            </> 
-
-            {/* 리뷰 목록 */}
-            {!isLoading && reviewList && (
-                <div className="mt-5">
-                    {/* <div className="row mt-5">
-                        <div className="col">
-                            <h3>리뷰</h3>
-                        </div>
-                    </div> */}
-                    {reviewList.map((review) => (
-                        <div className="row mt-4 p-3 shadow rounded dark-bg-wrapper" key={review.reviewNo}>
-                            <div className="col mt-2">
-                                <div className="d-flex justify-content-between">
-                                    <h4 className="text-light">{review.reviewWriter}{review.reviewEtime ? "  (수정됨)" : ""}</h4>
-                                    <p className="text-light">
-                                        {review.reviewEtime ?
-                                            getFormattedDate(review.reviewEtime)
-                                            :
-                                            getFormattedDate(review.reviewWtime)}
-                                    </p>
+                            {/* 이미지 영역 */}
+                            <div className="col-4 col-sm-3 p-4 black-bg-wrapper text-light rounded">
+                                <img src={getPosterUrl(contentsDetail.contentsPosterPath)} style={{ height: "350px", objectFit: "cover", borderRadius: "4px", }}
+                                    alt={`${contentsDetail.contentsTitle} 포스터`} className="text-center w-100" />
+                                <div>
+                                    <div className="mt-3">
+                                        <span>{contentsDetail.contentsType} • {contentsDetail.contentsRuntime} 분</span>
+                                    </div>
+                                    <div>장르 : {renderGenres}</div>
+                                    <div>방영일 : {formattedDate}</div>
+                                    <div>평점 : {contentsDetail.contentsVoteAverage.toFixed(1)} / 10</div>
                                 </div>
-                                <div className="mt-1">
-                                    {[1, 2, 3, 4, 5].map((num) => (
-                                        <FaStar
-                                            key={num}
-                                            style={{
-                                                color: num <= review.reviewRating ? "#ffc107" : "#444",
-                                                marginRight: "2px"
-                                            }}
-                                        />
-                                    ))}
-                                    <span className="ms-2 text-light small me-2">{review.reviewRating}점</span>
-                                    •
-                                    <span className="ms-2"><FcMoneyTransfer className="me-1" />(가격) 원</span>
-                                </div>
+                            </div>
+
+                            {/* 텍스트 영역 */}
+                            <div className="col-7 col-sm-8 ms-4 mt-2 text-light">
+                                <h3 className="text-light">{contentsDetail.contentsTitle}</h3>
                                 <div className="mt-4">
-                                    {review.reviewSpoiler === "Y" && !showSpoiler ? (
-                                        <p
-                                            onClick={toggleSpoiler}
-                                            className="text-danger"
-                                            style={{ cursor: "pointer", fontWeight: "bold" }}
-                                        >
-                                            🚨 스포일러가 포함된 리뷰입니다. (클릭하여 보기)
-                                        </p>
-                                    ) : (
-                                        <p className="break-word text-light">
-                                            {review.reviewText}
-                                        </p>
-                                    )}
+                                    <h5>줄거리</h5>
+                                    <span className="break-word">{contentsDetail.contentsOverview}</span>
                                 </div>
-                                <div className="text-end">
-                                    <span className="fs-4 me-1">👍🏻</span>
-                                    <span className="fs-5">
-                                        {review.reviewLike}
-                                    </span>
+                                <div className="mt-3">
+                                    <h5>감독</h5>
+                                    <p>{contentsDetail.contentsDirector}</p>
+                                </div>
+                                <div className="mt-3">
+                                    <h5>주연</h5>
+                                    <p>{contentsDetail.contentsMainCast}</p>
                                 </div>
                             </div>
+
+                            <div className="text-end mb-3">
+                                <button className="btn btn-success" onClick={writeReview}><FaPencil className="mb-1 me-1" />리뷰등록</button>
+                                <button className="btn btn-warning ms-2" onClick={goToQuiz}>
+                                    {isQuizOpen ? (
+                                        <><FaChevronUp className="mb-1 me-1" /> 퀴즈 닫기</>
+                                    ) : (
+                                        <><FaQuestion className="mb-1 me-1" /> 퀴즈 풀기</>
+                                    )}
+                                </button>
+                            </div>
                         </div>
-                    ))}
 
-                </div>
+                        {/* 중첩 라우팅 자리 */}
+                        <div className="mt-4">
+                            <Outlet />
+                        </div>
+                    </>
+                )}
 
-            )}
-
-        </div>
-    </>)
+                {/* 리뷰 목록 */}
+                {!isLoading && reviewList && reviewList.length > 0 && (
+                    <div className="mt-5">
+                        <div className="row mt-5">
+                            <div className="col">
+                                <h3 className="text-light">리뷰</h3>
+                            </div>
+                        </div>
+                        {reviewList.map((review) => (
+                            <div className="row mt-4 p-3 shadow rounded dark-bg-wrapper" key={review.reviewNo}>
+                                <div className="col mt-2">
+                                    <div className="d-flex justify-content-between">
+                                        <h4 className="text-light">{review.reviewWriter}{review.reviewEtime ? "  (수정됨)" : ""}</h4>
+                                        <p className="text-light">
+                                            {review.reviewEtime ? getFormattedDate(review.reviewEtime) : getFormattedDate(review.reviewWtime)}
+                                        </p>
+                                    </div>
+                                    <div className="mt-1">
+                                        {[1, 2, 3, 4, 5].map((num) => (
+                                            <FaStar
+                                                key={num}
+                                                style={{ color: num <= review.reviewRating ? "#ffc107" : "#444", marginRight: "2px" }}
+                                            />
+                                        ))}
+                                        <span className="ms-2 text-light small me-2">{review.reviewRating}점</span>
+                                        •
+                                        <span className="ms-2"><FcMoneyTransfer className="me-1" />(가격) 원</span>
+                                    </div>
+                                    <div className="mt-4">
+                                        {review.reviewSpoiler === "Y" && !showSpoiler ? (
+                                            <p onClick={toggleSpoiler} className="text-danger" style={{ cursor: "pointer", fontWeight: "bold" }}>
+                                                🚨 스포일러가 포함된 리뷰입니다. (클릭하여 보기)
+                                            </p>
+                                        ) : (
+                                            <p className="break-word text-light">{review.reviewText}</p>
+                                        )}
+                                    </div>
+                                    <div className="text-end">
+                                        <span className="fs-4 me-1">👍🏻</span>
+                                        <span className="fs-5">{review.reviewLike}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </>
+    );
 }
