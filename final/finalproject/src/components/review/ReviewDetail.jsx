@@ -38,7 +38,8 @@ export default function ReviewDetail() {
         reviewRealiability: 0,
         reviewPrice: "",
         reviewWtime: "",
-        reviewEtime: ""
+        reviewEtime: "",
+        reviewNickname: ""
     });
 
     const [reviewClass, setReviewClass] = useState("");
@@ -95,7 +96,8 @@ export default function ReviewDetail() {
                         reviewRealiability: data.reviewRealiability,
                         reviewPrice: data.reviewPrice,
                         reviewWtime: data.reviewWtime,
-                        reviewEtime: data.reviewEtime
+                        reviewEtime: data.reviewEtime,
+                        reviewNickname: data.reviewNickname
                     });
                     setRating(data.reviewRating);
                     setLikeCount(data.reviewLike);

@@ -122,7 +122,6 @@ export default function ContentsDetail() {
             watchlistContent: contentsId,
             watchlistMember: loginId,
         };
-        console.log(watchlistCheckData);
         try {
             const { data } = await axios.post("/watchlist/check", watchlistCheckData);
             if (data.hasWatchlist === true) {
@@ -235,7 +234,7 @@ export default function ContentsDetail() {
     }, [myReview]);
 
     //나의 리뷰 가격 콤마
-    const myReviewPrice = useMemo(() => {   
+    const myReviewPrice = useMemo(() => {
         return myReview?.reviewPrice?.toLocaleString('ko-KR') ?? "";
     }, [myReview]);
 
@@ -291,8 +290,9 @@ export default function ContentsDetail() {
             ? review.reviewEtime.replace('T', ' ').substring(0, 16)
             : review.reviewWtime.replace('T', ' ').substring(0, 16);
 
+
         // 가격 포맷
-        const formattedPrice = review.reviewPrice.toLocaleString('ko-KR') ;   
+        const formattedPrice = review.reviewPrice.toLocaleString('ko-KR');
 
         return (
             <div className="row mt-4 p-3 review-card">
@@ -301,7 +301,7 @@ export default function ContentsDetail() {
                         to={`/review/${contentsId}/${review.reviewNo}`}>
                         <div className="d-flex justify-content-between">
                             <h4 className="text-light">
-                                {review.reviewWriter}{review.reviewEtime ? " (수정됨)" : ""}
+                                {review.memberNickname}({review.reviewWriter}){review.reviewEtime ? " (수정됨)" : ""}
                             </h4>
                             <p className="text-light">{formattedDate}</p>
                         </div>
@@ -480,7 +480,7 @@ export default function ContentsDetail() {
                                 <div className="text-start">
                                     <span>
                                         <span className="fs-4 me-2">
-                                            <FaHeart className="text-danger"/>
+                                            <FaHeart className="text-danger" />
                                         </span>
                                         <span className="fs-5">{myReview.reviewLike}</span>
                                     </span>
