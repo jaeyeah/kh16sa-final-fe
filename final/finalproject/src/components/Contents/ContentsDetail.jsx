@@ -262,7 +262,7 @@ export default function ContentsDetail() {
                             <FaStar key={num} style={{ color: num <= review.reviewRating ? "#ffc107" : "#444", marginRight: "2px" }} />
                         ))}
                         <span className="ms-2 text-light small me-2">{review.reviewRating}점</span>
-                        • <span className="ms-2"><FcMoneyTransfer className="me-1" />(가격) 원</span>
+                        • <span className="ms-2"><FcMoneyTransfer className="me-1" />{review.reviewPrice} 원</span>
                     </div>
 
                     {/* 내용 (스포일러) */}
@@ -326,7 +326,7 @@ export default function ContentsDetail() {
                                     <div>방영일 : {formattedDate}</div>
                                     <div>평점 : {contentsDetail.contentsVoteAverage.toFixed(1)} / 10</div>
                                     <div className="mt-4 text-center">
-                                        <div className="d-inline-flex align-items-center justify-content-center px-4 py-2 rounded-pill like-wrapper">
+                                        <div className="d-inline-flex align-items-center justify-content-center px-4 py-2 rounded-pill">
                                             <FaRegEye className="me-2 text-info fs-3" />
                                             <span className="fw-bold fs-5">{contentsDetail.contentsLike.toLocaleString()}</span>
                                         </div>

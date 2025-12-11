@@ -10,6 +10,7 @@ import { times } from "lodash";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaHeart } from "react-icons/fa";
 import { FaShare } from "react-icons/fa6";
+import ReviewWriter from "./ReviewWrite";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
@@ -32,6 +33,7 @@ export default function WriteReview() {
 
     const [review, setReview] = useState({
         reviewRating: 0,
+        reviewPrice: 0,
         reviewSpoiler: "N",
         reviewText: "",
         reviewLike: 0,
@@ -71,22 +73,22 @@ export default function WriteReview() {
         }
     });
 
-    // 전체 리뷰 조회
-    useEffect(() => {
-        const fetchAll = async () => {
-            try {
-                const { data } = await axios.get(`/review/reviewContents/${contentsId}`, {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`
-                    }
-                });
-                setAllReviews(data);
-            } catch (error) {
-                console.error("전체 리뷰 조회 실패:", error);
-            }
-        }
-        if (accessToken) fetchAll(); // 토큰이 있어야 호출
-    }, [contentsId, accessToken]);
+    // // 전체 리뷰 조회
+    // useEffect(() => {
+    //     const fetchAll = async () => {
+    //         try {
+    //             const { data } = await axios.get(`/review/reviewContents/${contentsId}`, {
+    //                 headers: {
+    //                     Authorization: `Bearer ${accessToken}`
+    //                 }
+    //             });
+    //             setAllReviews(data);
+    //         } catch (error) {
+    //             console.error("전체 리뷰 조회 실패:", error);
+    //         }
+    //     }
+    //     if (accessToken) fetchAll(); // 토큰이 있어야 호출
+    // }, [contentsId, accessToken]);
 
     // 로그인 시 내 리뷰 조회
     useEffect(() => {
@@ -162,15 +164,45 @@ export default function WriteReview() {
 
     //별점 기능 구현
     const [rating, setRating] = useState(0);
+    const [price, setPrice] = useState(0);
     const [ratingAlert, setRatingAlert] = useState(false);
 
     const handleStarClick = (num) => {
         setRating(num);  // 클릭한 별 번호로 rating 설정
+        setPrice(num * 3000); //별의 개수로 price 설정
         setReview(prev => ({
             ...prev,
-            reviewRating: num
+            reviewRating: num,
+            reviewPrice: price
         }));
     };
+
+    const handleStarByPrice = (e) => {
+        let currentPrice = parseInt(price) || 0;
+        let newRating = 0;
+
+        if(currentPrice>=15000) {
+            newRating = 5;
+        }
+        else {
+            newRating = Math.floor(currentPrice/3000);
+        }
+
+        setRating(newRating);
+        setReview(prev => ({
+            ...prev,
+            reviewRating: newRating,
+            reviewPrice: currentPrice
+        }));
+    };
+
+    //가격 입력창 제어 함수
+    const changeNum = useCallback((e) => {
+        const regex = /[^0-9]+/g;
+        const replacement = e.target.value.replace(regex, "");
+        const number = replacement.length == 0 ? "" : parseInt(replacement);
+        setPrice(number);
+    }, [price]);
 
     //Memo
     //장르 목록을 react 엘리먼트로 변환하는 함수
@@ -250,8 +282,13 @@ export default function WriteReview() {
                 {/* 리뷰 영역 시작  new-review*/}
                 {(loginId && !myReview && !isLoading) && (
                     <div className="row mt-5 new-review">
-                        <div className="col text-center">
-                            <span className="how">이 작품 어떠셨나요?</span><br />
+                        <div className="col">
+                            <div className="text-center">
+                                <h4>이 작품 어떠셨나요?</h4>
+                            </div>
+                            <div className="text-center mt-4">
+                                <span>별점이나 영화의 값어치를 입력해주세요</span>
+                            </div>
                             <div className="mt-3 rating-box" value={review.reviewRating}>
                                 {[1, 2, 3, 4, 5].map((num) => (
                                     <FaStar
@@ -262,9 +299,17 @@ export default function WriteReview() {
                                     />
                                 ))}
                                 <span className="me-1 rating-number">{review.reviewRating}.0</span>
+                            <div className="mt-1 ms-3 input-group price-wrapper text-center w-25">
+                                <input type="text" inputMode="numerice"
+                                    className="price form-control price-bar text-light"
+                                    value={price} onChange={changeNum} onBlur={handleStarByPrice} />
+                                <span className="input-group-text price-label text-light">원</span>
                             </div>
+                            </div>
+    
                         </div>
-                        <div className="row mt-2">
+
+                        <div className="row mt-4">
                             <div className="col text-center">
                                 <br />
                                 <div className="form-check form-switch d-inline-block mx-auto">
@@ -422,12 +467,12 @@ export default function WriteReview() {
                     </div>
                     <div className="col textAA3 mt-1 mx-auto spoCheck">
                         <div className="row d-flex justify-content-center align-items-center mt-4">
-                                <div className="col-auto mt-5">
+                            <div className="col-auto mt-5">
                                 <h3 className="spoText" >스포일러가 포함된 리뷰입니다</h3>
-                                </div>
+                            </div>
                         </div>
                         <div className="d-flex">
-                            <button className="spoButton me-4 mt-2"><h5 style={{fontWeight:"bold"}}>확인하기</h5></button>
+                            <button className="spoButton me-4 mt-2"><h5 style={{ fontWeight: "bold" }}>확인하기</h5></button>
                         </div>
                     </div>
 
