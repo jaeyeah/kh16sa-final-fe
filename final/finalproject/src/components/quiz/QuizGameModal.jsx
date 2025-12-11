@@ -248,9 +248,9 @@ export default function QuizGameModal({ show, onClose, contentsId }) {
 
                 // 서버로 보낼 데이터 구성
                 const payload = {
-                    quizId: currentQuiz.quizId,   // 현재 문제 ID
-                    quizReportType: type,       // DB 컬럼명에 맞춤
-                    quizReportContent: content  // DB 컬럼명에 맞춤
+                    quizReportQuizId: currentQuiz.quizId,   // 현재 문제 ID
+                    quizReportType: type,       //신고 유형
+                    quizReportContent: content  //신고 유형이 'ETC'일때만 작성 가능한 내용
                 };
 
                 try {
