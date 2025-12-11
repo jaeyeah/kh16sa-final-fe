@@ -95,10 +95,10 @@ return(<>
                     </Link>
                     <div className="row card-body">
                         <h5 className="col-12 col-sm-8 card-title text-truncate text-light">{watchlist.contentsTitle}</h5>
-                            <span className="col-6 col-sm-2 badge bg-danger btn text-truncate" style={{cursor: "pointer"}} onClick={()=>deleteWatchlist(watchlist.watchlistContent)}>
+                            <span className="col-6 col-sm-2 badge bg-danger btn text-truncate d-flex justify-content-center" style={{cursor: "pointer"}} onClick={()=>deleteWatchlist(watchlist.watchlistContent)}>
                                 <h5><FaBookmark className="text-dark"/></h5>
                             </span>
-                            <span className="col-6 col-sm-2 badge bg-light btn text-truncate" style={{cursor: "pointer"}} onClick={()=>changeWatchlistType(watchlist.watchlistContent)}>
+                            <span className="col-6 col-sm-2 badge bg-light btn text-truncate d-flex justify-content-center" style={{cursor: "pointer"}} onClick={()=>changeWatchlistType(watchlist.watchlistContent)}>
                                 <h5><MdFavorite className="text-danger"/></h5>
                             </span>
                         <p className="card-text text-truncate">
