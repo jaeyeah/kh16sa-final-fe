@@ -6,7 +6,6 @@ import { FaStar } from "react-icons/fa";
 import "./review.css";
 import { accessTokenState, loginIdState, loginLevelState, refreshTokenState } from "../../utils/jotai";
 import { useAtom } from "jotai";
-import { times } from "lodash";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaHeart } from "react-icons/fa";
 import { FaShare } from "react-icons/fa6";

@@ -2,13 +2,14 @@ import { useAtom } from "jotai";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { accessTokenState, loginIdState, refreshTokenState } from "../../utils/jotai";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import "./review.css";
 import { FaStar } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa";
 import { FaShare } from "react-icons/fa6";
 import { IoHeartCircleSharp } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
@@ -20,10 +21,8 @@ const INITIAL_DETAIL = {
     contentsDirector: "", contentsMainCast: "", genreNames: [],
 };
 
-
 export default function ReviewDetail() {
     const { contentsId, reviewNo } = useParams();
-
 
     //state
     const [loginId, setLoginId] = useAtom(loginIdState);
@@ -85,6 +84,7 @@ export default function ReviewDetail() {
             try {
                 setIsLoading(true);
                 const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+                
                 const { data } = await axios.get(`/review/${contentsId}/${reviewNo}`, { headers });
                 if (data) {
                     setReview({
@@ -98,17 +98,23 @@ export default function ReviewDetail() {
                         reviewEtime: data.reviewEtime
                     });
                     setRating(data.reviewRating);
+                    setLikeCount(data.reviewLike);
                 }
+                if (accessToken && loginId) {
+                    const {data : likeData} = await axios.post(
+                        "/review/check",
+                        null,
+                        {params: {loginId , reviewNo}}
+                    );
+                    setLike(likeData.like);
+                } else {
+                    setLike(false);
+                }
+
             } catch (error) {
-                if (error.response?.status === 401) {
-                    setStatusMessage("로그인이 필요합니다.");
-                }
-                if (error.response?.status === 404) {
-                    setStatusMessage("존재하지 않는 리뷰입니다.");
-                }
-                if (error.response?.status === 500) {
-                    setStatusMessage("리뷰를 불러오는데 실패했습니다.");
-                }
+                if (error.response?.status === 401) setStatusMessage("로그인이 필요합니다.");
+                if (error.response?.status === 404) setStatusMessage("존재하지 않는 리뷰입니다.");
+                if (error.response?.status === 500) setStatusMessage("리뷰를 불러오는데 실패했습니다.");
             } finally {
                 setIsLoading(false);
             }
@@ -175,7 +181,33 @@ export default function ReviewDetail() {
     }, [contentsDetail.contentsReleaseDate]);
 
 
+    //공유하기(링크복사)
+    const [link, setLink] = useState("");
+    const copyLink = ()=> {
+        const currentUrl = window.location.href;
+        setLink(currentUrl);
+        navigator.clipboard.writeText(currentUrl)
+            .then(()=> alert("링크가 복사되었습니다!"))
+            .catch(err=>console.error("복사 실패", err));
+    };
 
+    //좋아요
+    const [like, setLike] = useState(false);
+    const [likeCount, setLikeCount] = useState(reviewData.reviewLike);
+
+    const clickLike = async()=> {
+        if(!loginId) {
+            toast.info("로그인이 필요합니다.");
+            return;
+        }
+        try {
+            const { data } = await axios.post(`/review/action/${reviewNo}/${loginId}`);
+            setLike(data.like);
+            setLikeCount(data.count);
+        } catch (error) {
+            console.error("좋아요 처리 실패", error);
+        }
+    }
 
     //render
     return (<>
@@ -201,15 +233,15 @@ export default function ReviewDetail() {
                 <hr className="HR" />
                 <div className="reviewText">{review.reviewText}</div>
                 <div className="col iconBox">
-                    <div>
+                    <div className="ms-2">
                         <span><IoHeartCircleSharp className="me-2 iconH" />
-                            <span style={{fontSize:"20px"}}>{review.reviewLike}개</span>
+                            <span style={{fontSize:"20px"}}>{review.reviewLike+likeCount}개</span>
                         </span>
                     </div>
                     <hr className="HR"/>
-                    <div>
-                        <span><FaHeart className="me-2 icon ms-1" />좋아요</span>
-                        <span className="ms-4"><FaShare className="me-2 icon" />공유하기</span>
+                    <div className="mb-1">
+                        <button onClick={clickLike} style={{color: like ? "#7188faff" : "white"}} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
+                        <button onClick={copyLink}  type="button" className="ms-2 mainTitleB"><FaShare className="me-2 icon" />공유하기</button>
                     </div>
                 </div>
             </div>
