@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { accessTokenState, loginIdState, refreshTokenState } from "../../utils/jotai";
+import { accessTokenState, loginIdState, loginLevelState, loginNicknameState, refreshTokenState } from "../../utils/jotai";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import "./review.css";
@@ -10,7 +10,6 @@ import { FaHeart } from "react-icons/fa";
 import { FaShare } from "react-icons/fa6";
 import { IoHeartCircleSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
-
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
@@ -26,6 +25,8 @@ export default function ReviewDetail() {
 
     //state
     const [loginId, setLoginId] = useAtom(loginIdState);
+    const [loginLevel, setLoginLevel] = useAtom(loginLevelState);
+    const [loginNickname, setLoginNickname] = useAtom(loginNicknameState);
     const [accessToken, setAccessToken] = useAtom(accessTokenState);
     const [refreshToken, setRefreshToken] = useAtom(refreshTokenState);
 
@@ -38,8 +39,7 @@ export default function ReviewDetail() {
         reviewRealiability: 0,
         reviewPrice: "",
         reviewWtime: "",
-        reviewEtime: "",
-        reviewNickname: ""
+        reviewEtime: ""
     });
 
     const [reviewClass, setReviewClass] = useState("");
@@ -63,6 +63,9 @@ export default function ReviewDetail() {
         reviewWriter: loginId
     };
 
+    const [isLiked, setIsLiked] = useState(false);
+        const [likeCount, setLikeCount] = useState(0);
+
 
     //effect
     useEffect(() => {
@@ -85,32 +88,25 @@ export default function ReviewDetail() {
             try {
                 setIsLoading(true);
                 const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
-                
+
                 const { data } = await axios.get(`/review/${contentsId}/${reviewNo}`, { headers });
                 if (data) {
                     setReview({
-                        reviewRating: data.reviewRating,
-                        reviewSpoiler: data.reviewSpoiler,
-                        reviewText: data.reviewText,
-                        reviewLike: data.reviewLike,
-                        reviewRealiability: data.reviewRealiability,
-                        reviewPrice: data.reviewPrice,
-                        reviewWtime: data.reviewWtime,
-                        reviewEtime: data.reviewEtime,
-                        reviewNickname: data.reviewNickname
+                        ...data,
+                        reviewNo : reviewNo
                     });
                     setRating(data.reviewRating);
                     setLikeCount(data.reviewLike);
                 }
                 if (accessToken && loginId) {
-                    const {data : likeData} = await axios.post(
+                    const { data: likeData } = await axios.post(
                         "/review/check",
                         null,
-                        {params: {loginId , reviewNo}}
+                        { params: { loginId, reviewNo } }
                     );
-                    setLike(likeData.like);
+                    setIsLiked(likeData.like);
                 } else {
-                    setLike(false);
+                    setIsLiked(false);
                 }
 
             } catch (error) {
@@ -176,7 +172,7 @@ export default function ReviewDetail() {
         ));
     }, [contentsDetail.genreNames]);
 
-    //방영일 날짜 형식 변경
+ //방영일 날짜 형식 변경
     const formattedDate = useMemo(() => {
         const formattedDate = contentsDetail.contentsReleaseDate.split(" ")[0];
         return formattedDate;
@@ -185,31 +181,44 @@ export default function ReviewDetail() {
 
     //공유하기(링크복사)
     const [link, setLink] = useState("");
-    const copyLink = ()=> {
+    const copyLink = () => {
         const currentUrl = window.location.href;
         setLink(currentUrl);
         navigator.clipboard.writeText(currentUrl)
-            .then(()=> alert("링크가 복사되었습니다!"))
-            .catch(err=>console.error("복사 실패", err));
+            .then(() => alert("링크가 복사되었습니다!"))
+            .catch(err => console.error("복사 실패", err));
     };
 
-    //좋아요
-    const [like, setLike] = useState(false);
-    const [likeCount, setLikeCount] = useState(reviewData.reviewLike);
+    // 좋아요 확인
+    useEffect(() => {
+        if (loginId) {
+            axios.post("/review/check", null, {
+                params: { loginId: loginId, reviewNo: reviewNo }
+            }).then(res => {
+                setIsLiked(res.data.like);
+            }).catch(err => console.error(err));
+        }
+    }, [loginId, reviewNo]);
 
-    const clickLike = async()=> {
-        if(!loginId) {
+    // 좋아요 토글
+    const handleLikeToggle = async () => {
+        if (!loginId) {
             toast.info("로그인이 필요합니다.");
             return;
         }
         try {
-            const { data } = await axios.post(`/review/action/${reviewNo}/${loginId}`);
-            setLike(data.like);
-            setLikeCount(data.count);
-        } catch (error) {
-            console.error("좋아요 처리 실패", error);
+            const res = await axios.post(`/review/action/${review.reviewNo}/${loginId}`);
+            setIsLiked(res.data.like);
+            setLikeCount(res.data.count);
+        } catch (err) {
+            console.error(err);
         }
-    }
+    };
+
+    //날짜 포맷
+     const reviewDate = review.reviewEtime
+            ? review.reviewEtime.replace('T', ' ').substring(0, 16)
+            : review.reviewWtime.replace('T', ' ').substring(0, 16);
 
     //render
     return (<>
@@ -221,15 +230,15 @@ export default function ReviewDetail() {
                     <button className="mainTitleB" type="button"><BsThreeDotsVertical /></button>
                 </div>
                 <div className="mt-4 mb-4">
-                    <span className="userId">{reviewData.reviewWriter}</span>
-                    <span className="time ms-3">몇일 전!!</span>
+                    <span className="userId">닉네임</span>
+                    <span className="time ms-3">{formattedDate}</span>
                 </div>
                 <div className="col title mb-2">
                     {contentsDetail.contentsTitle}
                 </div>
                 <div className="d-flex align-items-center mb-3">
                     <span className="me-2">내 평가</span>
-                    <span><FaStar className="littleStar me-1 mb-1" />{review.reviewRating}</span>
+                    <span><FaStar className="littleStar me-1 mb-1" />{reviewDate}</span>
                     <span className="ms-3">{review.reviewPrice}원</span>
                 </div>
                 <hr className="HR" />
@@ -237,14 +246,15 @@ export default function ReviewDetail() {
                 <div className="col iconBox">
                     <div className="ms-2">
                         <span><IoHeartCircleSharp className="me-2 iconH" />
-                            <span style={{fontSize:"20px"}}>{review.reviewLike+likeCount}개</span>
+                            <span style={{ fontSize: "20px" }}>{likeCount}개</span>
                         </span>
                     </div>
-                    <hr className="HR"/>
+                    <hr className="HR" />
                     <div className="mb-1">
-                        <button onClick={clickLike} style={{color: like ? "#7188faff" : "white"}} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
-                        <button onClick={copyLink}  type="button" className="ms-2 mainTitleB"><FaShare className="me-2 icon" />공유하기</button>
+                        <button onClick={handleLikeToggle} style={{ color: isLiked ? "#7188faff" : "white" }} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
+                        <button onClick={copyLink} type="button" className="ms-2 mainTitleB"><FaShare className="me-2 icon" />공유하기</button>
                     </div>
+                     
                 </div>
             </div>
         </div>
