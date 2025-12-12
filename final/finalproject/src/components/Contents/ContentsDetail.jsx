@@ -3,8 +3,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { FaQuestion, FaShare } from "react-icons/fa";
 import { useNavigate, useParams, Outlet, useLocation, Link } from "react-router-dom";
-
-import { FaBookmark, FaChevronUp, FaHeart, FaPencil, FaRegEye, FaStar } from "react-icons/fa6";
+import { ImEyePlus } from "react-icons/im";
+import { FaBookmark, FaChevronUp, FaHeart, FaPencil, FaStar } from "react-icons/fa6";
 import { FcMoneyTransfer } from "react-icons/fc";
 
 import "./SearchAndSave.css";
@@ -397,7 +397,7 @@ export default function ContentsDetail() {
                                     <div>평점 : {contentsDetail.contentsVoteAverage.toFixed(1)} / 10</div>
                                     <div className="mt-4 text-center">
                                         <div className="d-inline-flex align-items-center justify-content-center px-4 py-2 rounded-pill like-wrapper">
-                                            <FaRegEye className="me-2 text-info fs-3" />
+                                            <ImEyePlus className="me-2 text-info fs-3" />
                                             <span className="fw-bold fs-5">{contentsDetail.contentsLike.toLocaleString()}</span>
                                         </div>
                                     </div>
