@@ -118,17 +118,17 @@
   color: #ffffff !important;
   font-weight: 700 !important;
   display: block;
-  width: 30ch; 
   overflow: hidden;  
   text-overflow: ellipsis;
+  width:200px;
 }
 .quiz-option{
   color : rgb(255, 255, 255) !important;
   background: rgb(99, 99, 99)!important;
   display: block;
   overflow: hidden;  
-  width: 30ch; 
   text-overflow: ellipsis;
+  width:200px;
 }
 .quiz-normal{
   color : rgb(255, 255, 255) !important;
@@ -138,19 +138,26 @@
 }
 
 .quiz-table-thead{
-  color : rgb(255, 255, 255) !important;
-  background: #5993ffcc !important;
+    background-color: #212529 !important; /* 배경색 강제 적용 */
+    border: 1px solid #373b3e !important; /* 테두리 강제 적용 */
+    /* border-radius: 1.2rem; */
+    color: #ffffff !important; /* 글자색 강제 적용 */
+}
+.quiz-table-thead-ex{
+    width:80px !important;
 }
 
 .quiz-correct{
   color : rgb(255, 255, 255) !important;
   background: #2270ffdc !important;
   font-weight: 700 !important;
+  width:80px !important;
 }
 .quiz-wrong{
   color : rgb(255, 255, 255) !important;
   background: #fd0c0cde !important;
   font-weight: 700 !important;
+  width:80px !important;
 }
 .quiz-link{
   color : rgb(195, 238, 255) !important;
