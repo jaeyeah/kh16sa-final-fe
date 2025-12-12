@@ -130,8 +130,17 @@
     font-weight: 500;
 }
 
-
 .like-wrapper {
    background-color: rgba(255, 255, 255, 0.1);
    backdrop-filter: blur(5px);
+}
+
+.contents.btn.btn-success {
+  background-color: #2c8692;
+  border-color: transparent !important;
+}
+
+.contents.btn.btn-warning {
+  background-color: #218c74;
+  border-color: transparent !important;
 }

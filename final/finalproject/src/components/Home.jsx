@@ -6,6 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
 import "./Home.css";
 import { FaHeart, FaRegEye } from "react-icons/fa6";
+import { ImEyePlus } from "react-icons/im";
 
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
@@ -40,12 +41,16 @@ export default function Home() {
     //state
     const [tvList, setTvList] = useState([]);
     const [movieList, setMovieList] = useState([]);
+    const [rateList, setRateList] = useState([]);
+    const [priceList, setPriceList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     //effect
     useEffect(() => {
         loadTVData();
         loadMovieData();
+        loadRateData();
+        loadPriceData();
     }, []);
 
     //callback
@@ -78,6 +83,35 @@ export default function Home() {
         }
         setIsLoading(false);
     }, []);
+    const loadRateData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const { data } = await axios.get("/api/tmdb/contents/rank/rate");
+            const ratelist = [
+                ...data.map(rate => ({ ...rate }))
+            ];
+            setRateList(ratelist);
+            // console.log("불러온 데이터: ", data);
+        }
+        catch (error) {
+            console.log("에러발생 : ", error);
+        }
+        setIsLoading(false);
+    }, []);
+    const loadPriceData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const { data } = await axios.get("/api/tmdb/contents/rank/price");
+            const pricelist = [
+                ...data.map(price => ({ ...price }))
+            ];
+            setPriceList(pricelist);
+        }
+        catch (error) {
+            console.log("에러발생 : ", error);
+        }
+        setIsLoading(false);
+    }, []);
 
     //[포스터 이미지 url 생성 함수]
     const getPosterUrl = useCallback((path) => {
@@ -102,14 +136,109 @@ export default function Home() {
                         <img src={getPosterUrl(content.contentsPosterPath)}
                             className="card-img-top"
                             alt={content.contentsTitle}
-                            style={{ height: "350px", objectFit: "cover" }}/>
+                            style={{ height: "350px", objectFit: "cover" }} />
                         {/* 북마크 수 뱃지 */}
                         <div className="position-absolute top-0 end-0 m-2 px-2 py-2 rounded bg-black bg-opacity-75 text-white shadow-sm"
                             style={{ fontSize: "0.9rem", backdropFilter: "blur(2px)" }}>
                             <span className="fw-bold fs-5">
-                                <FaRegEye className="text-info me-2 mb-1" />
+                                <ImEyePlus className="text-info me-1 mb-1" />
                                 {content.contentsLike ? content.contentsLike.toLocaleString() : 0}
                             </span>
+                        </div>
+                    </div>
+                    <div className="card-body shadow">
+                        <h5 className="card-title text-truncate text-light">{content.contentsTitle}</h5>
+                        <p className="card-text">
+                            <small className="text-secondary">{getFormattedDate(content.contentsReleaseDate)}</small>
+                            <br />
+                            <span className="badge bg-warning text-dark me-1">
+                                {content.contentsType}
+                            </span>
+                            {content.genreNames && content.genreNames.slice(0, 2).map((g, index) => (
+                                <span key={index} className="badge bg-secondary me-1">
+                                    {g}
+                                </span>
+                            ))}
+                        </p>
+                    </div>
+                </Link>
+            </div>
+        </div>
+    );
+
+
+    //[카드 렌더링 함수]
+    const renderRateRankCard = (content) => (
+        <div key={content.contentsId} className="px-2 mb-4 mt-2">
+            <div className="card h-100 text-white content-wrapper" style={{ backgroundColor: "#212529" }}>
+                <Link className="text-decoration-none link-body-emphasis" to={`/contents/detail/${content.contentsId}`}>
+                    {/* 이미지 & 뱃지 영역 */}
+                    <div className="position-relative">
+                        <img src={getPosterUrl(content.contentsPosterPath)}
+                            className="card-img-top"
+                            alt={content.contentsTitle}
+                            style={{ height: "350px", objectFit: "cover" }} />
+                        {/* 랭킹 뱃지 영역 (이미지 내부) */}
+                        <div className="position-absolute top-0 start-0 m-0 p-0">
+                            <div className="bg-black bg-opacity-75 text-danger d-flex align-items-center justify-content-center shadow"
+                                style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    borderBottomRightRadius: "8px",
+                                    backdropFilter: "blur(2px)"
+                                }}>
+                                {/* 숫자 스타일: 굵고 크게 */}
+                                <span className="fw-bold fs-4">
+                                    {content.contentsRateRank}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card-body shadow">
+                        <h5 className="card-title text-truncate text-light">{content.contentsTitle}</h5>
+                        <p className="card-text">
+                            <small className="text-secondary">{getFormattedDate(content.contentsReleaseDate)}</small>
+                            <br />
+                            <span className="badge bg-warning text-dark me-1">
+                                {content.contentsType}
+                            </span>
+                            {content.genreNames && content.genreNames.slice(0, 2).map((g, index) => (
+                                <span key={index} className="badge bg-secondary me-1">
+                                    {g}
+                                </span>
+                            ))}
+                        </p>
+                    </div>
+                </Link>
+            </div>
+        </div>
+    );
+
+    //[카드 렌더링 함수]
+    const renderPriceRankCard = (content) => (
+        <div key={content.contentsId} className="px-2 mb-4 mt-2">
+            <div className="card h-100 text-white content-wrapper" style={{ backgroundColor: "#212529" }}>
+                <Link className="text-decoration-none link-body-emphasis" to={`/contents/detail/${content.contentsId}`}>
+                    {/* 이미지 & 뱃지 영역 */}
+                    <div className="position-relative">
+                        <img src={getPosterUrl(content.contentsPosterPath)}
+                            className="card-img-top"
+                            alt={content.contentsTitle}
+                            style={{ height: "350px", objectFit: "cover" }} />
+                        {/* 랭킹 뱃지 영역 (이미지 내부) */}
+                        <div className="position-absolute top-0 start-0 m-0 p-0">
+                            <div className="bg-black bg-opacity-75 text-danger d-flex align-items-center justify-content-center shadow"
+                                style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    borderBottomRightRadius: "8px",
+                                    backdropFilter: "blur(2px)"
+                                }}>
+                                {/* 숫자 스타일: 굵고 크게 */}
+                                <span className="fw-bold fs-4">
+                                    {content.contentsPriceRank}
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <div className="card-body shadow">
@@ -137,9 +266,49 @@ export default function Home() {
         <div className="container mt-5">
 
 
-            {/* 1. TV 시리즈 슬라이더 */}
+            {/* 별점 랭킹 슬라이더 */}
             <div className="mt-4">
-                <h3 className="mb-4 text-white">📺 인기 TV 시리즈</h3>
+                <h3 className="mb-4 text-white">⭐️ TOP 10 컨텐츠</h3>
+                <div className="p-2 pt-3 rounded series-wrapper" >
+                    {rateList.length > 0 ? (
+                        <Slider {...settings}>
+                            {rateList.map((rate) => renderRateRankCard(rate))}
+                        </Slider>
+                    ) : (
+                        <p className="text-white">로딩 중이거나 데이터가 없습니다.</p>
+                    )}
+                </div>
+            </div>
+
+            <div className="row mt-4">
+                <div className="col">
+
+                </div>
+            </div>
+
+            {/* 가격 랭킹 슬라이더 */}
+            <div className="mt-4">
+                <h3 className="mb-4 text-white">💰 TOP 10 컨텐츠</h3>
+                <div className="p-2 pt-3 rounded series-wrapper" >
+                    {priceList.length > 0 ? (
+                        <Slider {...settings}>
+                            {priceList.map(price => renderPriceRankCard(price))}
+                        </Slider>
+                    ) : (
+                        <p className="text-white">로딩 중이거나 데이터가 없습니다.</p>
+                    )}
+                </div>
+            </div>
+
+            <div className="row mt-4">
+                <div className="col">
+
+                </div>
+            </div>
+
+            {/* TV 시리즈 슬라이더 */}
+            <div className="mt-4">
+                <h3 className="mb-4 text-white">📺 최신 TV 시리즈</h3>
                 <div className="p-2 pt-3 rounded series-wrapper" >
                     {tvList.length > 0 ? (
                         <Slider {...settings}>
@@ -157,7 +326,7 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* 2. 영화 슬라이더 */}
+            {/*  영화 슬라이더 */}
             <div className="mt-4">
                 <h3 className="mb-4 text-white">🎬 최신 영화</h3>
                 <div className="p-2 pt-3 rounded  series-wrapper">
