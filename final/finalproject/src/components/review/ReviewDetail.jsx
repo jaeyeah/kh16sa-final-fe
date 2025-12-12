@@ -231,7 +231,6 @@ export default function ReviewDetail() {
     //모달
     const modal1 = useRef();
     const modal2 = useRef();
-    const modal3 = useRef();
 
     const openModal1 = () => {
         const open = new Modal(modal1.current);
@@ -239,10 +238,6 @@ export default function ReviewDetail() {
     }
     const openModal2 = () => {
         const open = new Modal(modal2.current);
-        open.show();
-    }
-    const openModal3 = () => {
-        const open = new Modal(modal3.current);
         open.show();
     }
     const closeModal1 = () => {
@@ -253,20 +248,6 @@ export default function ReviewDetail() {
         const close = Modal.getInstance(modal2.current);
         if (close) close.hide();
     }
-    const closeModal3 = () => {
-        const close = Modal.getInstance(modal3.current);
-        if (close) close.hide();
-    }
-
-
-    // const openModal = useCallback(() => {
-    //     const bsModal = new Modal(modal.current);
-    //     bsModal.show();
-    // }, [modal]);
-    // const closeModal = useCallback(() => {
-    //     const bsModal = Modal.getInstance(modal.current);
-    //     if (bsModal) bsModal.hide();
-    // }, [modal]);
 
     //작성자
     const [writer, setWriter] = useState("");
@@ -299,11 +280,29 @@ export default function ReviewDetail() {
         return review.reviewSpoiler === "Y";
     }, [review.reviewSpoiler])
 
+    // 수정하기
+    const changeRatingValue = useCallback(e => { //별점
+
+    })
+
+    const changePriceValue = useCallback(e => { //가격
+
+    })
+
+    const changeSpoilerValue = useCallback(e => { //스포일러
+
+    })
+
+    const changeTextValue = useCallback(e => { //내용
+
+    })
+
 
     //render
     return (<>
         <div className="container">
-            <div className="row">
+            {/* (단일) 조회 페이지 */}
+            <div className="row"> 
                 <div className="col d-flex justify-content-between align-items-center">
                     {/* 본인이면  mainTitleB 버튼 나와서 수정, 삭제  모달*/}
                     <span className="mainTitle mx-auto">리뷰</span>
@@ -335,27 +334,25 @@ export default function ReviewDetail() {
                 <div className="col iconBox">
                     <div className="ms-2">
                         <span><IoHeartCircleSharp className="me-2 iconH" />
-                            <span style={{ fontSize: "20px" }}>{likeCount}개</span>
+                            <span style={{ fontSize: "20px", fontWeight: "bold" }}>{likeCount}개</span>
                         </span>
                     </div>
                     <hr className="HR" />
                     <div className="mb-1">
-                        <button onClick={handleLikeToggle} style={{ color: isLiked ? "#7188faff" : "white" }} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
+                        <button onClick={handleLikeToggle} style={{ color: isLiked ? "#7188faff" : "white", fontWeight: "bold" }} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
                         <button onClick={copyLink} type="button" className="ms-2 mainTitleB"><FaShare className="me-2 icon" />공유하기</button>
                     </div>
 
                 </div>
             </div>
-            {/* 수정하기 */}
-            <div className="row">
-                <div className="col d-flex justify-content-between align-items-center">
+            {/* 수정 페이지 */}
+            <div className="row position-relative">
+                <div className="col text-center">
                     {/* 본인이면  mainTitleB 버튼 나와서 수정, 삭제  모달*/}
-                    <span className="mainTitle mx-auto">리뷰</span>
-                    {isWriter && (
-                        <button className="mainTitleB" type="button" onClick={openModal1}
-                            data-bs-dismiss="ModalToggle1"
-                        ><BsThreeDotsVertical /></button>
-                    )}
+                    <span className="mainTitle2 mx-auto">리뷰</span>
+                    <button type="button" className="save position-absolute end-0 top-0">
+                        저장하기
+                    </button>
                 </div>
                 <div className="mt-4 mb-4">
                     <span className="userId">닉네임</span>
@@ -372,22 +369,41 @@ export default function ReviewDetail() {
                     <span className="ms-3"><FcMoneyTransfer className="me-2" />{review.reviewPrice}원</span>
                 </div>
                 <hr className="HR" />
-                {isSpoiler && (
-                    <div className="detailSpo"><FaRegEye /> 스포일러</div>
-                )}
-                <div className="mt-2 reviewText">{review.reviewText}</div>
-                <div className="col iconBox">
-                    <div className="ms-2">
-                        <span><IoHeartCircleSharp className="me-2 iconH" />
-                            <span style={{ fontSize: "20px" }}>{likeCount}개</span>
-                        </span>
+                <div className="mt-2 reviewText">
+                    <textarea className="reviewText2" value={review.reviewText}> </textarea>
+                </div>
+                <div className="col iconBox2">
+                    <div className="rr">
+                        <div className="me-5">
+                            <span className="ms-2"><FaStar/> 별점</span>
+                            <span className="ms-2 me-4" value={review.reviewRating}>
+                                {[1, 2, 3, 4, 5].map((num) => (
+                                    <FaStar
+                                        key={num}
+                                        className={num <= rating ? "fullStar3" : "emptyStar3"}
+                                        onClick={() => handleStarClick(num)}
+                                        style={{ cursor: "pointer" }}
+                                    />
+                                ))}
+                            </span>
+                            <span className="pp"><FcMoneyTransfer />
+                            <span className="ms-2 me-2">가격</span>{review.reviewPrice}</span>
+                        </div>
                     </div>
-                    <hr className="HR" />
-                    <div className="mb-1">
-                        <button onClick={handleLikeToggle} style={{ color: isLiked ? "#7188faff" : "white" }} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
-                        <button onClick={copyLink} type="button" className="ms-2 mainTitleB"><FaShare className="me-2 icon" />공유하기</button>
+                    <hr />
+                    <div className="d-flex align-items-center ms-2 mb-1 justify-content-between">
+                        <span style={{ fontSize: "20px", fontWeight: "bold" }}><FaRegEye className="spo2 me-1" />스포일러 포함</span>
+                        <div className="form-switch form-check">
+                            <input type="checkbox" className="me-3 form-check-input spo3"
+                                checked={review.reviewSpoiler === "Y"}
+                                onChange={e => {
+                                    setReview({
+                                        ...review,
+                                        reviewSpoiler: e.target.checked ? "Y" : "N"
+                                    })
+                                }} />
+                        </div>
                     </div>
-
                 </div>
             </div>
             {/* 모달(Modal) */}
@@ -404,7 +420,7 @@ export default function ReviewDetail() {
                                 </div>
                                 <div>
                                     <button type="button" className="ms-2 mt-2 modalButton"
-                                        onClick={openModal3}>리뷰 수정하기</button>
+                                        onClick={closeModal1}>리뷰 수정하기</button>
                                 </div>
                                 <div>
                                     <button type="button" className="ms-2 modalButton mt-4"
