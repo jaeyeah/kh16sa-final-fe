@@ -12,6 +12,7 @@ import { IoHeartCircleSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { Modal } from "bootstrap";
 import { FcMoneyTransfer } from "react-icons/fc";
+import { FaRegEye } from "react-icons/fa";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
@@ -24,7 +25,7 @@ const INITIAL_DETAIL = {
 
 export default function ReviewDetail() {
     const { contentsId, reviewNo } = useParams();
-    const navigate = useNavigate() ;
+    const navigate = useNavigate();
 
     //state
     const [loginId, setLoginId] = useAtom(loginIdState);
@@ -97,6 +98,7 @@ export default function ReviewDetail() {
                     setRating(data.reviewRating);
                     setLikeCount(data.reviewLike);
                     setWriter(data.reviewWriter);
+                    setSpoiler(data.reviewSpoiler);
                     console.log(data.reviewWriter, "작성자");
                 }
                 if (accessToken && loginId) {
@@ -229,6 +231,7 @@ export default function ReviewDetail() {
     //모달
     const modal1 = useRef();
     const modal2 = useRef();
+    const modal3 = useRef();
 
     const openModal1 = () => {
         const open = new Modal(modal1.current);
@@ -238,12 +241,20 @@ export default function ReviewDetail() {
         const open = new Modal(modal2.current);
         open.show();
     }
+    const openModal3 = () => {
+        const open = new Modal(modal3.current);
+        open.show();
+    }
     const closeModal1 = () => {
         const close = Modal.getInstance(modal1.current);
         if (close) close.hide();
     }
     const closeModal2 = () => {
         const close = Modal.getInstance(modal2.current);
+        if (close) close.hide();
+    }
+    const closeModal3 = () => {
+        const close = Modal.getInstance(modal3.current);
         if (close) close.hide();
     }
 
@@ -271,17 +282,22 @@ export default function ReviewDetail() {
         console.log("최종 삭제 요청 URL:", url);
 
         try {
-        const { data } = await axios.delete(`/review/${contentsId}/${reviewNo}`)
-        toast.success("리뷰 삭제 완료"); 
-        navigate("/");
+            const { data } = await axios.delete(`/review/${contentsId}/${reviewNo}`)
+            toast.success("리뷰 삭제 완료");
+            navigate("/");
         }
         catch (error) {
-            console.error("리뷰 삭제 오류:",error.response);
+            console.error("리뷰 삭제 오류:", error.response);
             toast.error("리뷰 삭제 중 오류가 발생했습니다");
         }
     }, [reviewNo, contentsId])
 
+    //스포일러
+    const [spoiler, setSpoiler] = useState("");
 
+    const isSpoiler = useMemo(() => {
+        return review.reviewSpoiler === "Y";
+    }, [review.reviewSpoiler])
 
 
     //render
@@ -291,14 +307,11 @@ export default function ReviewDetail() {
                 <div className="col d-flex justify-content-between align-items-center">
                     {/* 본인이면  mainTitleB 버튼 나와서 수정, 삭제  모달*/}
                     <span className="mainTitle mx-auto">리뷰</span>
-
-
                     {isWriter && (
                         <button className="mainTitleB" type="button" onClick={openModal1}
                             data-bs-dismiss="ModalToggle1"
                         ><BsThreeDotsVertical /></button>
                     )}
-
                 </div>
                 <div className="mt-4 mb-4">
                     <span className="userId">닉네임</span>
@@ -308,7 +321,53 @@ export default function ReviewDetail() {
                     {contentsDetail.contentsTitle}
                 </div>
                 <div className="d-flex align-items-center mb-3">
-                    <span className="me-2">내 평가</span>
+                    {isWriter && (
+                        <span className="me-2">내 평가</span>
+                    )}
+                    <span><FaStar className="littleStar me-1 mb-1" />{reviewDate}</span>
+                    <span className="ms-3"><FcMoneyTransfer className="me-2" />{review.reviewPrice}원</span>
+                </div>
+                <hr className="HR" />
+                {isSpoiler && (
+                    <div className="detailSpo"><FaRegEye /> 스포일러</div>
+                )}
+                <div className="mt-2 reviewText">{review.reviewText}</div>
+                <div className="col iconBox">
+                    <div className="ms-2">
+                        <span><IoHeartCircleSharp className="me-2 iconH" />
+                            <span style={{ fontSize: "20px" }}>{likeCount}개</span>
+                        </span>
+                    </div>
+                    <hr className="HR" />
+                    <div className="mb-1">
+                        <button onClick={handleLikeToggle} style={{ color: isLiked ? "#7188faff" : "white" }} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
+                        <button onClick={copyLink} type="button" className="ms-2 mainTitleB"><FaShare className="me-2 icon" />공유하기</button>
+                    </div>
+
+                </div>
+            </div>
+            {/* 수정하기 */}
+            <div className="row">
+                <div className="col d-flex justify-content-between align-items-center">
+                    {/* 본인이면  mainTitleB 버튼 나와서 수정, 삭제  모달*/}
+                    <span className="mainTitle mx-auto">리뷰</span>
+                    {isWriter && (
+                        <button className="mainTitleB" type="button" onClick={openModal1}
+                            data-bs-dismiss="ModalToggle1"
+                        ><BsThreeDotsVertical /></button>
+                    )}
+                </div>
+                <div className="mt-4 mb-4">
+                    <span className="userId">닉네임</span>
+                    <span className="time ms-3">{formattedDate}</span>
+                </div>
+                <div className="col title mb-2">
+                    {contentsDetail.contentsTitle}
+                </div>
+                <div className="d-flex align-items-center mb-3">
+                    {isWriter && (
+                        <span className="me-2">내 평가</span>
+                    )}
                     <span><FaStar className="littleStar me-1 mb-1" />{reviewDate}</span>
                     <span className="ms-3"><FcMoneyTransfer className="me-2" />{review.reviewPrice}원</span>
                 </div>
@@ -341,7 +400,8 @@ export default function ReviewDetail() {
                                     </button>
                                 </div>
                                 <div>
-                                    <button type="button" className="ms-2 mt-2 modalButton">리뷰 수정하기</button>
+                                    <button type="button" className="ms-2 mt-2 modalButton"
+                                        onClick={openModal3}>리뷰 수정하기</button>
                                 </div>
                                 <div>
                                     <button type="button" className="ms-2 modalButton mt-4"
@@ -353,7 +413,7 @@ export default function ReviewDetail() {
                 </div>
             </div>
             {/* 삭제 모달 */}
-            <div className="modal fade floating-modal" id="ModalToggle2" data-bs-backdrop="static" tabIndex="-1" ref={modal2}
+            <div className="modal fade" id="ModalToggle2" data-bs-backdrop="static" tabIndex="-1" ref={modal2}
                 data-bs-keyboard="false">
                 <div className="modal-dialog modal-sm">
                     <div className="two">
@@ -372,11 +432,11 @@ export default function ReviewDetail() {
                                         closeModal2();
                                     }} className="closeB col-5 ms-4 p-2">취소하기</button>
                                     <button type="button" className="deleteB col-5 me-4"
-                                    onClick={()=>{
-                                        closeModal1();
-                                        closeModal2();
-                                        Ondelete();
-                                    }}>삭제하기</button>
+                                        onClick={() => {
+                                            closeModal1();
+                                            closeModal2();
+                                            Ondelete();
+                                        }}>삭제하기</button>
                                 </div>
                             </div>
                         </div>

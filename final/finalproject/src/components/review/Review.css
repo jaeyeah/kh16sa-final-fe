@@ -439,3 +439,6 @@ textAA:focus::placeholder {
 .deleteB {
     background-color: rgb(69, 90, 182);
 }
+.detailSpo {
+    color: rgb(189, 190, 197);
+}
