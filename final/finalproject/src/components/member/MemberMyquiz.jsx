@@ -105,7 +105,7 @@ export default function MemberMypage(){
                                     <td className="quiz-option quiz-wrong">X</td>
                                 )}
 
-                            <td className="quiz-normal"></td>
+                            <td className="quiz-normal">{answerQuiz.correctRate * 100}%</td>
                         </tr>
                     ))}
                     </tbody>
