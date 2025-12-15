@@ -1,11 +1,12 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { toast } from "react-toastify";
 
 
 
 export default function BoardDetail(){
-
+    const navigate = useNavigate();
     //state
     const [board, setBoard] = useState({});
     const {boardNo} = useParams();
@@ -23,8 +24,19 @@ export default function BoardDetail(){
         setBoard(data);
     },[])
 
-    const deleteBoard = useCallback(()=>{
-
+    const deleteBoard = useCallback(async()=>{
+        const choice = window.confirm("게시글을 삭제하시겠습니까?");
+        if(choice === false) return;
+        try {
+            await axios.delete(`/board/${boardNo}`);
+            console.log("삭제 완료");
+            toast.success("게시글이 삭제되었습니다");
+            navigate("/board/list");
+        }
+        catch(err){
+            toast.error("삭제 실패")
+            return;
+        }
     },[])
 
     //rendar

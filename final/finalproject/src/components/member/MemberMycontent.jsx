@@ -38,7 +38,7 @@ export default function MemberMycontent() {
             await axios.delete(`/watchlist/${contentsId}/${loginId}`);
             console.log("삭제성공");
             toast.success("찜목록이 삭제되었습니다");
-            loadData()
+            loadData();
         }
         catch (err) {
             console.error(err);
