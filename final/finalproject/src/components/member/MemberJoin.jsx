@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 import "./Member.css";
 
-export default function member(){
+export default function MemberJoin(){
     //도구
     const navigate = useNavigate();
 

@@ -34,7 +34,6 @@ export default function ReviewDetail() {
     const [accessToken, setAccessToken] = useAtom(accessTokenState);
     const [refreshToken, setRefreshToken] = useAtom(refreshTokenState);
 
-
     const [review, setReview] = useState({
         reviewRating: 0,
         reviewSpoiler: "N",
@@ -150,15 +149,20 @@ export default function ReviewDetail() {
         return path ? `${TMDB_IMAGE_BASE_URL}${path}` : 'https://placehold.co/500x750/cccccc/333333?text=No+Image';
     }, []);
 
-    //별점 기능 구현
+     //별점 기능 구현
     const [rating, setRating] = useState(0);
+    const [price, setPrice] = useState(0);
     const [ratingAlert, setRatingAlert] = useState(false);
 
     const handleStarClick = (num) => {
         setRating(num);  // 클릭한 별 번호로 rating 설정
+        const calcPrice = num * 3000;
+        setPrice(calcPrice.toLocaleString('ko-KR')); //별의 개수로 price를 콤마 찍어서 설정
+
         setReview(prev => ({
             ...prev,
-            reviewRating: num
+            reviewRating: num,
+            reviewPrice: calcPrice
         }));
     };
 
@@ -241,10 +245,6 @@ export default function ReviewDetail() {
         const open = new Modal(modal2.current);
         open.show();
     }
-    const openModal3 = () => {
-        const open = new Modal(modal3.current);
-        open.show();
-    }
     const closeModal1 = () => {
         const close = Modal.getInstance(modal1.current);
         if (close) close.hide();
@@ -253,20 +253,39 @@ export default function ReviewDetail() {
         const close = Modal.getInstance(modal2.current);
         if (close) close.hide();
     }
+    const openModal3 = () => {
+        const open = new Modal(modal3.current);
+        open.show();
+    }
     const closeModal3 = () => {
         const close = Modal.getInstance(modal3.current);
         if (close) close.hide();
     }
+       //가격 입력창 제어 함수
+    const changeNum = useCallback((e) => {
+        const regex = /[^0-9]+/g;
+        const replacement = e.target.value.replace(regex, "");
+        const number = replacement.length == 0 ? "" : parseInt(replacement);
 
+        const formattedNumber = number === 0 ? "" : number.toLocaleString('ko-KR');
+        setPrice(formattedNumber);
 
-    // const openModal = useCallback(() => {
-    //     const bsModal = new Modal(modal.current);
-    //     bsModal.show();
-    // }, [modal]);
-    // const closeModal = useCallback(() => {
-    //     const bsModal = Modal.getInstance(modal.current);
-    //     if (bsModal) bsModal.hide();
-    // }, [modal]);
+        let newRating =  0;
+        if (number >= 15000) {
+            newRating = 5;
+        } else {
+            newRating = Math.floor(number / 3000);
+        }
+
+        setRating(newRating);
+
+        setReview(prev => ({
+            ...prev,
+            reviewPrice: number,
+            reviewRating: newRating
+        }));
+
+    }, [price]);
 
     //작성자
     const [writer, setWriter] = useState("");
@@ -299,22 +318,76 @@ export default function ReviewDetail() {
         return review.reviewSpoiler === "Y";
     }, [review.reviewSpoiler])
 
+    // 수정하기
+    const changeTextValue = useCallback(e => {
+    const { name, value } = e.target;
+    setReview(prev => ({
+        ...prev,
+        [name]: value
+    }));
+}, []);
+
+    const changeSpoilerValue = useCallback(e => { //스포일러
+        setReview(prev => ({
+            ...prev,
+            reviewSpoiler : e.target.checked ? "Y" : "N"
+        }))
+    }, [])
+
+    const sendData = useCallback(()=> {
+        const payload = {
+            reviewText: review.reviewText,
+            reviewRating: review.reviewRating,
+            reviewSpoiler: review.reviewSpoiler,
+            reviewPrice: review.reviewPrice,   
+        }
+
+        axios.patch(`/review/${contentsId}/${reviewNo}`, payload)
+        .then(() => {
+            toast.success("리뷰 수정 완료");
+            setReviewView(true);
+        })
+        .catch(err=>{
+            toast.error("수정 도중 오류가 발생했습니다");
+        })
+            // const { data } = await axios.get(`/review/${contentsId}/${reviewNo}`, { headers });
+    }, [review, reviewNo, contentsId]);
+
+    //수정하기 버튼
+    const [reviewView, setReviewView] = useState(true);
+
+    const openView = useCallback(()=>{
+        setReviewView(true);
+    },[])
+
+    const openEdit = useCallback(()=> {
+        setReviewView(false);
+    },[])
+
+    
 
     //render
     return (<>
+        
         <div className="container">
-            <div className="row">
+            {/* (단일) 조회 페이지 */}
+            {( reviewView &&
+            <div className="row"> 
                 <div className="col d-flex justify-content-between align-items-center">
-                    {/* 본인이면  mainTitleB 버튼 나와서 수정, 삭제  모달*/}
                     <span className="mainTitle mx-auto">리뷰</span>
                     {isWriter && (
                         <button className="mainTitleB" type="button" onClick={openModal1}
                             data-bs-dismiss="ModalToggle1"
                         ><BsThreeDotsVertical /></button>
                     )}
+                    {!isWriter &&(
+                        <button className="mainTitleB" type="button" onClick={openModal3}
+                            data-bs-dismiss="ModalToggle3"
+                        ><BsThreeDotsVertical /></button>
+                    )}
                 </div>
                 <div className="mt-4 mb-4">
-                    <span className="userId">닉네임</span>
+                    <span className="userId">{loginNickname}</span>
                     <span className="time ms-3">{formattedDate}</span>
                 </div>
                 <div className="col title mb-2">
@@ -335,30 +408,32 @@ export default function ReviewDetail() {
                 <div className="col iconBox">
                     <div className="ms-2">
                         <span><IoHeartCircleSharp className="me-2 iconH" />
-                            <span style={{ fontSize: "20px" }}>{likeCount}개</span>
+                            <span style={{ fontSize: "20px", fontWeight: "bold" }}>{likeCount}개</span>
                         </span>
                     </div>
                     <hr className="HR" />
                     <div className="mb-1">
-                        <button onClick={handleLikeToggle} style={{ color: isLiked ? "#7188faff" : "white" }} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
+                        <button onClick={handleLikeToggle} style={{ color: isLiked ? "#7188faff" : "white", fontWeight: "bold" }} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
                         <button onClick={copyLink} type="button" className="ms-2 mainTitleB"><FaShare className="me-2 icon" />공유하기</button>
                     </div>
 
                 </div>
             </div>
-            {/* 수정하기 */}
-            <div className="row">
-                <div className="col d-flex justify-content-between align-items-center">
+           )}
+            {/* 수정 페이지 */}
+           {( !reviewView &&
+            <div className="row position-relative">
+                <div className="col text-center">
                     {/* 본인이면  mainTitleB 버튼 나와서 수정, 삭제  모달*/}
-                    <span className="mainTitle mx-auto">리뷰</span>
-                    {isWriter && (
-                        <button className="mainTitleB" type="button" onClick={openModal1}
-                            data-bs-dismiss="ModalToggle1"
-                        ><BsThreeDotsVertical /></button>
-                    )}
+                    <span className="mainTitle2 mx-auto">리뷰</span>
+                    <button type="button" className="save position-absolute end-0 top-0"
+                    onClick={sendData}
+                    >
+                        저장하기
+                    </button>
                 </div>
                 <div className="mt-4 mb-4">
-                    <span className="userId">닉네임</span>
+                    <span className="userId">{loginNickname}</span>
                     <span className="time ms-3">{formattedDate}</span>
                 </div>
                 <div className="col title mb-2">
@@ -369,27 +444,53 @@ export default function ReviewDetail() {
                         <span className="me-2">내 평가</span>
                     )}
                     <span><FaStar className="littleStar me-1 mb-1" />{reviewDate}</span>
-                    <span className="ms-3"><FcMoneyTransfer className="me-2" />{review.reviewPrice}원</span>
                 </div>
                 <hr className="HR" />
-                {isSpoiler && (
-                    <div className="detailSpo"><FaRegEye /> 스포일러</div>
-                )}
-                <div className="mt-2 reviewText">{review.reviewText}</div>
-                <div className="col iconBox">
-                    <div className="ms-2">
-                        <span><IoHeartCircleSharp className="me-2 iconH" />
-                            <span style={{ fontSize: "20px" }}>{likeCount}개</span>
-                        </span>
+                <div className="mt-2 reviewText">
+                    <textarea className="reviewText2" value={review.reviewText}
+                    name="reviewText"
+                    onChange={changeTextValue}
+                    > </textarea>
+                </div>
+                <div className="col iconBox2">
+                    <div className="rr">
+                        <div className="me-5">
+                            <span className="ms-2"><FaStar/> 별점</span>
+                            <span className="ms-2 me-5" value={review.reviewRating}
+                            name="reviewRating"
+                            >
+                                {[1, 2, 3, 4, 5].map((num) => (
+                                    <FaStar
+                                        key={num}
+                                        className={num <= rating ? "fullStar3" : "emptyStar3"}
+                                        onClick={() => handleStarClick(num)}
+                                        style={{ cursor: "pointer" }}
+                                    />
+                                ))}
+                            </span>
+                            <div className="mt-1 ms-3 input-group price-wrapper text-center w-25">
+                                <input type="text" inputMode="numerice"
+                                    className="price form-control price-bar text-light input-group"
+                                    // value={price} onChange={changeNum}
+                                    />
+                                <span className="input-group-text price-label text-light">원</span>
+                            </div>
+                        </div>
                     </div>
-                    <hr className="HR" />
-                    <div className="mb-1">
-                        <button onClick={handleLikeToggle} style={{ color: isLiked ? "#7188faff" : "white" }} type="button" className="mainTitleB"><FaHeart className="me-2 icon ms-1" />좋아요</button>
-                        <button onClick={copyLink} type="button" className="ms-2 mainTitleB"><FaShare className="me-2 icon" />공유하기</button>
+                    <hr />
+                    <div className="d-flex align-items-center ms-2 mb-1 justify-content-between">
+                        <span style={{ fontSize: "20px", fontWeight: "bold" }}><FaRegEye className="spo2 me-1" />스포일러 포함</span>
+                        <div className="form-switch form-check">
+                            <input type="checkbox" className="me-3 form-check-input spo3"
+                                checked={review.reviewSpoiler === "Y"}
+                                onChange={changeSpoilerValue}
+                                name="reviewSpoiler"
+                                 />
+                        </div>
                     </div>
-
                 </div>
             </div>
+            )}
             {/* 모달(Modal) */}
             <div className="modal fade" id="ModalToggle1" tabIndex="-1" ref={modal1}
                 data-bs-keyboard="false">
@@ -404,11 +505,16 @@ export default function ReviewDetail() {
                                 </div>
                                 <div>
                                     <button type="button" className="ms-2 mt-2 modalButton"
-                                        onClick={openModal3}>리뷰 수정하기</button>
+                                        onClick={()=> {
+                                            closeModal1();
+                                            openEdit();
+                                        }}>리뷰 수정하기</button>
                                 </div>
                                 <div>
                                     <button type="button" className="ms-2 modalButton mt-4"
-                                        onClick={openModal2}>리뷰 삭제하기</button>
+                                        onClick={()=>{openModal2();
+                                                    closeModal1();
+                                        }}>리뷰 삭제하기</button>
                                 </div>
                             </div>
                         </div>
@@ -440,6 +546,47 @@ export default function ReviewDetail() {
                                             closeModal2();
                                             Ondelete();
                                         }}>삭제하기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/* 신고 모달 */}
+            <div className="modal fade" id="ModalToggle3" data-bs-backdrop="static" tabIndex="-1" ref={modal3}
+                data-bs-keyboard="false">
+                <div className="modal-dialog modal-sm">
+                    <div className="three">
+                        <div className="modal-content">
+                            <div className="modal-body">
+                                <div className="row">
+                                <div className="col report text-center mt-2 d-flex">
+                                    <div className="col-2 mt-1" style={{marginLeft:"40%"}}>신고</div>
+                                    <div className="col-2">
+                                    <button type="button" className="modalButtonX2" onClick={closeModal3}>
+                                        <FaXmark />
+                                    </button>
+                                    </div>
+                                </div>
+
+                                </div>
+                                <div style={{color:"white"}} className="mt-4">
+                                    <input type="checkbox" className="ms-3" /><span className="ms-3">스포일러 포함</span><br />
+                                    <input type="checkbox" className="ms-3" /><span className="ms-3">작품을 보지 않고 쓴 내용</span><br />
+                                    <input type="checkbox" className="ms-3" /><span className="ms-3">홍보성 및 영리목적</span><br />
+                                    <input type="checkbox" className="ms-3" /><span className="ms-3">욕설 및 특정인 비방</span><br />
+                                    <input type="checkbox" className="ms-3" /><span className="ms-3">음란성 및 선정성</span><br />
+                                    <input type="checkbox" className="ms-3" /><span className="ms-3">편파적인 언행</span><br />
+                                    <input type="checkbox" className="ms-3" /><span className="ms-3">기타</span><br />
+                                    <hr className="HR"/>
+                                </div>
+                                    <div style={{color:"white"}} className="mt-4"><span>더 자세한 의견 / 추후 디자인</span></div>
+                                    <textarea name="" id=""></textarea>
+                                <div className="mt-4 d-flex justify-content-between">
+                                    <button type="button" className="reportB col-5 me-4 mb-1"
+                                        onClick={() => {
+                                            closeModal3();
+                                        }}>신고하기</button>
                                 </div>
                             </div>
                         </div>

@@ -36,8 +36,9 @@ import AdminMain from "./admin/AdminMain";
 import AdminMemberPage from "./admin/AdminMemberPage";
 import AdminMemberDetail from "./admin/AdminMemberDetail";
 import MyCreatedQuizDetail from "./quiz/MyCreatedQuizDetail";
-
-
+import BoardInsert from "./board/BoardInsert";
+import BoardList from "./board/BoardList";
+import BoardContentsList from "./board/BoardContentsList";
 
 export default function Content() {
     return (<>
@@ -73,6 +74,10 @@ export default function Content() {
                     {/* 회원 페이지 */}
                     <Route path="/point/main" element={<PointMain/>}></Route>
 
+                    {/* 게시글 페이지 */}
+                    <Route path="/board/list" element={<BoardList/>}></Route>
+                    <Route path="/board/List/:contentsId" element={<BoardContentsList/>}></Route>
+                    <Route path="/board/insert" element={<BoardInsert/>}></Route>
 
 
                     {/* 회원 페이지 */}
