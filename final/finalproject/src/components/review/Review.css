@@ -546,8 +546,9 @@ textAA:focus::placeholder {
 }
 .save {
     padding: 1em;
-    border-radius: 0.8em;
-    background-color: #003481;
+    border: none;
+    border-radius: 1.1em;
+    background-color: #313f57;
     color: #fff;
     font-weight: bold;
     font-size: 20px;
@@ -555,4 +556,10 @@ textAA:focus::placeholder {
 .save:hover {
     filter: brightness(85%) !important;
     transform: translateY(1px);
+}
+.price2 {
+  color: #fff;
+  background: none;
+  border: none;
+  border-radius: 0.8em;
 }

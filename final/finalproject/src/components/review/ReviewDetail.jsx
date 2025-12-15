@@ -34,7 +34,6 @@ export default function ReviewDetail() {
     const [accessToken, setAccessToken] = useAtom(accessTokenState);
     const [refreshToken, setRefreshToken] = useAtom(refreshTokenState);
 
-
     const [review, setReview] = useState({
         reviewRating: 0,
         reviewSpoiler: "N",
@@ -297,14 +296,25 @@ export default function ReviewDetail() {
 
     })
 
+    //수정하기 버튼
+    const [reviewView, setReviewView] = useState(true);
+
+    const openView = useCallback(()=>{
+        setReviewView(true);
+    },[])
+
+    const openEdit = useCallback(()=> {
+        setReviewView(false);
+    },[])
 
     //render
     return (<>
+        
         <div className="container">
             {/* (단일) 조회 페이지 */}
+            {( reviewView &&
             <div className="row"> 
                 <div className="col d-flex justify-content-between align-items-center">
-                    {/* 본인이면  mainTitleB 버튼 나와서 수정, 삭제  모달*/}
                     <span className="mainTitle mx-auto">리뷰</span>
                     {isWriter && (
                         <button className="mainTitleB" type="button" onClick={openModal1}
@@ -313,7 +323,7 @@ export default function ReviewDetail() {
                     )}
                 </div>
                 <div className="mt-4 mb-4">
-                    <span className="userId">닉네임</span>
+                    <span className="userId">{loginNickname}</span>
                     <span className="time ms-3">{formattedDate}</span>
                 </div>
                 <div className="col title mb-2">
@@ -345,17 +355,21 @@ export default function ReviewDetail() {
 
                 </div>
             </div>
+           )}
             {/* 수정 페이지 */}
+           {( !reviewView &&
             <div className="row position-relative">
                 <div className="col text-center">
                     {/* 본인이면  mainTitleB 버튼 나와서 수정, 삭제  모달*/}
                     <span className="mainTitle2 mx-auto">리뷰</span>
-                    <button type="button" className="save position-absolute end-0 top-0">
+                    <button type="button" className="save position-absolute end-0 top-0"
+                    onClick={openView}
+                    >
                         저장하기
                     </button>
                 </div>
                 <div className="mt-4 mb-4">
-                    <span className="userId">닉네임</span>
+                    <span className="userId">{loginNickname}</span>
                     <span className="time ms-3">{formattedDate}</span>
                 </div>
                 <div className="col title mb-2">
@@ -370,13 +384,19 @@ export default function ReviewDetail() {
                 </div>
                 <hr className="HR" />
                 <div className="mt-2 reviewText">
-                    <textarea className="reviewText2" value={review.reviewText}> </textarea>
+                    <textarea className="reviewText2" value={review.reviewText}
+                    onChange={e => 
+                        setReview({
+                            ...review,
+                            reviewText:e.target.value
+                        })
+                    }> </textarea>
                 </div>
                 <div className="col iconBox2">
                     <div className="rr">
                         <div className="me-5">
                             <span className="ms-2"><FaStar/> 별점</span>
-                            <span className="ms-2 me-4" value={review.reviewRating}>
+                            <span className="ms-2 me-5" value={review.reviewRating}>
                                 {[1, 2, 3, 4, 5].map((num) => (
                                     <FaStar
                                         key={num}
@@ -387,7 +407,15 @@ export default function ReviewDetail() {
                                 ))}
                             </span>
                             <span className="pp"><FcMoneyTransfer />
-                            <span className="ms-2 me-2">가격</span>{review.reviewPrice}</span>
+                            <span className="ms-2 me-3">가격</span>
+                            <input className="price2" value={review.reviewPrice} onChange={e=>{
+                                setReview({
+                                    ...review,
+                                    reviewPrice:e.target.value
+                                })
+                            }}/>
+                            <span>신고버튼????</span>
+                            </span>
                         </div>
                     </div>
                     <hr />
@@ -406,6 +434,7 @@ export default function ReviewDetail() {
                     </div>
                 </div>
             </div>
+            )}
             {/* 모달(Modal) */}
             <div className="modal fade" id="ModalToggle1" tabIndex="-1" ref={modal1}
                 data-bs-keyboard="false">
@@ -420,11 +449,16 @@ export default function ReviewDetail() {
                                 </div>
                                 <div>
                                     <button type="button" className="ms-2 mt-2 modalButton"
-                                        onClick={closeModal1}>리뷰 수정하기</button>
+                                        onClick={()=> {
+                                            closeModal1();
+                                            openEdit();
+                                        }}>리뷰 수정하기</button>
                                 </div>
                                 <div>
                                     <button type="button" className="ms-2 modalButton mt-4"
-                                        onClick={openModal2}>리뷰 삭제하기</button>
+                                        onClick={()=>{openModal2();
+                                                    closeModal1();
+                                        }}>리뷰 삭제하기</button>
                                 </div>
                             </div>
                         </div>

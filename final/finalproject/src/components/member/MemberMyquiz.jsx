@@ -2,8 +2,8 @@ import { useAtom } from "jotai";
 import { loginIdState, loginNicknameState } from "../../utils/jotai";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-
-
+import { Link } from "react-router-dom";
+import { FaChartBar } from "react-icons/fa";
 
 export default function MemberMypage(){
     const [loginId, setLoginId] = useAtom(loginIdState);
@@ -11,7 +11,9 @@ export default function MemberMypage(){
     
     //state
     const [answerQuizList, setAnswerQuizList] = useState([]);
+    const [answerQuizRate, setAnswerQuizRate] = useState([]);
     const [addQuizList, setAddQuizList] = useState([]);
+    
 
     //callback 
     const loadData = useCallback(async()=>{
@@ -19,84 +21,145 @@ export default function MemberMypage(){
         setAnswerQuizList(answerList.data);
         const addList = await axios.get(`/member/myaddquiz/${loginId}`);
         setAddQuizList(addList.data);
+        const rateList = await axios.get(`/member/myanswerRate/${loginId}`);
+        setAnswerQuizRate(rateList.data);
 
-        console.log(answerList);
         console.log(addList);
+        console.log(answerList);
     },[loginId]);
 
-
-
+   
     useEffect(()=>{
         loadData();
     },[loadData]);
 
     
     return(<>
+
         <h1 className="text-center mt-4"> {loginNickname}님의 퀴즈</h1>
         
-        
-        <div className="row mt-2">
-            <div className="col text-center">
-                <label className="fs-4 mb-2">내가 푼 퀴즈</label>
-                <table className="table table-responsive table-hover table-striped">
-                    <thead className="quiz-table-thead">
-                        <tr>
-                            <td>문제</td>
-                            <td>정답여부</td>
-                            <td>정답률</td>
+        {/* 나의 퀴즈 기록 통계 */}
+        <div className="card border-0 shadow-sm quiz-dark-card">
+            <div className="card-header fw-bold border-0 stats-header-dark text-center p-3 fs-5">
+                <FaChartBar className="me-2" />
+                나의 퀴즈 기록
+            </div>
+            <div className="card-body">
+                <div className="row text-center text-light">
+                    <div className="col-5">
+                        <span className="fs-5">콘텐츠</span>
+                    </div>
+                    <div className="col-2">
+                        <span className="fs-5">정답</span>
+                    </div>
+                    <div className="col-2">
+                        <span className="fs-5">오답</span>
+                    </div>
+                    <div className="col-3">
+                        <span className="fs-5">정답률</span>
+                    </div>
+                </div>
+                <hr/>
+                {answerQuizRate.map((answerQuizRate,index)=>(
+                <div className="row text-center mt-2" key={index}>
+                    <div className="col-5 text-truncate">
+                        <Link className="quiz-link" to={`/contents/detail/${answerQuizRate.quizContentsId}`}>{answerQuizRate.contentsTitle}</Link>
+                    </div>
+                    <div className="col-2">
+                        {answerQuizRate.correctCount}
+                    </div>
+                    <div className="col-2">
+                        {answerQuizRate.wrongCount}
+                    </div>
+                    <div className="col-3 p-0 fs-bold rate-bar">
+                        <div className="rate-fill fs-6 text-dark" style={{ width: `${answerQuizRate.correctRate * 100}%` }}>
+                            {(answerQuizRate.correctRate*100).toFixed(2)} % 
+                        </div>
+                    </div>
+                </div>
+                ))}
+            </div>
+        </div>
+
+
+        <div className="mt-4 card quiz-dark-card text-center">
+
+            <div className="card-header fw-bold border-0 stats-header-dark p-3 fs-5">
+                내가 푼 퀴즈
+            </div>
+            <div className="table-responsive">
+            <table className="table">
+                <thead >
+                    <tr className="text-truncate">
+                        <th  className="quiz-table-thead">콘텐츠</th>
+                        <th  className="quiz-table-thead">문제</th>
+                        <th  className="quiz-table-thead quiz-table-thead-ex">정답여부</th>
+                        <th  className="quiz-table-thead quiz-table-thead-ex">정답률</th>
+                    </tr>
+                </thead>
+                <tbody >
+                    {answerQuizList.map((answerQuiz)=>(
+                        <tr key={answerQuiz.quizLogQuizId}>
+                            <td className="quiz-normal text-truncate">
+                                <Link className="quiz-link" to={`/contents/detail/${answerQuiz.quizContentsId}`}>{answerQuiz.contentsTitle}</Link>
+                            </td>
+                            <td className="text-truncate quiz-question">
+                                <Link className="quiz-link text-white" to={`/member/mypage/quiz/detail/${answerQuiz.quizContentsId}`}>{answerQuiz.quizQuestion}</Link>
+                            </td>
+                            {answerQuiz.quizLogIsCorrect==="Y" ? (
+                                <td className="quiz-option quiz-correct">O</td>
+                            ) : (
+                                <td className="quiz-option quiz-wrong">X</td>
+                            )}
+                            <td className="rate-bar ">
+                                <div className="rate-fill fs-6 text-light d-flex text-nowrap" style={{ width: `${answerQuiz.correctRate * 100}%` }}>{(answerQuiz.correctRate * 100).toFixed(2)}%</div>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+            </table>
+            </div>
+
+    </div>
+
+        <div className="mt-4 card quiz-dark-card text-center">
+            <div className="card-header fw-bold border-0 stats-header-dark p-3 fs-5">
+                내가 등록한 퀴즈
+            </div>
+            <div className="table-responsive">
+                <table className="table">
+                    <thead>
+                        <tr className="text-truncate quiz-table-thead">
+                            <th className="quiz-table-thead">문제</th>
+                            <th className="quiz-table-thead">풀이횟수</th>
+                            <th className="quiz-table-thead quiz-table-thead-ex">보기</th>
+                            <th className="quiz-table-thead quiz-table-thead-ex">정답률</th>
                         </tr>
                     </thead>
-                       {answerQuizList.map((answerQuiz)=>(
-                        <tbody key={answerQuiz.quizId}>
-                            <tr>
-                                <td>{answerQuiz.quizQuestion}</td>
-                                <td>{answerQuiz.quizLogIsCorrect}</td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                      ))}
-             </table>
-            </div>
-        </div>
-
-
-        <div className="row mt-2">
-            <div className="col text-center">
-                <label className="fs-4 mb-2">내가 등록한 퀴즈</label>
-                <div className="table-responsive">
-                    <table className="table table-responsive table-hover table-striped">
-                        <thead>
-                            <tr className="text-truncate quiz-table-thead">
-                                <td >문제</td>
-                                <td>1번</td>
-                                <td>2번</td>
-                                <td>3번</td>
-                                <td>4번</td>
-                                <td>정답</td>
-                                <td>정답률</td>
-                                <td>풀이횟수</td>
-                            </tr>
-                        </thead>
+                    <tbody >
                         {addQuizList.map((addQuiz)=>(
-                            <tbody key={addQuiz.quizId}>
-                                <tr>
-                                    <td className="text-truncate quiz-question">{addQuiz.quizQuestion}</td>
-                                    <td className="text-truncate quiz-option">{addQuiz.quizQuestionOption1}</td>
-                                    <td className="text-truncate quiz-option">{addQuiz.quizQuestionOption2}</td>
-                                    <td className="text-truncate quiz-option">{addQuiz.quizQuestionOption3}</td>
-                                    <td className="text-truncate quiz-option">{addQuiz.quizQuestionOption4}</td>
-                                    <td className="quiz-answer">{addQuiz.quizAnswer}</td>
-                                    <td></td>
-                                    <td>{addQuiz.solveCount}</td>
-                                </tr>
-                            </tbody>
-                        ))}
-                </table>
-                </div>
+                            <tr key={addQuiz.quizId}>
+                                <td className="text-truncate quiz-question">
+                                   <Link className="quiz-link fs-5" to={`/contents/detail/${addQuiz.quizContentsId}`}> [ {addQuiz.contentsTitle} ]</Link> 
+                                    <br/>
+                                    <Link className="quiz-link fs-6 text-white" to={`/member/mypage/quiz/detail/${addQuiz.quizContentsId}`}> {addQuiz.quizQuestion}</Link> 
+                                </td>
+                                <td className="quiz-normal">{addQuiz.quizSolveCount}</td>
+                                <td className={`text-truncate ${addQuiz.quizAnswer==="1" ? "quiz-answer" : "quiz-option"}`}>{addQuiz.quizQuestionOption1}</td>
+                                <td className={`text-truncate ${addQuiz.quizAnswer==="2" ? "quiz-answer" : "quiz-option"}`}>{addQuiz.quizQuestionOption2}</td>
+                                    {addQuiz.quizQuestionType === "MULTI" && (
+                                            <>
+                                                <td className={`text-truncate ${addQuiz.quizAnswer==="3" ? "quiz-answer" : "quiz-option"}`}>{addQuiz.quizQuestionOption3}</td>
+                                                <td className={`text-truncate ${addQuiz.quizAnswer==="4" ? "quiz-answer" : "quiz-option"}`}>{addQuiz.quizQuestionOption4}</td>
+                                            </>
+                                        )}
+                                <td className="quiz-normal">{addQuiz.correctRate * 100}%</td>
+                            </tr>
+                    ))}
+                    </tbody>
+            </table>
             </div>
         </div>
 
-
-
-    </>)
+</>)
 }
