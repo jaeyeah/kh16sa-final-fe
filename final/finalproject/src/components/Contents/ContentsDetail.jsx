@@ -498,7 +498,11 @@ export default function ContentsDetail() {
                 {/* 컨텐츠 관련 게시글 */}
                 <div className="mt-4 card quiz-dark-card text-center">
                     <div className="card-header fw-bold border-0 stats-header-dark p-3 fs-5">
-                        관련 게시글
+                        <div className="row">
+                            <span className ="col-12 col-md-10 mb-1">최근 게시글</span>
+                            <Link to={`/board/list/${contentsId}`} className="col-md-2 btn btn-secondary">전체보기</Link>
+                        </div>
+                        
                     </div>
                     <div className="table-responsive">
                         <table className="table">
@@ -514,7 +518,7 @@ export default function ContentsDetail() {
                                 {boardList.map((boardList)=>(
                                     <tr key={boardList.boardNo}>
                                         <td className="quiz-normal">{boardList.boardNo}</td>
-                                        <td className="quiz-normal">{boardList.boardTitle}</td>
+                                        <td className="quiz-normal"><Link to={`/board/${boardList.boardNo}`}>{boardList.boardTitle}</Link></td>
                                         <td className="quiz-normal">{boardList.boardWtime}</td>
                                         <td className="quiz-normal">{boardList.boardWriter}</td>
                                     </tr>

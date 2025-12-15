@@ -39,6 +39,7 @@ import MyCreatedQuizDetail from "./quiz/MyCreatedQuizDetail";
 import BoardInsert from "./board/BoardInsert";
 import BoardList from "./board/BoardList";
 import BoardContentsList from "./board/BoardContentsList";
+import BoardDetail from "./board/BoardDetail";
 
 export default function Content() {
     return (<>
@@ -78,6 +79,7 @@ export default function Content() {
                     <Route path="/board/list" element={<BoardList/>}></Route>
                     <Route path="/board/List/:contentsId" element={<BoardContentsList/>}></Route>
                     <Route path="/board/insert" element={<BoardInsert/>}></Route>
+                    <Route path="/board/:boardNo" element={<BoardDetail/>}></Route>
 
 
                     {/* 회원 페이지 */}
