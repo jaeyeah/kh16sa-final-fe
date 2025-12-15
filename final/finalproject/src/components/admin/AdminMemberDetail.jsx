@@ -2,28 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { FaArrowLeft, FaUserSlash, FaSave } from 'react-icons/fa'; // 아이콘 사용 (설치 필요: npm install react-icons)
+import { FaArrowLeft, FaUserSlash, FaSave } from 'react-icons/fa';
 
 export default function AdminMemberDetail() {
-    const { memberId } = useParams(); // URL 파라미터 추출
+    const { memberId } = useParams();
     const navigate = useNavigate();
+
+    
     
     const [member, setMember] = useState(null);
-    const [activeTab, setActiveTab] = useState('quiz'); // 기본 탭
+    const [activeTab, setActiveTab] = useState('quiz');
+
+    const [loading, setLoading] = useState(true);
 
     // 데이터 로드
     useEffect(() => {
         const fetchDetail = async () => {
+            setLoading(true);
+
             try {
-                const res = await axios.get(`/admin/members/${memberId}`)
+
+                //요청 전송
+                const res = await axios.get(`/admin/members/${memberId}`);
                 setMember(res.data);
+
             } catch (error) {
-                console.error(error);
-                Swal.fire("오류", "회원 정보를 불러오지 못했습니다.", "error");
+                console.error("데이터 로딩 실패:", error);
+                
+                await Swal.fire({
+                    icon: 'error',
+                    title: '정보 로드 실패',
+                    text: '회원 정보를 불러올 수 없습니다. (로그인 만료 가능성)',
+                });
                 navigate('/admin/member');
+            } finally {
+                setLoading(false);
             }
         };
-        fetchDetail();
+
+        if (memberId) {
+            fetchDetail();
+        }
     }, [memberId, navigate]);
 
     // 등급 변경
@@ -52,125 +71,195 @@ export default function AdminMemberDetail() {
         }
     };
 
-    if (!member) return <div className="text-white text-center p-5">로딩중...</div>;
+    const handleForceWithdrawal = async () => {
+        const result = await Swal.fire({
+             title: '회원 영구 추방',
+             text: "정말 이 회원을 탈퇴 처리하시겠습니까?",
+             icon: 'warning',
+             showCancelButton: true,
+             confirmButtonColor: '#d33',
+             cancelButtonColor: '#3085d6',
+             confirmButtonText: '네, 추방합니다',
+             cancelButtonText: '취소'
+         });
+ 
+         if (result.isConfirmed) {
+             try {
+                 await axios.delete(`/admin/members/${memberId}`);
+                 Swal.fire('추방 완료', '회원이 삭제되었습니다.', 'success');
+                 navigate('/admin/member'); // 목록으로 이동
+             } catch (error) {
+                 Swal.fire('오류', '삭제 실패', 'error');
+             }
+         }
+    };
+
+    //대기 화면
+    if (loading || !member) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+                <div className="text-white text-center">
+                    <div className="spinner-border text-primary mb-3" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <h5>회원 정보를 불러오는 중입니다...</h5>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="admin-detail-container text-white">
             
-            {/* 1. 상단 헤더 (뒤로가기 + 타이틀) */}
-            <div className="d-flex align-items-center mb-4 border-bottom border-secondary pb-3">
-                <button className="btn btn-outline-light me-3" onClick={() => navigate('/admin/member')}>
-                    <FaArrowLeft /> 목록으로
+            {/* 상단 헤더 */}
+            <div className="d-flex align-items-center flex-wrap gap-3 mb-4 border-bottom border-secondary pb-3">
+                <button className="btn btn-outline-light d-flex align-items-center gap-2 text-nowrap"
+                        onClick={() => navigate('/admin/member')}>
+                    <FaArrowLeft /> 
+                    <span>목록으로</span>
                 </button>
-                <h3 className="mb-0 fw-bold">👤 회원 상세 정보</h3>
+                <h3 className="mb-0 fw-bold text-nowrap">
+                    👤 회원 상세 정보
+                </h3>
             </div>
 
-            <div className="row">
-                {/* --- [왼쪽] 프로필 요약 & 관리 카드 --- */}
-                <div className="col-md-4 mb-4">
-                    <div className="card bg-dark border-secondary shadow-sm h-100">
-                        <div className="card-body text-center">
-                            {/* 프로필 이미지 */}
-                            {/* <img 
-                                src={member.memberImg || "https://via.placeholder.com/150"} 
-                                alt="프로필" 
-                                className="rounded-circle mb-3 border border-2 border-warning"
-                                style={{width: '120px', height: '120px', objectFit: 'cover'}}
-                            /> */}
-                            <h4 className="text-white fw-bold">{member.memberNickname}</h4>
-                            <p className="text-muted mb-4">ID: {member.memberId}</p>
+            {/* 프로필 요약 & 관리 카드 */}
+            <div className="row mb-4">
 
-                            {/* 정보 테이블 */}
-                            <ul className="list-group list-group-flush text-start rounded mb-4">
-                                <li className="list-group-item bg-dark text-white border-secondary d-flex justify-content-between">
-                                    <span className="text-secondary">가입일</span>
-                                    <span>{new Date(member.memberJoin).toLocaleDateString()}</span>
-                                </li>
-                                <li className="list-group-item bg-dark text-white border-secondary d-flex justify-content-between">
-                                    <span className="text-secondary">포인트</span>
-                                    <span className="text-warning fw-bold">{member.memberPoint.toLocaleString()} P</span>
-                                </li>
-                                <li className="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center">
-                                    <span className="text-secondary">등급</span>
-                                    <select 
-                                        className="form-select form-select-sm bg-secondary text-white border-0 w-auto"
-                                        value={member.memberLevel}
-                                        onChange={handleGradeChange}
-                                    >
-                                        <option value="관리자">관리자</option>
-                                        <option value="우수회원">우수회원</option>
-                                        <option value="일반회원">일반회원</option>
-                                    </select>
-                                </li>
-                            </ul>
+                {/* 상세 정보와 탈퇴 버튼 */}
+                {/* PC: 좌우 배치/ 모바일: 상하 배치 */}
 
-                            {/* 관리 버튼 */}
-                            <div className="d-grid gap-2">
-                                <button className="btn btn-danger">
-                                    <FaUserSlash className="me-2" /> 강제 탈퇴 처리
-                                </button>
+                <div className="col-12">
+                    <div className="card bg-dark border-secondary shadow-sm">
+                        <div className="card-body p-4">
+                            
+                            {/* 닉네임과 아이디 */}
+                            <div className="d-flex flex-column flex-md-row align-items-center align-items-md-end mb-4 pb-3 border-bottom border-secondary gap-1 gap-md-3">
+                                <h2 className="fw-bold text-white mb-0" style={{fontSize: '2rem'}}>
+                                    {member.memberNickname}
+                                </h2>
+                                <span className="text-white pb-1 fs-5">
+                                    ID: {member.memberId}
+                                </span>
                             </div>
+
+                            {/* 상세 정보 리스트 */}
+                            <div className="row">
+                                <div className="col-12">
+                                    <ul className="list-group list-group-flush rounded">
+                                        
+                                        {/* 가입일 */}
+                                        <li className="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center px-0">
+                                            <span className="text-secondary fw-bold">가입일</span>
+                                            <span>{new Date(member.memberJoin).toLocaleDateString()}</span>
+                                        </li>
+                                        
+                                        {/* 포인트 */}
+                                        <li className="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center px-0">
+                                            <span className="text-secondary fw-bold">포인트</span>
+                                            <span className="text-warning fw-bold">
+                                                {member.memberPoint ? member.memberPoint.toLocaleString() : 0} P
+                                            </span>
+                                        </li>
+                                        
+                                        {/* 회원 관리 */}
+                                        <li className="list-group-item bg-dark text-white border-secondary d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center border-bottom-0 px-0 pt-3">
+                                            
+                                            <span className="text-secondary fw-bold mb-2 mb-md-0">회원 관리</span>
+                                            
+                                            {/* 오른쪽 컨트롤 영역 */}
+                                            <div className="d-flex align-items-center gap-2 w-100 w-md-auto">
+                                                
+                                                {/* (1) 등급 변경 셀렉트 */}
+                                                <select 
+                                                    className={`form-select form-select-sm bg-secondary text-white border-0 fw-bold flex-grow-1 flex-md-grow-0
+                                                        ${member.memberLevel === '관리자' ? 'text-danger' : 
+                                                          member.memberLevel === '우수회원' ? 'text-info' : ''}`}
+                                                    value={member.memberLevel}
+                                                    onChange={handleGradeChange}
+                                                    style={{ minWidth: '90px' }}
+                                                >
+                                                    <option value="관리자">관리자</option>
+                                                    <option value="우수회원">우수회원</option>
+                                                    <option value="일반회원">일반회원</option>
+                                                </select>
+
+                                                {/* 강제 탈퇴 버튼 */}
+                                                <button 
+                                                    className="btn btn-danger btn-sm fw-bold d-flex align-items-center justify-content-center gap-1 text-nowrap flex-grow-1 flex-md-grow-0" 
+                                                    onClick={handleForceWithdrawal}
+                                                >
+                                                    <FaUserSlash /> 강제 탈퇴
+                                                </button>
+                                            </div>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* --- [오른쪽] 활동 상세 내역 탭 --- */}
-                <div className="col-md-8">
-                    <div className="card bg-dark border-secondary shadow-sm h-100">
+            {/* 활동 상세 내역 탭 */}
+            <div className="row">
+                <div className="col-12">
+                    <div className="card bg-dark border-secondary shadow-sm">
                         <div className="card-header border-secondary bg-transparent">
                             <ul className="nav nav-tabs card-header-tabs border-0">
                                 <li className="nav-item">
                                     <button 
                                         className={`nav-link border-0 ${activeTab === 'quiz' ? 'active bg-secondary text-white' : 'text-secondary'}`}
-                                        onClick={() => setActiveTab('quiz')}
-                                    >
+                                        onClick={() => setActiveTab('quiz')}>
                                         만든 퀴즈
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button 
                                         className={`nav-link border-0 ${activeTab === 'review' ? 'active bg-secondary text-white' : 'text-secondary'}`}
-                                        onClick={() => setActiveTab('review')}
-                                    >
+                                        onClick={() => setActiveTab('review')}>
                                         작성 리뷰
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button 
                                         className={`nav-link border-0 ${activeTab === 'report' ? 'active bg-secondary text-white' : 'text-secondary'}`}
-                                        onClick={() => setActiveTab('report')}
-                                    >
+                                        onClick={() => setActiveTab('report')}>
                                         신고 내역
                                     </button>
                                 </li>
                             </ul>
                         </div>
                         
-                        <div className="card-body overflow-auto" style={{maxHeight: '600px'}}>
-                            {/* 1. 퀴즈 탭 */}
+                        {/* 탭 내용 영역 */}
+                        <div className="card-body d-flex flex-column" style={{ minHeight: '500px', maxHeight: '800px', overflowY: 'auto' }}>
                             {activeTab === 'quiz' && (
-                                <div>
+                                <div className="d-flex flex-column h-100">
                                     <h5 className="mb-3">❓ 등록한 퀴즈 목록</h5>
-                                    {/* 여기에 퀴즈 리스트 컴포넌트 or 테이블 */}
-                                    <div className="alert alert-secondary bg-opacity-10 border-0 text-white">
-                                        아직 등록한 퀴즈가 없습니다.
+                                    <div className="alert alert-secondary bg-opacity-10 border-0 text-white flex-grow-1 d-flex flex-column justify-content-center align-items-center m-0">
+                                        <div className="fs-1 text-secondary mb-3">📭</div>
+                                        <h5>아직 등록한 퀴즈가 없습니다.</h5>
                                     </div>
                                 </div>
                             )}
-
-                            {/* 2. 리뷰 탭 */}
                             {activeTab === 'review' && (
-                                <div>
+                                <div className="d-flex flex-column h-100">
                                     <h5 className="mb-3">📝 작성한 리뷰 목록</h5>
-                                    {/* 여기에 리뷰 리스트 */}
+                                    <div className="alert alert-secondary bg-opacity-10 border-0 text-white flex-grow-1 d-flex flex-column justify-content-center align-items-center m-0">
+                                        <div className="fs-1 text-secondary mb-3">📭</div>
+                                        <h5>아직 작성한 리뷰가 없습니다.</h5>
+                                    </div>
                                 </div>
                             )}
-
-                            {/* 3. 신고 탭 */}
                             {activeTab === 'report' && (
-                                <div>
+                                <div className="d-flex flex-column h-100">
                                     <h5 className="mb-3 text-danger">🚨 신고 당한 기록</h5>
-                                    {/* 여기에 신고 내역 */}
+                                    <div className="alert alert-secondary bg-opacity-10 border-0 text-white flex-grow-1 d-flex flex-column justify-content-center align-items-center m-0">
+                                        <div className="fs-1 text-danger mb-3">🚨</div>
+                                        <h5>신고 내역이 없습니다.</h5>
+                                    </div>
                                 </div>
                             )}
                         </div>

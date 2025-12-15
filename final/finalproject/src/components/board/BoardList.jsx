@@ -55,7 +55,7 @@ export default function BoardList(){
                             <tr key={boardList.boardNo}>
                                 <td className="quiz-normal">{boardList.boardNo}</td>
                                 <td className="quiz-normal">{boardList.boardContentsId}</td>
-                                <td className="quiz-normal">{boardList.boardTitle}</td>
+                                <td className="quiz-normal"><Link to={`/board/${boardList.boardNo}`}>{boardList.boardTitle}</Link></td>
                                 <td className="quiz-normal">{boardList.boardWtime}</td>
                                 <td className="quiz-normal">{boardList.boardWriter}</td>
                             </tr>

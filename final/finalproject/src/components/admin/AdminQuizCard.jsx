@@ -84,11 +84,14 @@ export default function AdminQuizCard({ quizData, refreshList }) {
                 </div>
 
                 {/* 기타 사유: 건수가 있을 때만 버튼 활성화 */}
-                <div className="report-item d-flex align-items-center">
-                    <span className="me-2">⚪ 기타 ({quizData.countEtc}건)</span>
+                <div className="report-item d-flex align-items-center flex-wrap gap-2">
+                    <span className="me-1">⚪ 기타 ({quizData.countEtc}건)</span>
+
                     {quizData.countEtc > 0 && (
                         <button
-                            className="btn btn-sm btn-outline-primary py-0"
+                            /* 3. text-nowrap: 버튼 안의 글자는 절대 줄바꿈 금지 */
+                            /* 4. d-flex & gap-1: 아이콘과 글자 정렬 */
+                            className="btn btn-sm btn-outline-primary py-0 d-flex align-items-center gap-1 text-nowrap"
                             style={{ fontSize: '0.8rem' }}
                             onClick={toggleEtcDetails}
                         >
@@ -114,27 +117,27 @@ export default function AdminQuizCard({ quizData, refreshList }) {
             )}
 
             {/* 5. 관리자 액션 버튼 */}
-            <div className="action-buttons">
+            <div className="action-buttons d-flex justify-content-end flex-wrap gap-2">
                 {quizData.quizStatus === 'DELETED' ? (
-                    // 삭제된 탭일 경우: 복구 or 영구삭제? (보통 복구만 둠)
-                    <button className="btn btn-success btn-sm" onClick={() => handleStatusChange('ACTIVE')}>
-                        ♻️ 복구하기
+                    // 삭제된 탭일 경우: 복구
+                    <button className="btn btn-success btn-sm d-flex align-items-center gap-1" onClick={() => handleStatusChange('ACTIVE')}>
+                        ♻️ <span>복구하기</span>
                     </button>
                 ) : (
                     // 운영 탭일 경우: 숨기기/해제, 삭제
                     <>
                         {quizData.quizStatus === 'ACTIVE' ? (
-                            <button className="btn btn-secondary btn-sm me-2" onClick={() => handleStatusChange('BLIND')}>
-                                👁️ 숨기기 (Blind)
+                            <button className="btn btn-secondary btn-sm d-flex align-items-center gap-1" onClick={() => handleStatusChange('BLIND')}>
+                                👁️ <span>숨기기 (Blind)</span>
                             </button>
                         ) : (
-                            <button className="btn btn-success btn-sm me-2" onClick={() => handleStatusChange('ACTIVE')}>
-                                👁️ 숨김 해제 (Active)
+                            <button className="btn btn-success btn-sm d-flex align-items-center gap-1" onClick={() => handleStatusChange('ACTIVE')}>
+                                👁️ <span>숨김 해제 (Active)</span>
                             </button>
                         )}
 
-                        <button className="btn btn-danger btn-sm" onClick={() => handleStatusChange('DELETED')}>
-                            🗑️ 삭제 (Delete)
+                        <button className="btn btn-danger btn-sm d-flex align-items-center gap-1" onClick={() => handleStatusChange('DELETED')}>
+                            🗑️ <span>삭제 (Delete)</span>
                         </button>
                     </>
                 )}

@@ -57,8 +57,6 @@ const ReportForm = ({ onDataChange }) => {
 
 export default function QuizGameModal({ show, onClose, contentsId }) {
 
-
-
     //통합 state
     const [currentIndex, setCurrentIndex] = useAtom(currentQuizIndexAtom);
     const [quizList, setQuizList] = useAtom(quizListAtom);
@@ -266,18 +264,29 @@ export default function QuizGameModal({ show, onClose, contentsId }) {
 
                 try {
                     // API 호출
-                    await quizApi.reportQuiz(payload);
+                    const response = await quizApi.reportQuiz(payload);
 
-                    // 성공 알림
-                    await MySwal.fire({
-                        icon: 'success',
-                        title: '신고 완료',
-                        text: '소중한 의견 감사합니다. 검토 후 반영하겠습니다.',
-                        confirmButtonColor: "#59cc9d"
-                    });
+                    if (response === "DUPLICATE") {
+                        // 중복 신고인 경우
+                        await MySwal.fire({
+                            icon: 'warning',
+                            title: '이미 신고 접수됨',
+                            text: '이 문제는 이미 신고하셨습니다.',
+                            confirmButtonColor: "#f0ad4e"
+                        });
+                    } else {
+                        // 성공인 경우
+                        await MySwal.fire({
+                            icon: 'success',
+                            title: '신고 완료',
+                            text: '소중한 의견 감사합니다. 검토 후 반영하겠습니다.',
+                            confirmButtonColor: "#59cc9d"
+                        });
+                    }
                 } catch (error) {
                     console.error("신고 전송 실패:", error);
                     // 실패 알림
+                    
                     MySwal.fire({
                         icon: 'error',
                         title: '전송 실패',

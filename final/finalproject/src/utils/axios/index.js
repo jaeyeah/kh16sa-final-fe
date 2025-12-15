@@ -12,9 +12,17 @@ axios.defaults.timeout = 10000;//10000ms초가 넘어가면 통신 취소(상황
 //axios interceptor
 axios.interceptors.request.use((config)=>{ //config는 axios 설정
     config.headers["Fronted-Url"] = window.location.href;
+
+    //Jotai Store에서 토큰 꺼내기
+    const accessToken = store.get(accessTokenState);
+
+    //토큰이 있으면 헤더에 심어주기
+    if (accessToken && accessToken.length > 0) {
+        config.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
     return config;
 });
-
 
 // - 서버의 응답 헤더에 "Access-Token"이 있으면 axios 헤더와 jotai의 AccessTokenState를 교체
     axios.interceptors.response.use((response) => {

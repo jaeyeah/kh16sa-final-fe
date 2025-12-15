@@ -24,24 +24,10 @@ export default function MyCreatedQuizDetail() {
     //데이터 로드
     useEffect(() => {
         const fetchQuizDetail = async () => {
-            const token = sessionStorage.getItem('accessTokenState');
-
-            if (!token) {
-                await Swal.fire({
-                    icon: 'warning',
-                    title: '로그인 필요',
-                    text: '접근 권한이 없습니다. 로그인 해주세요.'
-                });
-                navigate('/member/login');
-                return;
-            }
 
             try {
-                const res = await axios.get(`/quiz/${quizId}`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                });
+                //const res = await axios.get(`/quiz/${quizId}`);
+                const res = await quizApi.getQuizDetail(quizId);
                 const data = res.data;
                 setQuizData(data);
 
@@ -99,11 +85,8 @@ export default function MyCreatedQuizDetail() {
             try {
                 const token = sessionStorage.getItem('accessTokenState');
 
-                const res = await axios.delete(`/quiz/${quizId}`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                });
+                //const res = await axios.delete(`/quiz/${quizId}`);
+                const res = await quizApi.deleteQuiz(quizId);
 
                 await Swal.fire('삭제 완료', '퀴즈가 삭제되었습니다.', 'success');
                 //navigate(-1);

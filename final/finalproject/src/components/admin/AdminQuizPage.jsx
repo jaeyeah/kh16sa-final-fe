@@ -41,7 +41,7 @@ export default function AdminQuizPage() {
         <div className="admin-quiz-container">
             
             {/* 1. 헤더 영역 */}
-            <div className="admin-page-header d-flex justify-content-between align-items-center">
+            <div className="admin-page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <h3 className="admin-title mb-0">
                     👮‍♀️ 퀴즈 신고 관리
                 </h3>
