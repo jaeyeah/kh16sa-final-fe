@@ -2,18 +2,22 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react"
 import { Link } from "react-router-dom";
 import "./Board.css";
-
+import Pagination from "../Pagination";
 
 export default function BoardList() {
 
     //state
     const [boardList, setBoardList] = useState([]);
     const [titles, setTitles] = useState({});
+    const [page, setPage] = useState(1);
+    const [pageData, setPageData] = useState({
+        page : 1,size : 10,  totalCount : 0, totalPage : 0, blockStart : 1, blockFinish : 1
+    });
 
     //effect
     useEffect(() => {
         loadBoard();
-    }, []);
+    }, [page]);
 
     useEffect(() => {
         if (boardList.length > 0) {
@@ -29,13 +33,15 @@ export default function BoardList() {
     };
 
     const loadBoard = useCallback(async () => {
-        const { data } = await axios.get("/board/");
-        const formattedData = data.map(board => ({
+        const { data } = await axios.get(`/board/page/${page}`);
+        console.log(data);
+        const formattedData = data.list.map(board => ({
             ...board,
             boardWtime: formatWtime(board.boardWtime)
         }));
         setBoardList(formattedData);
-    }, []);
+        setPageData(data.pageVO);
+    }, [page]);
 
     const loadAllTitles = async () => {
         // 이미 제목을 가져온 ID는 건너뛰기 위해 (최적화)
@@ -95,6 +101,18 @@ export default function BoardList() {
                     </tbody>
                 </table>
             </div>
+            {/* 페이지네이션 */}
+        <div className ="row mt-1">
+            <div className="col-6 offset-3">
+                    <Pagination
+                    page={page}
+                    totalPage={pageData.totalPage}
+                    blockStart={pageData.blockStart}
+                    blockFinish={pageData.blockFinish}
+                    onPageChange={setPage}
+                />
+            </div>
+        </div>
         </div>
 
         <div className="row">

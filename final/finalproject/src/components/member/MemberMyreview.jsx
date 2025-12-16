@@ -7,7 +7,7 @@ import "./member.css";
 import { FaHeart, FaStar } from "react-icons/fa";
 export default function MemberMymovie() {
     //통합 state
-    const [loginid, setLoginId] = useAtom(loginIdState);
+    const [loginId, setLoginId] = useAtom(loginIdState);
     const [loginNickname, setLoginNickname] = useAtom(loginNicknameState);
 
 
@@ -18,12 +18,13 @@ export default function MemberMymovie() {
 
     //callback
     const loadData = useCallback(async () => {
-        const { data } = await axios.get(`/member/myreview/${loginid}`)
+         if (!loginId)  return; 
+        const { data } = await axios.get(`/member/myreview/${loginId}`)
         setMyReview(data);
         if (data.length !== 0) {
             setHasReview(true);
         }
-    }, [loginid]);
+    }, [loginId]);
 
     //effect
     useEffect(() => {

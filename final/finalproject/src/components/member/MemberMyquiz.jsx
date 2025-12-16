@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { FaChartBar } from "react-icons/fa";
-import Pagination from "./Pagination";
+import Pagination from "../Pagination";
 
 export default function MemberMypage(){
     const [loginId, setLoginId] = useAtom(loginIdState);
@@ -26,7 +26,7 @@ export default function MemberMypage(){
 
     //callback 
     const loadData = useCallback(async()=>{
-        console.log("loginId:", loginId, "page:", page);
+        if (!loginId)  return; 
         const answerList = await axios.get(`/member/myanswerquiz/${loginId}/${answerPage}`);
         setAnswerQuizList(answerList.data.list);
         setAnswerPageData(answerList.data.pageVO);
