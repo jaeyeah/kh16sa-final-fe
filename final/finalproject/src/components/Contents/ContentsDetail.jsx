@@ -14,7 +14,7 @@ import { loginIdState } from "../../utils/jotai";
 import { toast } from "react-toastify";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Modal } from "bootstrap";
-import { SiOpslevel } from "react-icons/si";
+import { FaCheckCircle } from "react-icons/fa";
 
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
@@ -56,6 +56,9 @@ export default function ContentsDetail() {
     const [myReview, setMyReview] = useState(null);
 
     const [boardList, setBoardList] = useState([]);
+
+    //신뢰도 state
+    const [realiability, setRealiability] = useState(0);
 
     //effect
     //처음에 컨텐츠 정보와 리뷰 리스트를 불러오는 effect
@@ -390,8 +393,10 @@ export default function ContentsDetail() {
                     <div className="d-flex align-items-center justify-content-between">
                         <div className="d-flex align-items-center w-100 mt-2">
                             {/* 왼쪽 */}
-                            <h4 className="text-light mb-0">
-                                {review.memberNickname}({review.reviewWriter})
+                            <h4 className="text-light">
+                                닉네임({review.reviewWriter})
+                                {/* <span className="ms-3 trust"><FaCheckCircle /></span> */}
+                                <span className="ms-3" style={{color:"#00ff55ff"}}>멤버신뢰도 {realiability} </span>
                                 {review.reviewEtime && " (수정됨)"}
                             </h4>
 
@@ -534,7 +539,6 @@ export default function ContentsDetail() {
                             ))}
                             <span className="ms-2 text-light me-2">{review.reviewRating}점 • </span>
                             <span className="ms-2 text-light"><FcMoneyTransfer className="me-1" />{formattedPrice} 원</span>
-                            <span className="ms-3" style={{color:"#e6ff02ff"}}><SiOpslevel /></span>
                         </div>
 
                         {/* 내용 (스포일러) */}
