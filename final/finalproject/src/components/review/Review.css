@@ -21,7 +21,7 @@
 }
 
 .fullStar3 {
-    color: gold;
+    color: #90b2ec;
     font-size: 25px;
     margin-left: 0.15em;
 }
@@ -341,6 +341,20 @@ textAA:focus::placeholder {
     background-color: transparent !important;
 }
 
+.price-wrapper2 {
+    box-shadow: 0 0 7px #86acee !important;
+
+    border-radius: 0.8em;
+    background-color: transparent;
+}
+
+.price-wrapper2:focus-within {
+    box-shadow: 0 0 25px #6988be !important;
+    border-radius: 0.8em !important;
+    background-color: transparent !important;
+}
+
+
 .price-bar.form-control {
     color: #ffffff;
     background-color: transparent;
@@ -387,8 +401,10 @@ textAA:focus::placeholder {
     font-size: 20px;
 }
 
-.time {
-    color: gray;
+.tv {
+    color: rgb(139, 139, 139);
+    font-weight: 500;
+    font-size: 16px;
 }
 
 .title {
@@ -564,6 +580,7 @@ textAA:focus::placeholder {
     color: #fff;
     font-weight: bold;
     font-size: 20px;
+    margin-top: 3%;
 }
 
 .save:hover {
@@ -595,10 +612,9 @@ textAA:focus::placeholder {
     background-color: #814c4c;
     background-color: lab(36.3% 33.24 16.28);
     margin-left: 29%;
-    margin-top: 20%;
 }
 .three>.modal-content {
-    height: 600px !important;
+    height: 727px !important;
     width: 500px;
     background-color: #2c2e3a !important;
     border-radius: 1.5em;
@@ -612,4 +628,18 @@ textAA:focus::placeholder {
     font-size: 18px;
     margin-left: 160px;
     margin-bottom: 20px;
+}
+.reportCheck {
+    font-size: 18px;
+}
+.idea {
+    background-color: #3f4753;
+    border: none;
+    border-radius: 0.8em;
+    color: #fff;
+    padding: 0.8em;
+    outline: none;
+    width: 93%;
+    height: 25%;
+    resize: none;
 }
