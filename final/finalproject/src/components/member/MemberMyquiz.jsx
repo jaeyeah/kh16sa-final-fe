@@ -155,8 +155,35 @@ export default function MemberMypage(){
     </div>
 
         <div className="mt-4 card quiz-dark-card text-center">
-            <div className="card-header fw-bold border-0 stats-header-dark p-3 fs-5">
+            <div className="card-header fw-bold border-0 p-3 fs-5">
                 내가 등록한 퀴즈
+            </div>
+             {/* 페이지네이션 */}
+            <div className ="row mt-1">
+                <div className="col-6 offset-3">
+                     <nav aria-label="Page navigation">
+                        <ul className="pagination">
+                            {/* 이전 버튼 */}
+                            <li className="page-item">
+                                <button className="page-link" disabled={addPageData.blockStart === 1}
+                                        onClick={movePrevBlock}>◀</button>
+                            </li>
+                            {/* 페이지 번호 */}
+                                    {pageNumbers.map(pageNum=>(
+                                    <li key={pageNum} className={`page-item ${addPage === pageNum ? "active" : ""}`}>
+                                        <button className="page-link" onClick={() => setAddPage(pageNum)}>
+                                            {pageNum}
+                                        </button>
+                                    </li>
+                                    ))}
+                            {/* 다음 버튼 */}
+                            <li className="page-item">
+                                <button className="page-link" disabled={addPageData.blockFinish >= addPageData.totalPage}
+                                        onClick={moveNextBlock}>▶</button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
             <div className="table-responsive">
                 <table className="table">
@@ -191,33 +218,7 @@ export default function MemberMypage(){
                     </tbody>
             </table>
             </div>
-            {/* 페이지네이션 */}
-            <div className ="row mt-1">
-                <div className="col-6 offset-3">
-                     <nav aria-label="Page navigation">
-                        <ul className="pagination">
-                            {/* 이전 버튼 */}
-                            <li className="page-item">
-                                <button className="page-link" disabled={addPageData.blockStart === 1}
-                                        onClick={movePrevBlock}>◀</button>
-                            </li>
-                            {/* 페이지 번호 */}
-                                    {pageNumbers.map(pageNum=>(
-                                    <li key={pageNum} className={`page-item ${addPage === pageNum ? "active" : ""}`}>
-                                        <button className="page-link" onClick={() => setAddPage(pageNum)}>
-                                            {pageNum}
-                                        </button>
-                                    </li>
-                                    ))}
-                            {/* 다음 버튼 */}
-                            <li className="page-item">
-                                <button className="page-link" disabled={addPageData.blockFinish >= addPageData.totalPage}
-                                        onClick={moveNextBlock}>▶</button>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
+
         </div>
 
 </>)
