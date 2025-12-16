@@ -36,7 +36,7 @@ export default function BoardDetail() {
     //[게시글 상세 정보 조회]
     const loadData = useCallback(async () => {
         try {
-            const { data } = await axios.get(`/board/${boardNo}`);
+            const { data } = await axios.get(`/board/boardNo/${boardNo}`);
             setBoard(data);
         }
         catch (err) {

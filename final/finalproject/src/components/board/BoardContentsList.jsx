@@ -2,7 +2,7 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom";
 import "./Board.css";
-
+import Pagination from "../Pagination";
 
 export default function BoardContentsList(){
     const {contentsId} =useParams();
@@ -10,11 +10,15 @@ export default function BoardContentsList(){
 
     //state
     const [boardList, setBoardList] = useState([]);
+    const [page, setPage] = useState(1);
+    const [pageData, setPageData] = useState({
+        page : 1,size : 10,  totalCount : 0, totalPage : 0, blockStart : 1, blockFinish : 1
+    });
 
     //effect
     useEffect(()=>{
         loadBoard();
-    },[])
+    },[page])
 
     const formatWtime = (dateString)=>{
         const date = new Date(dateString);
@@ -25,12 +29,14 @@ export default function BoardContentsList(){
 
     //callback
     const loadBoard = useCallback(async()=>{
-        const {data} = await axios.get(`/board/contentsId/${contentsId}`)
-          const formattedData = data.map(board => ({
+        const {data} = await axios.get(`/board/contentsId/${contentsId}/${page}`)
+        console.log(data);
+        const formattedData = data.list.map(board => ({
             ...board,
             boardWtime: formatWtime(board.boardWtime)
         }));
         setBoardList(formattedData);
+        setPageData(data.pageVO);
     },[contentsId])
 
 
@@ -64,6 +70,18 @@ export default function BoardContentsList(){
                     ))}
                     </tbody>
             </table>
+            </div>
+            {/* 페이지네이션 */}
+            <div className ="row mt-1">
+                <div className="col-6 offset-3">
+                        <Pagination
+                        page={page}
+                        totalPage={pageData.totalPage}
+                        blockStart={pageData.blockStart}
+                        blockFinish={pageData.blockFinish}
+                        onPageChange={setPage}
+                    />
+                </div>
             </div>
         </div>
         
