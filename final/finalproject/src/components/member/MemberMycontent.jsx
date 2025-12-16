@@ -83,7 +83,11 @@ export default function MemberMycontent() {
 
     return (<>
         <h1 className="text-center mt-4"> {loginNickname}님의 <span className="text-info">WatchList</span></h1>
-
+        {hasWatchlist === false && (
+            <div className="col-12 text-center mt-5 text-secondary">
+                <h3>아직 찜한 작품이 없습니다.</h3>
+            </div>
+        )}
         <div className="row mt-3" >
             {myWatchlist.map((watchlist) => (
                 <div className="col-6 col-md-3 mt-4" key={watchlist.watchlistContent}>

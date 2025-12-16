@@ -48,7 +48,7 @@ export default function MemberMypage(){
         
         {/* 나의 퀴즈 기록 통계 */}
         <div className="card border-0 shadow-sm quiz-dark-card">
-            <div className="card-header fw-bold border-0 stats-header-dark text-center p-3 fs-5">
+            <div className="card-header fw-bold border-0 text-center mt-2 fs-5">
                 <FaChartBar className="me-2" />
                 나의 퀴즈 기록
             </div>
@@ -92,7 +92,7 @@ export default function MemberMypage(){
         </div>
 
 
-        <div className="mt-4 card quiz-dark-card text-center">
+        <div className="mt-5 card quiz-dark-card text-center">
             <div className="card-header fw-bold border-0 p-3 fs-5">
                 내가 풀이한 퀴즈
             </div>
@@ -144,7 +144,7 @@ export default function MemberMypage(){
 
     </div>
 
-        <div className="mt-4 card quiz-dark-card text-center">
+        <div className="mt-5 card quiz-dark-card text-center">
             <div className="card-header fw-bold border-0 p-3 fs-5">
                 내가 등록한 퀴즈
             </div>
