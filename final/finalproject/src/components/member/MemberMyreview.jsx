@@ -49,9 +49,9 @@ export default function MemberMymovie() {
         <h1 className="text-center mt-4"> {loginNickname}님의 리뷰</h1>
 
         {hasReview === false && (
-            <div className="row mt-4">
-                <Link to="/review/write" className="col-6 offset-3 btn btn-secondary">신규 리뷰작성</Link>
-            </div>
+                    <div className="col-12 text-center mt-5 text-secondary">
+                        <h3>아직 작성된 리뷰가 없습니다.</h3>
+                    </div>
         )}
 
         <div className="row mt-4">

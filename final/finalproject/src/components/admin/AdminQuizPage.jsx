@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import AdminQuizCard from './AdminQuizCard';
 import './AdminQuiz.css'; // CSS 임포트
 import { loginIdState, loginLevelState } from '../../utils/jotai';
 import { useAtom, useAtomValue } from 'jotai';
+import { throttle } from "lodash";
 
 export default function AdminQuizPage() {
     
@@ -14,28 +15,78 @@ export default function AdminQuizPage() {
     const [quizList, setQuizList] = useState([]);
     const [loading, setLoading] = useState(false);
 
+
+    //무한스크롤 페이지네이션
+    const [page, setPage] = useState(1);//페이지번호
+    const remainDataRef = useRef(0);
+    const pageSize = 2; // 서버에서 한 페이지당 보내주는 데이터 수
+
     // 데이터 로딩 함수
-    const fetchQuizList = async () => {
-
+    const fetchQuizList = useCallback(async () => {
         if (!loginId) return;
-
         setLoading(true);
         try {
             const { data } = await axios.get(`/admin/quizzes/reports`, {
-                params: { status: currentTab }
+                params: { status: currentTab, page: page }
             });
-            setQuizList(data);
+            
+            // 서버에서 받은 데이터가 pageSize보다 작으면 더 이상 데이터가 없음
+            remainDataRef.current = data.length;
+
+            if (page === 1) {//첫페이지면
+                setQuizList(data);
+            }
+            else {//첫페이지가 아니면
+                setQuizList(prev => ([...prev, ...data]));
+            }
         } catch (error) {
             console.error("목록 로딩 실패", error);
         }
         setLoading(false);
-    };
+        
+    },[page]);
 
     useEffect(() => {
         if (loginId) {
             fetchQuizList();
         }
-    }, [currentTab, loginId]);
+    }, [currentTab, loginId, page]);
+
+    //최초 1회 실행하여 window에 스크롤 이벤트를 추가
+    useEffect(() => {
+        const listener = throttle(e => {
+            if(remainDataRef.current < pageSize) return;
+            const percent = getScrollPercent();
+            if (percent >= 90) {
+                setPage(prev => prev + 1);
+            }
+        }, 500);
+
+        window.addEventListener("scroll", listener);
+
+        //effect cleanup 함수 - 이펙트가 종료되는 시점에 실행할 코드를 작성
+        return () => {
+            window.removeEventListener("scroll", listener);
+        };
+    }, []);
+
+    // 스크롤바 퍼센트 구하는 함수
+    const getScrollPercent = useCallback(() => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+
+        if (scrollHeight <= clientHeight) {
+            return 0;
+        }
+        const scrollableHeight = scrollHeight - clientHeight;
+        if (scrollableHeight - scrollTop < 1) {
+            return 100;
+        }
+        const percentage = (scrollTop / scrollableHeight) * 100;
+        return percentage;
+    }, []);
+
 
     return (
         <div className="admin-quiz-container">

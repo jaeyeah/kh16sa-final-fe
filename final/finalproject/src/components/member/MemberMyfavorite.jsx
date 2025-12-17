@@ -87,7 +87,7 @@ export default function MemberMycontent() {
 
     return (
         <div className="container pb-5">
-            <h1 className="text-center mt-5 mb-5"> {loginNickname}님의 <span className="text-info">인생작</span></h1>
+            <h1 className="text-center mt-4 mb-5"> {loginNickname}님의 <span className="text-info">인생작</span></h1>
 
             <div className="row">
                 {myWatchlist.map((watchlist) => (
