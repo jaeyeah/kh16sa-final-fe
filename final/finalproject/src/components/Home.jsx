@@ -3,10 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import "./MenuForSearch.css";
 import "./Home.css";
-import { FaHeart, FaRegEye } from "react-icons/fa6";
 import { ImEyePlus } from "react-icons/im";
+import { FaSearch } from "react-icons/fa";
 
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
@@ -38,6 +39,11 @@ export default function Home() {
         ]
     };
 
+    const navigate = useNavigate();
+
+    //검색어 state
+    const [query, setQuery] = useState("");
+
     //state
     const [tvList, setTvList] = useState([]);
     const [movieList, setMovieList] = useState([]);
@@ -54,6 +60,16 @@ export default function Home() {
     }, []);
 
     //callback
+
+    //[입력창 제어 및 검색이동]
+    const handleSearch = useCallback(() => {
+        if (query.trim().length === 0) return;
+        // 검색어와 함께 결과 페이지로 이동
+        navigate(`/contents/searchResult/${query}`);
+        setQuery(""); // 입력창 비우기 (선택사항)
+    }, [query, navigate]);
+
+
     const loadTVData = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -263,11 +279,28 @@ export default function Home() {
 
 
     return (<>
-        <div className="container mt-5">
+        <div className="container mt-2">
+
+            {/* 검색영역 */}
+            <div className="row justify-content-center">
+                <div className="col-12 col-md-5 d-flex text-nowrap">
+                    <div className="mt-3 input-group search-wrapper">
+                        {/* 검색창 */}
+                        <input type="text" className="search form-control search-bar text-light" value={query}
+                            placeholder="제목" onChange={e => setQuery(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }} />
+                        {/* 검색 버튼 */}
+                        <button className="search btn btn-success" onClick={handleSearch}
+                        >
+                            <FaSearch className="fs-4" />
+                        </button>
+                    </div>
+                </div>
+            </div>
 
 
             {/* 별점 랭킹 슬라이더 */}
-            <div className="mt-4">
+            <div className="mt-5">
                 <h3 className="mb-4 text-white">⭐️ TOP 10 컨텐츠</h3>
                 <div className="p-2 pt-3 rounded series-wrapper" >
                     {rateList.length > 0 ? (

@@ -237,7 +237,7 @@ export default function BoardDetail() {
         }
 
         try {
-            await axios.put(`/reply/${editReplyNo}`, null, {params: { editContent: editContent }});
+            await axios.put(`/reply/${editReplyNo}`, null, { params: { editContent: editContent } });
 
             toast.success("댓글이 수정되었습니다.");
             setEditReplyNo(null); // 수정 모드 종료
@@ -252,7 +252,7 @@ export default function BoardDetail() {
         const choice = window.confirm("게시글을 삭제하시겠습니까?");
         if (choice === false) return;
         try {
-            await axios.delete(`/board/boardNo/${boardNo}`);
+            await axios.delete(`/board/${boardNo}`);
             console.log("삭제 완료");
             toast.success("게시글이 삭제되었습니다");
             navigate("/board/list");
@@ -477,17 +477,24 @@ export default function BoardDetail() {
                         </div>
                     ))}
                 </div>
-            </div>  
+            </div>
 
             <hr className="text-light mt-5 mb-4" />
 
             {/* 버튼 */}
             <div className="row mt-4 text-end">
-                <div className="col">
-                    <button type="button" className="btn btn-danger me-2" onClick={deleteBoard}>삭제</button>
-                    <Link className="btn btn-secondary me-2" to={`/board/edit/${board.boardNo}`}>수정</Link>
-                    <Link className="btn btn-info " to="/board/list">목록</Link>
-                </div>
+                {loginId && loginId === board.boardWriter ? (
+                    <div className="col">
+                        <button type="button" className="btn btn-danger me-2" onClick={deleteBoard}>삭제</button>
+                        <Link className="btn btn-secondary me-2" to={`/board/edit/${board.boardNo}`}>수정</Link>
+                        <Link className="btn btn-info " to="/board/list">목록</Link>
+                    </div>
+                ) : (
+                    <div className="col">
+                        <Link className="btn btn-info " to="/board/list">목록</Link>
+                    </div>
+                )}
+
             </div>
         </div>
     </>)
