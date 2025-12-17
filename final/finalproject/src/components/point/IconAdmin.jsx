@@ -3,49 +3,37 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 export default function IconAdmin() {
-    // 초기값을 빈 배열로 확실하게 설정
     const [icons, setIcons] = useState([]);
     
-    // 페이지네이션 & 필터 상태
+    // 페이지네이션 & 필터
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
     const [totalCount, setTotalCount] = useState(0);
     const [filterType, setFilterType] = useState("ALL"); 
 
-    // 입력 폼
     const [form, setForm] = useState({ 
-        iconId: 0, 
-        iconName: "", 
-        iconRarity: "COMMON", 
-        iconCategory: "DEFAULT", 
-        iconSrc: "" 
+        iconId: 0, iconName: "", iconRarity: "COMMON", iconCategory: "DEFAULT", iconSrc: "" 
     });
     const [isEdit, setIsEdit] = useState(false);
 
-    // ★ [핵심] 안전한 목록 불러오기 로직
+    // 목록 불러오기 (VO 구조 대응)
     const loadIcons = useCallback(async () => {
         try {
             const resp = await axios.get(`/point/icon/admin/list?page=${page}&type=${filterType}`);
             const data = resp.data; 
             
-            // 데이터 구조 확인 (배열인지, VO인지)
             if (data && data.list) {
-                // 정상적으로 VO가 왔을 때
                 setIcons(data.list);
                 setTotalPage(data.totalPage || 0);
                 setTotalCount(data.totalCount || 0);
             } else if (Array.isArray(data)) {
-                // 혹시 옛날 방식(List)으로 왔을 때 (에러 방지용)
                 setIcons(data);
-                setTotalPage(1);
-                setTotalCount(data.length);
             } else {
-                // 데이터가 이상할 때 빈 배열 처리
                 setIcons([]); 
             }
         } catch(e) { 
             console.error(e);
-            setIcons([]); // 에러나면 빈 화면 보여주기
+            setIcons([]); 
         }
     }, [page, filterType]);
 
@@ -53,18 +41,22 @@ export default function IconAdmin() {
 
     const handleFilterChange = (type) => { setFilterType(type); setPage(1); };
 
+    // 등록/수정
     const handleSubmit = async () => {
         if(!form.iconName || !form.iconSrc) return toast.warning("정보를 입력하세요.");
         try {
             const url = isEdit ? "/point/icon/admin/edit" : "/point/icon/admin/add";
             await axios.post(url, form);
             toast.success(isEdit ? "수정 완료" : "등록 완료");
+            
+            // 폼 초기화
             setForm({ iconId: 0, iconName: "", iconRarity: "COMMON", iconCategory: "DEFAULT", iconSrc: "" });
             setIsEdit(false);
             loadIcons();
         } catch(e) { toast.error("오류 발생"); }
     };
 
+    // 삭제
     const handleDelete = async (id) => {
         if(!window.confirm("삭제하시겠습니까?")) return;
         try {
@@ -80,9 +72,9 @@ export default function IconAdmin() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // 페이지네이션
+    // 페이지네이션 UI
     const renderPagination = () => {
-        if (totalPage <= 1) return null; // 페이지가 1개면 숨김
+        if (totalPage <= 1) return null;
         const pageGroupSize = 10;
         const currentGroup = Math.ceil(page / pageGroupSize); 
         const startPage = (currentGroup - 1) * pageGroupSize + 1;
@@ -136,27 +128,22 @@ export default function IconAdmin() {
                 </div>
             </div>
 
-            {/* 필터 버튼 */}
+            {/* 필터 */}
             <div className="d-flex gap-2 mb-3 overflow-auto pb-2">
                 {['ALL', 'COMMON', 'RARE', 'EPIC', 'UNIQUE', 'LEGENDARY', 'EVENT'].map(type => (
-                    <button 
-                        key={type}
-                        className={`btn btn-sm rounded-pill px-3 ${filterType === type ? 'btn-dark' : 'btn-outline-secondary'}`}
-                        onClick={() => handleFilterChange(type)}
-                    >
+                    <button key={type} className={`btn btn-sm rounded-pill px-3 ${filterType === type ? 'btn-dark' : 'btn-outline-secondary'}`} onClick={() => handleFilterChange(type)}>
                         {type}
                     </button>
                 ))}
             </div>
 
-            {/* 목록 테이블 */}
+            {/* 테이블 */}
             <div className="table-responsive">
                 <table className="table table-hover text-center align-middle border">
                     <thead className="table-dark">
                         <tr><th>ID</th><th>이미지</th><th>이름</th><th>등급</th><th>관리</th></tr>
                     </thead>
                     <tbody>
-                        {/* ★ [핵심] icons가 null/undefined면 렌더링 안 함 */}
                         {!icons || icons.length === 0 ? (
                             <tr><td colSpan="5" className="py-4">데이터가 없습니다.</td></tr>
                         ) : (
@@ -187,7 +174,6 @@ export default function IconAdmin() {
                     </tbody>
                 </table>
             </div>
-
             {renderPagination()}
         </div>
     );

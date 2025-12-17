@@ -7,6 +7,7 @@ export default function MyIconView({ refreshPoint }) {
 
     const loadMyIcons = async () => {
         try {
+            // 백엔드: PointRestController -> @GetMapping("/point/icon/my")
             const resp = await axios.get("/point/icon/my");
             setMyIcons(resp.data);
         } catch (e) { console.error(e); }
@@ -15,7 +16,7 @@ export default function MyIconView({ refreshPoint }) {
     useEffect(() => { loadMyIcons(); }, []);
 
     const handleEquip = async (icon) => {
-        // [수정 1] 이미 장착된 아이콘 클릭 시 안내 메시지
+        // [수정] 이미 장착된 아이콘 체크
         if (icon.isEquipped === 'Y') {
             toast.info("이미 장착중인 아이콘입니다. ⭐");
             return;
@@ -24,10 +25,12 @@ export default function MyIconView({ refreshPoint }) {
         if(!window.confirm(`[${icon.iconName}] 아이콘을 장착하시겠습니까?`)) return;
         
         try {
-            await axios.post("/point/icon/equip", { iconId: icon.memberIconIcon }); 
+            // ★ [핵심 수정] DTO 변수명 변경 반영 (memberIconIcon -> iconId)
+            await axios.post("/point/icon/equip", { iconId: icon.iconId }); 
+            
             toast.success("아이콘이 적용되었습니다! 😎");
             loadMyIcons(); 
-            if(refreshPoint) refreshPoint();
+            if(refreshPoint) refreshPoint(); // 상단바 정보 갱신
         } catch(e) { 
             toast.error("장착 실패"); 
         }
@@ -70,7 +73,6 @@ export default function MyIconView({ refreshPoint }) {
                                     onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                                     onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                                 >
-                                    {/* 장착중 뱃지 */}
                                     {isEquipped && (
                                         <span className="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-primary shadow-sm" style={{fontSize:'0.7rem', zIndex: 1}}>
                                             장착중
@@ -83,21 +85,20 @@ export default function MyIconView({ refreshPoint }) {
                                             className="mb-2" 
                                             style={{width: '50px', height: '50px', objectFit: 'contain'}} 
                                             alt={item.iconName}
-                                            // 이미지 깨짐 방지
                                             onError={(e)=>{e.target.src='https://placehold.co/50x50?text=IMG'}} 
                                         />
                                         
-                                        {/* [수정 2] 등급 표시 (EVENT 추가됨) */}
-                                        <span className={`badge mb-1 ${
-                                            item.iconRarity==='LEGENDARY' ? 'bg-warning text-dark border border-dark' :
-                                            item.iconRarity==='UNIQUE'    ? 'bg-purple text-white' :
-                                            item.iconRarity==='EPIC'      ? 'bg-danger' :
-                                            item.iconRarity==='RARE'      ? 'bg-primary' :
-                                            item.iconRarity==='EVENT'     ? 'bg-event' : /* ★ EVENT 추가 */
-                                            'bg-secondary'
-                                        }`} style={{fontSize:'0.6rem'}}>
-                                            {item.iconRarity}
-                                        </span>
+                                     <span className={`badge mb-1 ${
+    item.iconRarity === 'LEGENDARY' ? 'bg-warning text-dark border border-dark' :
+    item.iconRarity === 'UNIQUE'    ? 'bg-purple text-white' :
+    item.iconRarity === 'EPIC'      ? 'bg-danger' :
+    item.iconRarity === 'RARE'      ? 'bg-primary' :
+    item.iconRarity === 'EVENT'     ? 'bg-event' : 
+    item.iconRarity === 'COMMON'    ? 'bg-success' : /* ★ 여기도 추가 */
+    'bg-secondary'
+}`} style={{fontSize:'0.6rem'}}>
+    {item.iconRarity}
+</span>
                                         
                                         <small className="text-dark fw-bold text-truncate w-100" style={{fontSize: '0.75rem'}}>
                                             {item.iconName}

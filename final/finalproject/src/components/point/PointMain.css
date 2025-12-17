@@ -1,192 +1,253 @@
-/* === 1. 달력 전체 래퍼 === */
-.attendance-calendar-wrapper {
-    background-color: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;500;700;900&display=swap');
+
+:root {
+    --bg-dark: #141414;
+    --primary-red: #E50914;
+    --neon-mint: #00d2d3;
+    --text-white: #e5e5e5;
+    --text-gray: #b3b3b3;
 }
 
-/* === 2. 리액트 달력 커스텀 (기본 스타일 덮어쓰기) === */
-.custom-calendar {
+.movie-container {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    min-height: 100vh;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.inner-wrapper {
+    max-width: 1280px; 
     width: 100%;
-    border: none !important;
-    font-family: inherit;
-    background: transparent;
+    margin: 0 auto;
 }
 
-/* 상단 년/월 네비게이션 */
-.custom-calendar .react-calendar__navigation {
-    margin-bottom: 1.5rem;
-}
-.custom-calendar .react-calendar__navigation button {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: #495057;
-}
-.custom-calendar .react-calendar__navigation button:enabled:hover,
-.custom-calendar .react-calendar__navigation button:enabled:focus {
-    background-color: #f8f9fa;
-    border-radius: 8px;
+/* --- 대시보드 레이아웃 --- */
+.dashboard-row {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 30px;
+    align-items: stretch; /* 높이 맞춤 */
 }
 
-/* 요일 (일, 월, 화...) */
-.custom-calendar .react-calendar__month-view__weekdays {
-    text-align: center;
-    font-weight: bold;
-    font-size: 0.95rem;
-    color: #868e96;
-    text-decoration: none;
-    margin-bottom: 0.5rem;
-}
-.react-calendar__month-view__weekdays__weekday abbr {
-    text-decoration: none;
-    cursor: default;
-}
-
-/* 날짜 타일 (네모 칸) */
-.custom-calendar .react-calendar__tile {
-    height: 90px; /* 도장이 들어갈 넉넉한 높이 */
+.dashboard-left {
+    flex: 0.4; 
+    min-width: 400px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: 10px !important;
+    gap: 20px; 
+}
+
+.dashboard-right {
+    flex: 0.6;
+    min-width: 500px;
+}
+
+@media (max-width: 1100px) {
+    .dashboard-row { flex-direction: column; }
+    .dashboard-left, .dashboard-right { flex: 1; min-width: auto; }
+}
+
+/* --- 1. 프로필 카드 --- */
+.profile-card {
+    background: linear-gradient(145deg, #1f1f1f, #1a1a1a);
+    border-radius: 16px;
+    padding: 30px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     position: relative;
-    overflow: visible !important; /* 도장이 칸을 삐져나가도 잘리지 않게 */
-    font-size: 1.1rem;
-    border-radius: 12px;
-    transition: background-color 0.2s;
-    color: #495057;
+    overflow: hidden; /* 내부 요소 튀어나옴 방지 */
 }
 
-/* 오늘 날짜 표시 */
-.custom-calendar .react-calendar__tile--now {
-    background: #e7f5ff !important;
-    color: #1971c2 !important;
-    font-weight: bold;
-    border: 1px solid #a5d8ff;
-}
-
-/* 주말 색상 (선택 사항) */
-.react-calendar__month-view__days__day--weekend {
-    color: #fa5252;
-}
-
-/* 클릭/활성 상태 배경 제거 (도장이 주인공이므로) */
-.custom-calendar .react-calendar__tile--active,
-.custom-calendar .react-calendar__tile:enabled:hover,
-.custom-calendar .react-calendar__tile:enabled:focus {
-    background: rgba(0,0,0,0.03) !important;
-    color: inherit !important;
-}
-
-/* === 3. 달력 안에 찍히는 '참잘했어요' 도장 === */
-.small-stamp {
-    position: absolute;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-15deg);
-    
-    width: 50px;
-    height: 50px;
-    border: 2px solid #e03131; /* 진한 빨강 */
-    border-radius: 50%;
-    color: #e03131;
-    
+.profile-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 11px;
-    font-weight: 800;
-    line-height: 1.2;
-    
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 2px 6px rgba(224, 49, 49, 0.2);
-    
-    /* 찍히는 애니메이션 */
-    animation: stamp-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    z-index: 5;
-    pointer-events: none;
+    gap: 20px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 20px;
 }
 
-@keyframes stamp-pop {
-    0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
-    80% { transform: translate(-50%, -50%) scale(1.1) rotate(-15deg); opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(1) rotate(-15deg); opacity: 1; }
-}   
+.avatar-frame {
+    width: 85px; height: 85px; flex-shrink: 0;
+    border-radius: 50%; padding: 3px;
+    background: linear-gradient(45deg, var(--primary-red), #222);
+    box-shadow: 0 0 15px rgba(229, 9, 20, 0.4);
+    cursor: pointer; transition: transform 0.3s;
+}
+.avatar-frame:hover { transform: scale(1.05); }
+.avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #141414; }
 
-.nick-gold {
-    background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-    -webkit-background-clip: text;
-    color: transparent;
-    font-weight: 900;
+.profile-text-group { flex: 1; min-width: 0; }
+
+/* ★ 닉네임 줄바꿈 방지 핵심 CSS ★ */
+.profile-name-row {
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    margin-bottom: 5px;
+    flex-wrap: nowrap; /* 절대 줄바꿈 금지 */
+    overflow: hidden;
 }
 
-/* PointMain.css */
-
-/* 1. 무지개 (화려함) */
-@keyframes rainbow-move {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-.nick-rainbow {
-    background: linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
-    background-size: 400% 400%;
-    -webkit-background-clip: text;
-    color: transparent;
-    font-weight: 900;
-    animation: rainbow-move 4s ease infinite;
+.nickname-text { 
+    font-size: 1.6rem; font-weight: 900; color: #fff; line-height: 1.2; 
+    white-space: nowrap; /* 텍스트 줄바꿈 금지 */
+    overflow: hidden; text-overflow: ellipsis;
 }
 
-/* 2. 골드 (반짝임) */
-.nick-gold {
-    background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-    -webkit-background-clip: text;
-    color: transparent;
-    font-weight: 900;
-    text-shadow: 0px 1px 1px rgba(0,0,0,0.2);
+.level-badge {
+    background: var(--primary-red); color: white; font-size: 0.8rem;
+    padding: 3px 8px; border-radius: 4px; font-weight: 800;
+    white-space: nowrap; /* 뱃지 줄바꿈 금지 */
+    flex-shrink: 0; /* 뱃지 찌그러짐 방지 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
-/* 3. 네온 (야광) */
-.nick-neon {
-    color: #fff;
-    text-shadow: 
-        0 0 5px #00fff2,
-        0 0 10px #00fff2,
-        0 0 20px #00fff2;
-    font-weight: 900;
+.welcome-msg {
+    color: var(--text-white); font-size: 0.95rem; font-weight: 700; margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.member-desc {
+    color: var(--text-gray); font-size: 0.85rem; font-weight: 300;
 }
 
-/* 4. 관리자용 */
-.nick-admin {
-    color: #ff4d4d;
-    font-weight: bold;
+.profile-footer {
+    display: flex; justify-content: space-between; align-items: flex-end;
 }
 
-.bg-purple {
-    background-color: #9c27b0 !important;
-    color: white;
+.point-display { text-align: left; }
+.point-label { font-size: 0.8rem; color: var(--text-gray); letter-spacing: 2px; margin-bottom: 2px; display: block; }
+.point-value { 
+    font-size: 2rem; font-weight: 900; color: var(--text-white); 
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2); 
+    line-height: 1; white-space: nowrap;
 }
 
-/* 이벤트 등급 (핫핑크/민트 그라데이션) */
-.bg-event {
-    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-    color: white;
-    box-shadow: 0 0 5px #ff6b6b;
-    border: 1px solid #ffcccc;
+.btn-gift-neon {
+    background: transparent; border: 1px solid #555; color: #ddd;
+    padding: 8px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 700;
+    transition: 0.3s; cursor: pointer;
+}
+.btn-gift-neon:hover {
+    border-color: var(--primary-red); color: var(--primary-red);
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.4); background: rgba(229, 9, 20, 0.1);
 }
 
-/* 레전더리 (금색 반짝임 효과 추가 - 선택사항) */
-.bg-warning.text-dark {
-    background: linear-gradient(45deg, #FFD700, #FDB931, #FFD700);
-    box-shadow: 0 0 5px #FFD700;
+/* --- 일일 퀘스트 --- */
+.quest-card {
+    background: linear-gradient(145deg, #1f1f1f, #1a1a1a);
+    border-radius: 16px; padding: 25px; border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    flex: 1; 
+}
+.quest-item {
+    background: rgba(255, 255, 255, 0.03); border-radius: 10px; padding: 12px 15px;
+    margin-bottom: 10px; border: 1px solid transparent; transition: all 0.2s;
+}
+.quest-item:hover { background: rgba(255, 255, 255, 0.06); }
+.quest-item.done-bg { background: rgba(0, 210, 211, 0.05); border: 1px solid rgba(0, 210, 211, 0.2); }
+.quest-icon-box {
+    width: 42px; height: 42px; background: #252525; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+}
+.quest-title { color: #e5e5e5; font-weight: 700; font-size: 0.95rem; }
+
+/* --- 오른쪽 통합 패널 (Attendance + Calendar) --- */
+.attendance-unified-panel {
+    background: #1a1a1a;
+    border-radius: 16px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding: 30px;
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
 }
 
-.bg-event {
-    background: linear-gradient(45deg, #ff6b6b, #ff8e8e); /* 예쁜 핑크 그라데이션 */
-    color: white;
-    box-shadow: 0 0 5px #ff6b6b;
-    font-weight: bold;
+/* 통합 헤더 */
+.unified-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #333;
+    flex-wrap: wrap; 
+    gap: 15px;
 }
+
+.header-left { display: flex; flex-direction: column; }
+.header-title { font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 4px; }
+.header-subtitle { font-size: 0.9rem; color: #888; font-weight: 500; }
+
+.header-right { display: flex; align-items: center; gap: 15px; }
+
+/* 출석 완료 텍스트 */
+.attendance-status-text {
+    color: var(--neon-mint); font-weight: 800; font-size: 0.95rem;
+    display: flex; align-items: center; gap: 5px;
+}
+
+.attendance-btn {
+    background: var(--text-white); color: #141414; font-weight: 900; border: none;
+    padding: 10px 25px; border-radius: 6px; font-size: 1rem; transition: 0.3s; white-space: nowrap;
+}
+.attendance-btn:hover:not(:disabled) { background: var(--neon-mint); transform: scale(1.05); }
+.attendance-btn:disabled { background: #333; color: #666; cursor: default; }
+
+/* 달력 커스텀 */
+.custom-calendar { width: 100%; background: transparent !important; border: none !important; font-family: 'Noto Sans KR', sans-serif; flex-grow: 1; }
+.custom-calendar .react-calendar__navigation button { color: var(--text-white) !important; font-size: 1.5rem; font-weight: 900; }
+.custom-calendar .react-calendar__navigation button:enabled:hover { background-color: #333 !important; border-radius: 8px; }
+.custom-calendar .react-calendar__month-view__weekdays { color: #666; font-weight: 700; margin-bottom: 15px; }
+.custom-calendar .react-calendar__month-view__weekdays__weekday abbr { text-decoration: none; }
+
+.custom-calendar .react-calendar__tile {
+    height: 85px; display: flex; flex-direction: column; align-items: center; padding-top: 15px !important;
+    background: transparent !important; color: #888 !important; font-size: 1.1rem; border-radius: 8px;
+    overflow: visible !important; position: relative;
+}
+.custom-calendar .react-calendar__tile:enabled:hover { background: #252525 !important; color: white !important; }
+
+/* ★ [수정] 하얀 박스 제거 (배경색 덮어쓰기) ★ */
+.custom-calendar .react-calendar__tile--active { 
+    background: #252525 !important; /* 하얀색 절대 금지 */
+    color: white !important; border: 1px solid #555; 
+}
+.custom-calendar .react-calendar__tile--now { 
+    border: 2px solid var(--primary-red) !important; color: var(--primary-red) !important; font-weight: 900; 
+    background: rgba(229, 9, 20, 0.05) !important; 
+}
+.react-calendar__month-view__days__day--weekend { color: #d63031 !important; }
+
+/* ★ [수정] 도장 깨짐 방지 및 정중앙 정렬 ★ */
+.small-stamp {
+    position: absolute; top: 50%; left: 50%; 
+    transform: translate(-50%, -50%) rotate(-15deg); /* 정중앙 */
+    width: 50px; height: 50px; 
+    border: 3px solid #e50914; 
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95); /* 배경 불투명하게 */
+    color: #e50914;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    font-size: 11px; font-weight: 900; line-height: 1.1;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* 그림자 부드럽게 */
+    z-index: 10; pointer-events: none;
+    white-space: pre-line;
+}
+
+/* 탭 네비게이션 */
+.nav-cinema { display: flex; justify-content: flex-start; border-bottom: 1px solid #333; padding: 0; list-style: none; margin-top: 40px; overflow-x: auto; flex-wrap: nowrap; }
+.nav-cinema-item { flex: 1; text-align: center; min-width: 130px; }
+.nav-cinema-link { display: block; padding: 20px 0; color: #777; font-weight: 700; text-decoration: none; font-size: 1.05rem; transition: 0.3s; border-bottom: 4px solid transparent; white-space: nowrap; }
+.nav-cinema-link:hover { color: var(--text-white); }
+.nav-cinema-link.active { color: var(--text-white); border-bottom: 4px solid var(--primary-red); text-shadow: 0 0 15px rgba(255,255,255,0.3); }
+.cinema-content { background: #181818; border: 1px solid #333; border-top: none; padding: 40px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+
+/* 닉네임 효과 */
+.nick-rainbow { background: linear-gradient(90deg, #ff0055, #00d2d3, #ffea00, #ff0055); background-size: 300% 100%; -webkit-background-clip: text; color: transparent; display: inline-block; }
+.nick-neon { color: #fff; text-shadow: 0 0 5px #00d2d3, 0 0 15px #00d2d3; display: inline-block; }
+.nick-gold { background: linear-gradient(to bottom, #fbf5b7, #bf953f); -webkit-background-clip: text; color: transparent; text-shadow: 0 2px 10px rgba(191, 149, 63, 0.4); display: inline-block; }
+.nick-admin { background: linear-gradient(45deg, #ff4d4d, #c40726); -webkit-background-clip: text; color: transparent; text-shadow: 0 0 20px rgba(229, 9, 20, 0.6); display: inline-block; }

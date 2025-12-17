@@ -1,71 +1,135 @@
-/* 룰렛 전체 컨테이너 */
+/* 폰트: 두꺼운 게임용 폰트 */
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+
+/* 1. 전체 컨테이너 */
 .roulette-container {
-    background-color: #f8f9fa;
-    border-radius: 15px;
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 40px;
+    border: 1px solid #333;
+    text-align: center;
+    color: #fff;
+    font-family: 'Black Han Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* 룰렛 감싸는 틀 */
+/* 2. 룰렛 외부 테두리 (금색 링) */
 .wheel-wrapper {
     position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 0 auto;
-    border: 10px solid #333;
+    width: 320px; 
+    height: 320px;
+    margin: 30px auto;
     border-radius: 50%;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    overflow: hidden; /* 넘치는 부분 숨김 */
+    border: 12px solid #f1c40f; /* 금색 테두리 */
+    box-shadow: 
+        0 0 0 15px #c0392b, /* 바깥쪽 빨간 링 */
+        0 10px 40px rgba(0,0,0,0.6); /* 깊은 그림자 */
+    overflow: hidden;
     background: #fff;
 }
 
-/* 상단 화살표 (마커) */
+/* 3. 핀 (화살표) - 상단 중앙 고정 */
 .wheel-marker {
     position: absolute;
-    top: -5px;
+    top: -25px; /* 테두리 위로 살짝 튀어나오게 */
     left: 50%;
     transform: translateX(-50%);
-    font-size: 40px;
-    color: #ff0000;
-    z-index: 10;
-    text-shadow: 0 2px 2px rgba(0,0,0,0.3);
+    z-index: 20;
+    width: 0; 
+    height: 0; 
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 50px solid #e74c3c; /* 빨간색 역삼각형 */
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
 }
 
-/* 돌아가는 원판 */
+/* 4. 돌아가는 원판 (그라데이션으로 6등분) */
 .wheel-board {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    /* 6등분 색상 (원하는 색으로 변경 가능) */
-    background: conic-gradient(
-        #FFD700 0deg 60deg,
-        #FF6347 60deg 120deg,
-        #87CEEB 120deg 180deg,
-        #98FB98 180deg 240deg,
-        #DDA0DD 240deg 300deg,
-        #FFA500 300deg 360deg
-    );
     position: relative;
+    transition-timing-function: cubic-bezier(0.1, 0.7, 0.1, 1); /* 부드러운 감속 */
+    
+    /* ★ 핵심: 6등분 색상 (60도씩) */
+    background: conic-gradient(
+        #f1c40f 0deg 60deg,   /* 1. 골드 */
+        #34495e 60deg 120deg, /* 2. 다크 */
+        #3498db 120deg 180deg,/* 3. 블루 */
+        #e74c3c 180deg 240deg,/* 4. 레드 */
+        #9b59b6 240deg 300deg,/* 5. 퍼플 */
+        #34495e 300deg 360deg /* 6. 다크 */
+    );
 }
 
-/* 내부 텍스트 배치를 위한 가상 영역 (선택사항) */
-.wheel-segment {
+/* 5. 텍스트 배치 (각 조각의 중앙) */
+.wheel-label {
     position: absolute;
-    width: 50%;
-    height: 50%;
-    top: 50%;
-    left: 50%;
-    transform-origin: 0% 0%; /* 중심축 설정 */
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
+    transform-origin: center;
     display: flex;
-    align-items: center;
     justify-content: center;
+    /* 텍스트를 위쪽으로 밀어올림 */
+    padding-top: 20px; 
 }
 
-.segment-text {
+/* 각 텍스트 회전 (60도씩 배치 + 30도 보정) */
+/* 핀이 0도(12시)에 있으므로, 첫 번째 조각의 중심은 30도여야 함 */
+.label-0 { transform: translate(-50%, -50%) rotate(30deg); }
+.label-1 { transform: translate(-50%, -50%) rotate(90deg); }
+.label-2 { transform: translate(-50%, -50%) rotate(150deg); }
+.label-3 { transform: translate(-50%, -50%) rotate(210deg); }
+.label-4 { transform: translate(-50%, -50%) rotate(270deg); }
+.label-5 { transform: translate(-50%, -50%) rotate(330deg); }
+
+.label-text {
     position: absolute;
-    left: 40px; /* 중심으로부터의 거리 */
-    top: 10px;
-    transform: rotate(60deg); /* 텍스트 각도 보정 */
-    font-weight: bold;
+    top: 30px; /* 원의 가장자리에서 떨어진 거리 */
     color: #fff;
-    font-size: 14px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.5); /* 글자 테두리 효과 */
+    white-space: nowrap;
+}
+
+/* 6. 중앙 캡 (가운데 동그라미) */
+.wheel-center-cap {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; height: 60px;
+    background: #fff;
+    border: 6px solid #e74c3c;
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    
+    display: flex; justify-content: center; align-items: center;
+    font-size: 1.5rem; color: #e74c3c;
+}
+
+/* 스핀 버튼 */
+.btn-spin {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 15px 60px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    border-radius: 50px;
+    box-shadow: 0 5px 0 #c0392b, 0 10px 20px rgba(0,0,0,0.4);
+    transition: 0.1s;
+    margin-top: 20px;
+}
+.btn-spin:active {
+    transform: translateY(5px);
+    box-shadow: 0 0 0 #c0392b, 0 5px 10px rgba(0,0,0,0.4);
+}
+.btn-spin:disabled {
+    background: #555;
+    box-shadow: none;
+    cursor: not-allowed;
 }
