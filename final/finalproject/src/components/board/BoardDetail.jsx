@@ -32,7 +32,6 @@ export default function BoardDetail() {
 
     // effect
     useEffect(() => {
-        console.log(boardNo);
         loadData();
     }, [boardNo]);
 
@@ -50,9 +49,7 @@ export default function BoardDetail() {
     // 조회수 : 로컬 스토리지에서 검사 + 증가 요청
     const viewTimeLimit = 30 * 60 * 1000 ; // 30분
     const checkView = useCallback(async()=>{
-        console.log("checkView 실행됨");
         if(!loginId) return;
-        console.log("id 체크 통과");
         const key = `view_${loginId}_${boardNo}`;
         const now = Date.now();
 
@@ -61,17 +58,38 @@ export default function BoardDetail() {
 
         // 값이 없거나 30분이 지났다면
         if(!viewed||now-viewed.time > viewTimeLimit){
-            // 컬스토리지 key저장
-            localStorage.setItem(key,JSON.stringify({ time: now }));
+            localStorage.setItem(key,JSON.stringify({ time: now })); // 로컬스토리지 key저장
             //조회 수 증가 요청
-            try{const response = await axios.post(`/board/viewUpdate`,{boardNo});}
+            try{const response = await axios.post(`/board/viewUpdate/${boardNo}`);}
             catch(e){console.log("조회 수 증가 실패")};
         };
     },[loginId, boardNo])
+    // 로컬 스토리지에서 만료된 키 제거
+    const cleanExpiredViews = useCallback(() => {
+        const now = Date.now();
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith("view_")) {
+                const stored = localStorage.getItem(key);
+                if (!stored) continue;
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (now - parsed.time > viewTimeLimit) {
+                        localStorage.removeItem(key);
+                        i--; 
+                    }
+                } catch (e) {
+                    console.warn("Invalid localStorage entry:", key);
+                }
+            }
+        }
+},[]);
      // 조회수 증가요청 실행
     useEffect(()=>{
         checkView();
-    },[checkView])
+        cleanExpiredViews();
+    },[checkView, cleanExpiredViews])
 
 
 
