@@ -44,7 +44,7 @@ export default function AdminQuizPage() {
         }
         setLoading(false);
         
-    },[currentTab, loginId, page]);
+    },[page, currentTab, loginId]);
 
     useEffect(() => {
         if (loginId) {

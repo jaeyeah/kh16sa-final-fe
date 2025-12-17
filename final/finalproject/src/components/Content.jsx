@@ -40,7 +40,12 @@ import BoardInsert from "./board/BoardInsert";
 import BoardList from "./board/BoardList";
 import BoardContentsList from "./board/BoardContentsList";
 import BoardDetail from "./board/BoardDetail";
-import BoardEdit from "./board/BoardEdit";
+import RankingPage from "./ranking/RankingPage";
+import RankingQuizPage from "./ranking/RankingQuizPage";
+import RankingReviewPage from "./ranking/RankingReviewPage";
+import RankingMoviePage from "./ranking/RankingContentsPage";
+import RankingNewPage from "./ranking/RankingNewPage";
+import RankingContentsPage from "./ranking/RankingContentsPage";
 
 export default function Content() {
     return (<>
@@ -118,9 +123,16 @@ export default function Content() {
                         <Route path="/contents/searchForReview/review/:contentsId" element={<ReviewWrite/>}></Route>
                     </Route>
 
+                    {/* 랭킹 페이지 */}
+                    <Route path="/ranking" element={<RankingPage/>}></Route>
+                    <Route path="/ranking/quiz" element={<RankingQuizPage/>}></Route>
+                    <Route path="/ranking/review" element={<RankingReviewPage/>}></Route>
+                    <Route path="/ranking/contents" element={<RankingContentsPage/>}></Route>
+                    <Route path="/ranking/new" element={<RankingNewPage/>}></Route>
+
                     {/* 에러 페이지 */}
-                        <Route path="/error/403" element={<NeedPermission/>}></Route>
-                        <Route path="*" element={<TargetNotfound/>}></Route>
+                    <Route path="/error/403" element={<NeedPermission/>}></Route>
+                    <Route path="*" element={<TargetNotfound/>}></Route>
 
                     {/* 관리자 페이지 */}
                     <Route path="/admin" element={<AdminMain />}>

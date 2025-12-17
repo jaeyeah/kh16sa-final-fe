@@ -111,7 +111,7 @@ return(<>
             </button>
 
             <div className={`collapse navbar-collapse ${open && 'show'}`} id="menu-body">
-                {/* 좌측 메뉴 (화면이 좁아지면 합쳐짐) */}
+                {/* 좌측 메뉴 */}
                 <ul className="navbar-nav me-auto">
                     {/* home */}
                     <li className="nav-item" onClick={closeMenu}>
@@ -137,21 +137,15 @@ return(<>
                         <Link className="nav-link"  to="/board/list">
                             <span>게시판</span>
                         </Link>
-                    </li>    
-                    {/* 퀴즈(영화 상세 페이지에 구현)
-                     <li className="nav-item" onClick={closeMenu}>
-                        <Link className="nav-link"  to="#">
-                            <span>퀴즈</span>
-                        </Link>
-                    </li> */}
-                       <li className="nav-item" onClick={closeMenu}>
-                        <Link className="nav-link"  to="/point/main">
-                            <span>포인트</span>
+                    </li> 
+                    <li className="nav-item" onClick={closeMenu}>
+                        <Link className="nav-link"  to="/ranking">
+                            <span>랭킹</span>
                         </Link>
                     </li>          
                 </ul>
                  <ul className="navbar-nav ms-auto">
-                {/* 우측 메뉴 (화면이 좁아지면 합쳐짐) */}
+                {/* 우측 메뉴 */}
                     {isAdmin === true ? (
                         <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link" to={`/admin`}>
@@ -165,13 +159,13 @@ return(<>
 
                     {isLogin === true ? (<>  {/* 로그인 시 나와야 하는 화면 */}
 
-                    {/* 하트 표시 */}
+                    {/* 하트 표시(누르면 포인트 상점으로 이동) */}
                     {!isAdmin && (
-                        <li className="nav-item">
-                            <div className="nav-link text-warning" style={{cursor: 'default'}}>
+                        <li className="nav-item" onClick={closeMenu}>
+                            <Link className="nav-link"  to="/point/main">
                                 <FaHeart className="text-danger me-2" />
                                 <span className="fw-bold text-light">{heart} / 5</span>
-                            </div>
+                            </Link>
                         </li>
                     )}
 

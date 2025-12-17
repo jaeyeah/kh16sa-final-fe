@@ -6,7 +6,7 @@
 }
 
 /* 2. 카드 다크 테마 커스텀 (핵심 수정!) */
-.card.quiz-dark-card {
+.quizCard.quiz-dark-card {
     background-color: #212529 !important; /* 배경색 강제 적용 */
     border: 1px solid #373b3e !important; /* 테두리 강제 적용 */
     border-radius: 0.5rem;

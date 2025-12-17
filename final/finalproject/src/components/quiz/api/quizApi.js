@@ -66,11 +66,7 @@ export const quizApi = {
 
   // 전체 랭킹 확인
   getRanking: async (contentsId) => {
-    const response = await axios.get(`/quiz/log/list/ranking/${contentsId}`, {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    const response = await axios.get(`/quiz/log/list/ranking/${contentsId}`);
     return response.data;
   },
 

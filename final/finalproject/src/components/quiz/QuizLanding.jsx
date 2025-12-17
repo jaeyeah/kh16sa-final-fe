@@ -207,7 +207,7 @@ export default function QuizLanding() {
         <div className="container p-4 quiz-text-light">
 
             {/* --- 랭킹 섹션 --- */}
-            <div className="card border-0 mb-4 quiz-dark-card text-center shadow-sm">
+            <div className="quizCard border-0 mb-4 quiz-dark-card text-center shadow-sm">
                 <div className="card-body py-5">
                     {/* topRanker 데이터가 있을 때만 출력 */}
                     {topRanker ? (
@@ -277,7 +277,7 @@ export default function QuizLanding() {
 
 
             {/* --- 3. 통계 섹션 --- */}
-            <div className="card border-0 shadow-sm quiz-dark-card">
+            <div className="quizCard border-0 shadow-sm quiz-dark-card">
                 <div className="card-header fw-bold border-0 pt-3 stats-header-dark">
                     <FaChartBar className="me-2" />
                     나의 퀴즈 기록
