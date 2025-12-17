@@ -43,7 +43,7 @@ export default function ProductEdit({ target, closeModal, reload }) {
             };
 
             // 수정 API 호출
-            const resp = await axios.post("/point/store/item/edit", payload);
+            const resp = await axios.post("/point/main/store/item/edit", payload);
             
             if (resp.data === "success") {
                 // ★ [Toast 2] 성공 알림

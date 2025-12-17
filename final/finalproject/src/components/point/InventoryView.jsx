@@ -1,161 +1,199 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "./InventoryView.css";
 
 export default function InventoryView({ refreshPoint }) {
     const [myInven, setMyInven] = useState([]);
 
+    // 인벤토리 목록 불러오기
     const loadInven = useCallback(async () => {
         try {
-            const resp = await axios.get("/point/store/inventory/my");
+            const resp = await axios.get("/point/main/store/inventory/my");
+            // 백엔드에서 이미 수량(inventoryQuantity)이 합쳐져서 온다고 가정
             setMyInven(resp.data);
         } catch (e) { console.error(e); }
     }, []);
 
     useEffect(() => { loadInven(); }, [loadInven]);
 
-    // 아이템 그룹화
-    const groupedInven = useMemo(() => {
-        const groups = {};
-        myInven.forEach((item) => {
-            const key = item.pointInventoryItemNo;
-            if (!groups[key]) groups[key] = { ...item, count: 0, inventoryIds: [] };
-            groups[key].count += 1;
-            groups[key].inventoryIds.push(item.pointInventoryNo);
-        });
-        return Object.values(groups);
-    }, [myInven]);
-
     // [사용] 핸들러
-    const handleUse = async (group) => {
-        const targetNo = group.inventoryIds[0];
-        const type = group.pointInventoryItemType;
+    const handleUse = async (item) => {
+        // DTO 필드명: inventoryNo, pointItemType (조인된 필드)
+        const targetNo = item.inventoryNo; 
+        const type = item.pointItemType;
         let extraValue = null;
 
-        // 1. 유형별 로직
+        // 1. 유형별 추가 데이터 입력 로직
         if (type === "CHANGE_NICK") {
             extraValue = window.prompt("변경할 닉네임을 입력해주세요. (2~10자)");
             if (!extraValue) return;
         } 
         else if (type === "DECO_NICK") { 
-            const choice = window.prompt("1.무지개 2.골드 3.네온");
-            if (!choice) return;
-            // 입력값 검증
-            if(!["1","2","3"].includes(choice.trim())) return toast.warning("1~3번 중 선택해주세요.");
-            extraValue = choice.trim();
+            // 백엔드 변경됨: 아이템 이름(예: '무지개')을 보고 자동 적용하므로 선택창 불필요
+            if(item.inventoryEquipped === 'Y') {
+                toast.info("이미 착용중입니다.");
+                return;
+            }
+            if (!window.confirm(`[${item.pointItemName}] 닉네임 스타일을 적용하시겠습니까?`)) return;
         }
-else if (type === "ICON_GACHA") {
-            // ★ [뽑기 로직 수정] 한 번의 요청으로 안전하게 처리
+        else if (type === "RANDOM_ICON") {
+            // 뽑기는 별도 로직 (결과값인 아이콘 정보를 받아와야 하므로 별도 API 호출 유지)
             if (!window.confirm("🎲 아이콘 뽑기를 진행하시겠습니까? (티켓 1장 소모)")) return;
-            
             try {
-                // (1) 뽑기 요청 (티켓 번호를 같이 보냄)
-                // 서버에서 '티켓 차감' + '아이콘 지급'을 동시에 수행함
-                const drawResp = await axios.post("/point/icon/draw", { 
-                    inventoryNo: targetNo 
-                });
+                // 뽑기 전용 컨트롤러가 있다면 이곳 호출
+                const drawResp = await axios.post("/point/icon/draw", { inventoryNo: targetNo });
+                const icon = drawResp.data; // { iconName, iconRarity, iconSrc ... }
                 
-                const icon = drawResp.data;
-
-                // (2) 결과 보여주기
                 toast.success(
                     <div className="text-center">
                         <p className="mb-1 fw-bold">🎉 {icon.iconRarity} 등급 획득!</p>
-                        <img 
-                            src={icon.iconSrc} 
-                            style={{width:'60px', height:'60px', borderRadius:'8px', border:'2px solid #eee', objectFit: 'cover'}} 
-                            alt="icon" 
-                        />
+                        <img src={icon.iconSrc} style={{width:'60px', height:'60px', borderRadius:'8px', border:'2px solid #eee', objectFit: 'cover'}} alt="icon" />
                         <div className="mt-2 fw-bold text-dark">{icon.iconName}</div>
                     </div>, 
                     { autoClose: 4000, hideProgressBar: false }
                 );
-                
-                loadInven(); // 목록 갱신 (티켓 사라짐 확인)
-
-            } catch (e) {
-                console.error(e);
-                // 실패하면 티켓이 안 사라짐 (안전!)
-                toast.error("뽑기 실패: " + (e.response?.data?.message || "오류 발생"));
+                loadInven(); // 수량 갱신
+                if (refreshPoint) refreshPoint(); // 포인트 등 갱신
+            } catch (e) { 
+                toast.error("뽑기 실패: " + (e.response?.data?.message || "오류 발생")); 
             }
-            return; 
+            return; // 일반 use API 호출 건너뜀
         }
-        else if (type === "VOUCHER") {
-            if (!window.confirm("충전하시겠습니까?")) return;
+      else if (type === "VOUCHER") {
+            if (!window.confirm("포인트를 충전하시겠습니까?")) return;
+        }
+        
+        // ★ [추가] 룰렛 이용권 처리 (백엔드 에러 방지)
+        else if (type === "RANDOM_ROULETTE") {
+            if (window.confirm("이 아이템은 '행운의 룰렛' 페이지에서 사용할 수 있습니다.\n이동하시겠습니까?")) {
+                // 라우터가 있다면 navigate('/roulette') 처리
+                // 혹은 탭을 바꾸는 함수 호출
+                window.location.href = "/roulette"; // 예시 경로
+            }
+            return; // API 호출 막기
         }
         else if (type === "RANDOM_POINT") {
-            if (!window.confirm("개봉하시겠습니까?")) return;
+            if (!window.confirm("랜덤 포인트 상자를 여시겠습니까?")) return;
         }
         else {
-            if (!window.confirm("사용하시겠습니까?")) return;
+            // 그 외 아이템
+            if (!window.confirm("아이템을 사용하시겠습니까?")) return;
         }
 
-        // 2. 일반 아이템 사용 요청
+        // 2. 일반 사용 API 호출
         try {
-            const resp = await axios.post("/point/store/inventory/use", { inventoryNo: targetNo, extraValue: extraValue });
+            const resp = await axios.post("/point/main/store/inventory/use", { 
+                inventoryNo: targetNo, 
+                extraValue: extraValue 
+            });
+            
             if (resp.data === "success") {
                 toast.success("사용 완료!");
                 loadInven();
                 if (refreshPoint) refreshPoint();
             } else {
-                // "fail:사유" 처리
-                const msg = resp.data.startsWith("fail:") ? resp.data.substring(5) : resp.data;
+                // 에러 메시지 처리 (fail:이유)
+                const msg = String(resp.data).startsWith("fail:") ? resp.data.substring(5) : resp.data;
                 toast.error(msg);
             }
-        } catch (e) { toast.error("오류 발생"); }
+        } catch (e) { 
+            toast.error(e.response?.data?.message || "사용 중 오류가 발생했습니다."); 
+        }
     };
 
     // [환불]
-    const handleCancel = async (group) => {
-        if (!window.confirm("환불하시겠습니까?")) return;
+    const handleCancel = async (item) => {
+        if (!window.confirm("구매를 취소하고 환불하시겠습니까?")) return;
         try {
-            await axios.post("/point/store/cancel", { inventoryNo: group.inventoryIds[0] });
-            toast.info("환불 완료");
+            await axios.post("/point/main/store/cancel", { inventoryNo: item.inventoryNo });
+            toast.info("환불이 완료되었습니다. 💸");
             loadInven();
             if (refreshPoint) refreshPoint();
-        } catch (err) { toast.error("실패"); }
+        } catch (err) { 
+            toast.error(err.response?.data?.message || "환불 실패"); 
+        }
     };
 
-    // [삭제]
-    const handleDiscard = async (group) => {
-        if (!window.confirm("삭제하시겠습니까? (복구 불가)")) return;
+    // [삭제/버리기]
+    const handleDiscard = async (item) => {
+        if (!window.confirm("정말 버리시겠습니까? (복구 불가)")) return;
         try {
-            await axios.post("/point/store/inventory/delete", { inventoryNo: group.inventoryIds[0] });
-            toast.success("삭제 완료");
+            await axios.post("/point/main/store/inventory/delete", { inventoryNo: item.inventoryNo });
+            toast.success("아이템을 버렸습니다. 🗑️");
             loadInven();
-        } catch (err) { toast.error("실패"); }
+        } catch (err) { 
+            toast.error("삭제 실패"); 
+        }
     };
 
     return (
-        <div className="row">
-            {groupedInven.length === 0 ? <div className="p-5 text-center text-muted">보관함이 비어있습니다.</div> : 
-            groupedInven.map((group) => (
-                <div className="col-md-6 mb-3" key={group.pointInventoryItemNo}>
-                    <div className="card shadow-sm h-100 border-0">
-                        <div className="card-body d-flex align-items-center">
-                            <div className="flex-shrink-0 me-3 position-relative" style={{ width: "80px", height: "80px" }}>
-                                {group.pointItemSrc ? 
-                                    <img src={group.pointItemSrc} className="rounded w-100 h-100" style={{objectFit:'cover'}} alt=""/> 
-                                    : <div className="bg-secondary text-white rounded w-100 h-100 d-flex align-items-center justify-content-center">Img</div>}
-                                <span className="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary border border-light">{group.count}</span>
-                            </div>
-                            <div className="flex-grow-1 overflow-hidden">
-                                <h6 className="fw-bold text-truncate mb-1">{group.pointItemName}</h6>
-                                <p className="text-muted small mb-0">{group.pointInventoryItemType}</p>
-                            </div>
-                            <div className="d-flex flex-column gap-1 ms-2">
-                                {["CHANGE_NICK", "LEVEL_UP", "RANDOM_POINT", "VOUCHER", "DECO_NICK", "ICON_GACHA"].includes(group.pointInventoryItemType) && (
-                                    <button className={`btn btn-sm py-0 ${group.pointInventoryItemType==='ICON_GACHA'?'btn-warning':'btn-success'}`} onClick={() => handleUse(group)}>
-                                        {group.pointInventoryItemType === 'ICON_GACHA' ? '뽑기' : group.pointInventoryItemType === 'DECO_NICK' ? '장착' : '사용'}
-                                    </button>
-                                )}
-                                <button className="btn btn-outline-primary btn-sm py-0" onClick={() => handleCancel(group)}>환불</button>
-                                <button className="btn btn-outline-secondary btn-sm py-0" onClick={() => handleDiscard(group)}>삭제</button>
-                            </div>
-                        </div>
-                    </div>
+        <div className="inven-container mt-3">
+            <h5 className="text-white fw-bold mb-4 px-2">
+                🎒 나의 보관함 <span className="text-secondary small">({myInven.length})</span>
+            </h5>
+            
+            {myInven.length === 0 ? (
+                <div className="inven-empty">
+                    <span className="inven-empty-icon">📦</span>
+                    <h5>보관함이 비어있습니다.</h5>
+                    <p>스토어에서 아이템을 구매해보세요!</p>
                 </div>
-            ))}
+            ) : (
+                <div className="inven-grid">
+                    {myInven.map((item) => {
+                        // DECO_NICK 타입이면서 inventoryEquipped가 'Y'인 경우
+                        const isEquipped = item.inventoryEquipped === 'Y';
+
+                        return (
+                            <div className={`inven-card ${isEquipped ? 'equipped-card' : ''}`} key={item.inventoryNo}>
+                                
+                                {/* 이미지 영역 */}
+                                <div className="inven-img-box">
+                                    {item.pointItemSrc ? 
+                                        <img src={item.pointItemSrc} className="inven-img" alt={item.pointItemName}/> 
+                                        : <div className="no-img">Img</div>
+                                    }
+                                    {/* 수량 뱃지 (1개 이상일 때만 표시하거나 항상 표시) */}
+                                    <span className="inven-count-badge">x{item.inventoryQuantity}</span>
+
+                                    {/* 착용중 뱃지 */}
+                                    {isEquipped && <span className="badge bg-success equipped-badge">착용중</span>}
+                                </div>
+
+                                {/* 정보 영역 */}
+                                <div className="inven-info">
+                                    <h6 className="inven-name" title={item.pointItemName}>{item.pointItemName}</h6>
+                                    <span className="inven-type">{item.pointItemType}</span>
+                                </div>
+
+                                {/* 버튼 그룹 */}
+                                <div className="inven-actions">
+                                    {["CHANGE_NICK", "LEVEL_UP", "RANDOM_POINT", "VOUCHER", "DECO_NICK", "RANDOM_ICON"].includes(item.pointItemType) && (
+                                        <button 
+                                            className={`btn-inven use ${isEquipped ? 'disabled' : ''}`} 
+                                            onClick={() => handleUse(item)}
+                                            disabled={isEquipped} // 착용중이면 사용 버튼 비활성
+                                        >
+                                            {item.pointItemType === 'RANDOM_ICON' ? '뽑기' : 
+                                             item.pointItemType === 'DECO_NICK' ? (isEquipped ? '사용중' : '장착') : 
+                                             '사용'}
+                                        </button>
+                                    )}
+                                    
+                                    {/* 환불/삭제 버튼 (착용중이 아닐 때만 가능하게 처리 등) */}
+                                    {!isEquipped && (
+                                        <>
+                                            <button className="btn-inven refund" onClick={() => handleCancel(item)}>환불</button>
+                                            <button className="btn-inven delete" onClick={() => handleDiscard(item)}>버리기</button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 }

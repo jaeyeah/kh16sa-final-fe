@@ -35,7 +35,7 @@ export default function ProductAdd({ closeModal, reload }) {
                 pointItemUniques: Number(input.pointItemUniques)
             };
 
-            const resp = await axios.post("/point/store/item/add", payload);
+            const resp = await axios.post("/point/main/store/item/add", payload);
             
             if (resp.data === "success") {
                 // ★ [Toast 3] 성공 알림
@@ -106,8 +106,11 @@ export default function ProductAdd({ closeModal, reload }) {
                                     </optgroup>
                                     <optgroup label="이벤트/기타">
                                         <option value="VOUCHER">포인트 충전권</option>
-                                        <option value="RANDOM_POINT">랜덤 박스</option>
-                                        <option value="ICON_GACHA">아이콘뽑기</option>
+                                        <option value="RANDOM_POINT">포인트뽑기</option>
+                                        <option value="RANDOM_ICON">아이콘뽑기</option>
+                                        <option value="RANDOM_DECO">배경뽑기</option>   
+                                        <option value="RANDOM_ROULETTE">룰렛이용권</option>
+                                         
                                     </optgroup>
                                 </select>
                             </div>

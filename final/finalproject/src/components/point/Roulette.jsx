@@ -1,101 +1,142 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import './Roulette.css'; // 아래 작성해드린 CSS 파일 필요
+import { useAtomValue } from "jotai";
+import { loginIdState } from "../../utils/jotai";
+import './Roulette.css'; 
 
 export default function Roulette({ refreshPoint }) {
-    const [spinning, setSpinning] = useState(false);
-    const [rotation, setRotation] = useState(0); // 회전 각도 상태
+    const loginId = useAtomValue(loginIdState);
+    const [isSpinning, setIsSpinning] = useState(false);
+    const [rotation, setRotation] = useState(0);
+    
+    // 이용권 개수 관리
+    const [ticketCount, setTicketCount] = useState(0);
 
-    // 룰렛 판에 표시할 상품 목록 (현재는 시각적 효과용)
-    const prizes = ["1000P", "꽝", "500P", "한번 더", "2000P", "꽝"];
-    const segmentAngle = 360 / prizes.length; // 6개면 60도씩
+    // ★ [중요] 백엔드/DB와 동일하게 이름 맞춤
+    const TICKET_ITEM_TYPE = "RANDOM_ROULETTE"; 
 
-    // 룰렛 돌리기 버튼 클릭 핸들러
+    // 룰렛 아이템 (백엔드 로직과 순서가 같아야 함)
+    // 0:1000P, 1:꽝, 2:500P, 3:RETRY, 4:2000P, 5:꽝
+    const items = [
+        { name: "1000 P", value: 1000 },
+        { name: "꽝 😭", value: 0 },
+        { name: "500 P", value: 500 },
+        { name: "한번 더!", value: "RETRY" },
+        { name: "2000 P", value: 2000 },
+        { name: "꽝 😭", value: 0 },
+    ];
+
+    // 1. 내 인벤토리에서 이용권 개수 조회
+    const loadTicketCount = useCallback(async () => {
+        if (!loginId) return;
+        try {
+            const resp = await axios.get("/point/main/store/inventory/my");
+            
+            // "RANDOM_ROULETTE" 타입인 아이템만 필터링
+            // DTO 필드명이 pointItemType인지 확인 필요 (여기선 pointItemType으로 가정)
+            const tickets = resp.data.filter(item => item.pointItemType === TICKET_ITEM_TYPE);
+            
+            setTicketCount(tickets.length);
+        } catch (e) { console.error(e); }
+    }, [loginId, TICKET_ITEM_TYPE]);
+
+    useEffect(() => {
+        loadTicketCount();
+    }, [loadTicketCount]);
+
+    // 2. 룰렛 돌리기
     const handleSpin = async () => {
-        if (spinning) return;
+        if (isSpinning) return;
 
-        // 1. 사용자 확인
-        if (!window.confirm("🎫 룰렛 이용권 1장을 사용하여 돌리시겠습니까?")) {
+        if (ticketCount <= 0) {
+            toast.warning("🎟️ 룰렛 이용권이 부족합니다! 스토어에서 구매해주세요.");
             return;
         }
+        
+        if (!window.confirm(`이용권 1장을 사용하여 돌리시겠습니까? (남은 수량: ${ticketCount}장)`)) return;
 
-        setSpinning(true);
+        setIsSpinning(true);
 
         try {
-            // 2. 서버 통신 (이용권 차감 요청)
-            // Backend Controller: @PostMapping("/point/roulette/start")
-            await axios.post("/point/store/roulette/start");
+            // ★ [핵심 수정] 일반 사용(/inventory/use)이 아니라 룰렛 전용(/roulette) 호출
+            // 서버가 티켓 차감 + 랜덤 결과 계산 + 포인트 지급을 모두 처리하고 "결과 인덱스"를 줍니다.
+            const resp = await axios.post("/point/main/store/roulette");
+            
+            const resultIndex = resp.data; // 서버가 정해준 당첨 번호 (0~5)
+            
+            // --- 애니메이션 시작 ---
+            const segmentAngle = 360 / 6; 
+            const randomSpins = 360 * 5; // 최소 5바퀴 회전
+            const targetRotation = randomSpins + (360 - (resultIndex * segmentAngle));
 
-            // 3. 성공 시 룰렛 회전 애니메이션 시작
-            // (5바퀴 이상 회전 + 랜덤 각도)
-            const randomDegree = Math.floor(Math.random() * 360); 
-            const totalRotation = 360 * 5 + randomDegree + rotation; // 기존 각도에 누적
+            setRotation(targetRotation);
 
-            setRotation(totalRotation);
-
-            // 4. 회전이 멈춘 후 (3초 뒤) 결과 처리
-            setTimeout(() => {
-                setSpinning(false);
+            // 3. 결과 보여주기 (4초 후)
+            setTimeout(async () => {
+                const item = items[resultIndex];
                 
-                // 결과 알림 (현재는 랜덤이지만, 추후 서버에서 당첨 결과를 받아오도록 수정 가능)
-                toast.success("🎡 룰렛 종료! (이용권 차감 완료)");
+                if (item.value === 0) {
+                    toast.error("아쉽게도 꽝입니다... 😭");
+                } else if (item.value === "RETRY") {
+                    toast.info("한번 더 기회! (티켓이 차감되지 않았습니다)");
+                } else {
+                    toast.success(`축하합니다! ${item.name} 당첨! 🎉`);
+                }
                 
-                // 상단 포인트/인벤토리 정보 갱신 (부모 컴포넌트 함수 호출)
-                if (refreshPoint) refreshPoint();
+                setIsSpinning(false);
+                loadTicketCount(); // 갱신
+                if (refreshPoint) refreshPoint(); // 상단 포인트 갱신
+            }, 4000);
 
-            }, 3000); // CSS transition 시간(3s)과 동일하게 설정
-
-        } catch (error) {
-            setSpinning(false);
-            console.error(error);
-            const msg = error.response?.data?.message || error.response?.data || "이용권이 부족하거나 오류가 발생했습니다.";
+        } catch (e) {
+            console.error(e);
+            // 서버 에러 메시지 표시
+            const msg = e.response?.data?.message || "룰렛 실행 중 오류가 발생했습니다.";
             toast.error(msg);
+            setIsSpinning(false);
         }
     };
 
     return (
-        <div className="roulette-container text-center py-5">
-            <h3 className="mb-3 fw-bold text-primary">🎰 행운의 룰렛</h3>
-            <p className="text-muted mb-4">
-                인벤토리에 있는 <b>[룰렛 이용권]</b>을 사용하여 대박을 노려보세요!
-            </p>
+        <div className="roulette-container">
+            <h2 className="mb-2" style={{color:'#f1c40f', textShadow:'2px 2px 0 #000'}}>🎰 행운의 룰렛</h2>
+            
+            <div className="mb-4">
+                <span className="badge bg-dark border border-warning text-warning fs-6 px-3 py-2">
+                    🎟️ 보유 이용권: {ticketCount}장
+                </span>
+            </div>
 
             <div className="wheel-wrapper">
-                {/* 룰렛 화살표 (위쪽 고정) */}
-                <div className="wheel-marker">▼</div>
-
-                {/* 돌아가는 룰렛 판 */}
+                <div className="wheel-marker"></div>
                 <div 
                     className="wheel-board"
                     style={{ 
                         transform: `rotate(${rotation}deg)`,
-                        transition: spinning ? "transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)" : "none"
+                        transition: isSpinning ? 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)' : 'none'
                     }}
                 >
-                    {/* 섹션별 텍스트 배치 */}
-                    {prizes.map((item, index) => (
-                        <div 
-                            key={index} 
-                            className="wheel-segment"
-                            style={{ 
-                                // 각 섹션을 회전시켜 배치
-                                transform: `rotate(${index * segmentAngle}deg)` 
-                            }}
-                        >
-                            <div className="segment-text">{item}</div>
+                    {items.map((item, index) => (
+                        <div key={index} className={`wheel-label label-${index}`}>
+                            <span className="label-text">{item.name}</span>
                         </div>
                     ))}
                 </div>
+                <div className="wheel-center-cap">★</div>
             </div>
 
             <button 
-                className={`btn btn-lg mt-5 rounded-pill px-5 fw-bold shadow-sm ${spinning ? 'btn-secondary' : 'btn-danger'}`}
+                className={`btn-spin ${ticketCount === 0 ? 'disabled' : ''}`}
                 onClick={handleSpin}
-                disabled={spinning}
+                disabled={isSpinning || ticketCount === 0}
             >
-                {spinning ? "돌아가는 중..." : "GO! (이용권 1개 소모)"}
+                {isSpinning ? "..." : ticketCount > 0 ? "SPIN!" : "티켓 필요"}
             </button>
+            
+            {ticketCount === 0 && (
+                <p className="text-secondary mt-2 small">스토어에서 이용권을 구매하세요!</p>
+            )}
         </div>
     );
 }
