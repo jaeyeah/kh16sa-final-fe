@@ -15,9 +15,6 @@
     min-height: 100vh;
     padding: 40px 20px;
     box-sizing: border-box;
-
-    /* 배경 핵심 수정 */
-
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

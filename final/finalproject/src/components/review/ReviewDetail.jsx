@@ -397,14 +397,14 @@ export default function ReviewDetail() {
 
             try {
             //API 호출
-            await axios.post("/review/report/");
+            await axios.post("/review/report/", payload);
 
             //성공 처리
             toast.success("신고가 정상적으로 접수되었습니다.");
             setReportReason(""); // 선택 초기화
             setOtherReason("");  // 내용 초기화
             closeModal3();       // 모달 닫기
-
+            console.log("신고 성공");
         } catch (error) {
             console.error("신고 전송 실패:", error);
             
