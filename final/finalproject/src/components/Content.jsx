@@ -91,6 +91,7 @@ export default function Content() {
                     {/* 회원 페이지 */}
                     <Route path="/point/main" element={<PointMain/>}></Route>
                     <Route path="/point/ranking" element={<PointRankingPage />}></Route>
+
                     {/* 게시글 페이지 */}
                     <Route path="/board/list" element={<BoardList/>}></Route>
                     <Route path="/board/List/:contentsId" element={<BoardContentsList/>}></Route>
