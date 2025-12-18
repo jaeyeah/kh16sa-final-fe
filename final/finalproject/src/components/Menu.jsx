@@ -7,6 +7,7 @@ import './Menu.css'
 import { MdLiveTv, MdMovie } from "react-icons/md";
 import { FaHeart, FaGear, FaRankingStar } from "react-icons/fa6";
 import { FaClipboardList, FaHome } from "react-icons/fa";
+import { TbMoneybag } from "react-icons/tb";
 
 
 export default function Menu() {
@@ -155,11 +156,11 @@ return(<>
 
                     {isLogin === true ? (<>  {/* 로그인 시 나와야 하는 화면 */}
 
-                    {/* 하트 표시(누르면 포인트 상점으로 이동) */}
+                    {/* 주머니 (누르면 포인트 상점으로 이동) */}
                     {!isAdmin && (
                         <li className="nav-item" onClick={closeMenu}>
                             <Link className="nav-link"  to="/point/main">
-                                <FaHeart className="text-danger me-2" />
+                                <TbMoneybag className="text-danger me-2" />
                                 <span className="fw-bold text-light">{heart} / 5</span>
                             </Link>
                         </li>
