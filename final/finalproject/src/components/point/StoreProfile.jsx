@@ -12,13 +12,14 @@ export default function StoreProfile({ refreshTrigger }) {
         point: 0,
         level: "",
         iconSrc: null,
-        nickStyle: "" 
+        nickStyle: "",
+        frameSrc: "", // 추가: 테두리 클래스명 (frame-gold 등)
+        bgSrc: ""     // 추가: 배경 클래스명 (bg-ice 등)
     });
 
     useEffect(() => {
         if (!loginId) return;
         
-        // 백엔드: PointStoreRestController -> @GetMapping("/point/main/store/my-info")
         axios.get("/point/main/store/my-info")
             .then(res => {
                 if (res.data) {
@@ -31,29 +32,30 @@ export default function StoreProfile({ refreshTrigger }) {
 
     if (!loginId) return null;
 
+    // DB에서 넘어오는 'bg-ice', 'frame-gold' 등의 값을 클래스로 사용
+    const bgEffectClass = userInfo.bgSrc || ""; 
+    const frameEffectClass = userInfo.frameSrc || "";
+
     return (
         <div className="store-profile-wrapper">
-            <div className="membership-card">
+            {/* 배경 및 테두리 효과 동적 부여 */}
+            <div className={`membership-card ${bgEffectClass} ${frameEffectClass}`}>
                 
-                {/* 왼쪽: 유저 정보 */}
                 <div className="card-user-info">
-                    {/* 아바타 영역 */}
-                    <div className="card-avatar-box">
+                    {/* 아바타 박스에도 프레임 클래스 부여 */}
+                    <div className={`card-avatar-box ${frameEffectClass}`}>
                         {userInfo.iconSrc ? (
                             <img 
                                 src={userInfo.iconSrc} 
                                 alt="avatar" 
-                                // ★ [수정] bg-white(흰배경), rounded-circle(원형), p-1(여백) 추가
-                                className="card-avatar-img bg-white rounded-circle p-1" 
+                                className="card-avatar-img" 
                             />
                         ) : (
                             <div className="default-avatar">👤</div>
                         )}
                     </div>
                     
-                    {/* 텍스트 정보 */}
                     <div className="card-text-group">
-                        {/* ★ 닉네임 꾸미기 클래스 적용 (nick-rainbow 등) */}
                         <div className={`card-nickname ${userInfo.nickStyle || ""}`}>
                             {userInfo.nickname || loginId}
                         </div>
@@ -66,7 +68,6 @@ export default function StoreProfile({ refreshTrigger }) {
                     </div>
                 </div>
 
-                {/* 오른쪽: 포인트 지갑 */}
                 <div className="card-point-wallet">
                     <span className="wallet-label">CURRENT BALANCE</span>
                     <div className="wallet-amount">
@@ -74,7 +75,6 @@ export default function StoreProfile({ refreshTrigger }) {
                         <span className="currency-unit">P</span>
                     </div>
                 </div>
-
             </div>
         </div>
     );

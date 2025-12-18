@@ -1,0 +1,107 @@
+/* PointRanking.css */
+.ranking-bg-container {
+    background: url('https://i.postimg.cc/0yf5qmVZ/dijeunikeompyuteobaegyeonghwamyeon11.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+}
+
+.ranking-overlay {
+    background: rgba(0, 0, 0, 0.4); /* 배경 이미지를 살리기 위한 어두운 투명층 */
+    min-height: 100vh;
+}
+
+.text-glow {
+    color: white;
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.8), 0 0 20px rgba(0, 191, 255, 0.5);
+}
+
+.search-box-glass {
+    max-width: 500px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.search-box-glass input {
+    background: transparent !important;
+    border: none;
+    color: white;
+    padding-left: 20px;
+}
+
+.btn-snow {
+    background: #87ceeb;
+    color: white;
+    border-radius: 25px !important;
+    font-weight: bold;
+    border: none;
+}
+
+.ranking-glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.rank-row {
+    padding: 15px 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: 0.3s;
+}
+
+.rank-row:hover {
+    background: rgba(135, 206, 235, 0.2);
+    transform: translateX(10px);
+}
+
+.medal {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+}
+.medal-1::before { content: "🥇"; }
+.medal-2::before { content: "🥈"; }
+.medal-3::before { content: "🥉"; }
+
+.rank-num {
+    width: 40px;
+    font-weight: bold;
+    color: #87ceeb;
+    font-size: 1.2rem;
+}
+
+/* 기존 CSS 아래에 추가 */
+
+.glass-pagination .page-link {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    margin: 0 2px;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+.glass-pagination .page-link:hover {
+    background: rgba(135, 206, 235, 0.5);
+    color: white;
+}
+
+.glass-pagination .page-item.active .page-link {
+    background: #87ceeb; /* 올라프 색상 */
+    border-color: #87ceeb;
+    color: #000;
+    font-weight: bold;
+}
+
+.glass-pagination .page-item.disabled .page-link {
+    background: rgba(255, 255, 255, 0.05);
+    color: #aaa;
+    pointer-events: none;
+}

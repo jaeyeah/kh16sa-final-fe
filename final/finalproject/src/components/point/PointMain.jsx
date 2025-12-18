@@ -21,7 +21,9 @@ import DailyQuest from "./DailyQuest";
 // ★ [추가] 포인트 상점용 프로필
 import StoreProfile from "./StoreProfile";
 
+
 export default function PointMain() {
+    
     const loginId = useAtomValue(loginIdState);
     const loginLevel = useAtomValue(loginLevelState);
     const isAdmin = loginLevel === "관리자";

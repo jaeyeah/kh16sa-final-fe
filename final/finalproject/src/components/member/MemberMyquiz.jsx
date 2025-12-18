@@ -47,12 +47,12 @@ export default function MemberMypage(){
         <h1 className="text-center mt-4"> {loginNickname}님의 퀴즈</h1>
         
         {/* 나의 퀴즈 기록 통계 */}
-        <div className="card border-0 shadow-sm quiz-dark-card">
+        <div className="quizCard border-0 shadow-sm quiz-dark-card">
             <div className="card-header fw-bold border-0 text-center mt-2 fs-5">
                 <FaChartBar className="me-2" />
                 나의 퀴즈 기록
             </div>
-            <div className="card-body">
+            <div className="quizCard-body">
                 <div className="row text-center text-light">
                     <div className="col-5">
                         <span className="fs-5">콘텐츠</span>
@@ -92,7 +92,7 @@ export default function MemberMypage(){
         </div>
 
 
-        <div className="mt-5 card quiz-dark-card text-center">
+        <div className="mt-5 quizCard quiz-dark-card text-center">
             <div className="card-header fw-bold border-0 p-3 fs-5">
                 내가 풀이한 퀴즈
             </div>
@@ -144,7 +144,7 @@ export default function MemberMypage(){
 
     </div>
 
-        <div className="mt-5 card quiz-dark-card text-center">
+        <div className="mt-5 quizCard quiz-dark-card text-center">
             <div className="card-header fw-bold border-0 p-3 fs-5">
                 내가 등록한 퀴즈
             </div>

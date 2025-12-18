@@ -4,8 +4,9 @@ import { accessTokenState, adminState, clearLoginState, heartState, loginComplet
 import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import './Menu.css'
-import { MdMovie } from "react-icons/md";
-import { FaHeart, FaGear } from "react-icons/fa6";
+import { MdLiveTv, MdMovie } from "react-icons/md";
+import { FaHeart, FaGear, FaRankingStar } from "react-icons/fa6";
+import { FaClipboardList, FaHome } from "react-icons/fa";
 
 
 export default function Menu() {
@@ -116,31 +117,26 @@ return(<>
                     {/* home */}
                     <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link"  to="/">
-                            <span>홈</span>
+                            <FaHome className="fs-4" />
+                            {/* <span> 홈</span> */}
                         </Link>
                     </li>
                     {/* contents */}
                     <li className="nav-item" onClick={closeMenu}>    
-                        <Link className="nav-link"  to="/contents/genreList"><span className="fs-5"><MdMovie className="mb-2" /></span></Link>
+                        <Link className="nav-link"  to="/contents/genreList">
+                            <MdLiveTv className="fs-4" />
+                        </Link>
                     </li>
-                    {/* 리뷰 메뉴사용x
-                    <li className="nav-item dropdown ">
-                        <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                            aria-haspopup="true" aria-expanded="false"><span>리뷰</span></a>
-                        <div className="dropdown-menu">
-                            <Link className="nav-link"  to="/contents/searchForReview"><span>제목검색</span> </Link>
-                            <Link className="nav-link"  to="/review/insert"><span>리뷰등록</span> </Link>
-                            <Link className="nav-link"  to="/review/search"><span>리뷰검색</span></Link>
-                        </div>
-                    </li> */}
                     <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link"  to="/board/list">
-                            <span>게시판</span>
+                            <FaClipboardList className="fs-4"/>
+                            {/* <span>게시판</span> */}
                         </Link>
                     </li> 
                     <li className="nav-item" onClick={closeMenu}>
                         <Link className="nav-link"  to="/ranking">
-                            <span>랭킹</span>
+                            <FaRankingStar className="fs-4"/>
+                            {/* <span>랭킹</span> */}
                         </Link>
                     </li>          
                 </ul>

@@ -301,7 +301,7 @@ export default function MemberJoin(){
         if(memberValid === false) return ;
         const {data} = await axios.post("/member/",member)
         
-        navigate("/member/joinFinish"); // 메인페이지
+        navigate("/member/login"); // 메인페이지
     },[member,memberValid])
 
     //render
