@@ -25,7 +25,7 @@ import MemberEdit from "./member/MemberEdit";
 import MemberEditPassword from "./member/MemberEditPassword";
 import ReviewSearch from "./review/ReviewUpdate";
 import SearchResult from "./Contents/SearchResult";
-import PointMain from "./Point/PointMain";
+import PointMain from "./point/PointMain";
 
 import QuizLanding from "./quiz/QuizLanding";
 
@@ -81,7 +81,7 @@ export default function Content() {
 
                     {/* 회원 페이지 */}
                     <Route path="/point/main" element={<PointMain/>}></Route>
-
+                    <Route path="/point/ranking" element={<PointRanking/>}></Route>
                     {/* 게시글 페이지 */}
                     <Route path="/board/list" element={<BoardList/>}></Route>
                     <Route path="/board/List/:contentsId" element={<BoardContentsList/>}></Route>
