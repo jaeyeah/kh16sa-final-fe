@@ -1,148 +1,170 @@
 import axios from "axios";
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Board.css";
 import Pagination from "../Pagination";
 import { FaPen } from "react-icons/fa";
 
 export default function BoardList() {
-
     const navigate = useNavigate();
-
-    //state
+    
     const [boardList, setBoardList] = useState([]);
     const [titles, setTitles] = useState({});
+    
     const [page, setPage] = useState(1);
     const [pageData, setPageData] = useState({
         page: 1, size: 10, totalCount: 0, totalPage: 0, blockStart: 1, blockFinish: 1
     });
 
-    //드롭다운 상태 관리 및 검색 타입 관리
-    const [isOpen, setIsOpen] = useState(false); // 드롭다운 열림/닫힘 상태
-    const [column, setColumn] = useState("제목"); // 제목 / 컨텐츠 / 작성자
+    const [isOpen, setIsOpen] = useState(false);
+    const [inputColumn, setInputColumn] = useState("title"); 
+    const [inputKeyword, setInputKeyword] = useState("");    
+    
+    const [searchParams, setSearchParams] = useState({
+        column: "title",
+        keyword: ""
+    });
 
-    //드롭다운 토글 함수
-    const toggleDropdown = () => setIsOpen(!isOpen);
 
-    //검색 타입 변경 함수(column)
-    const handleTypeSelect = (type) => {
-        setColumn(type);
-        setIsOpen(false); // 선택 후 드롭다운 닫기
-    };
-
-    //effect
-    useEffect(() => {
-        loadBoard();
-    }, [page]);
-
-    useEffect(() => {
-        if (boardList.length > 0) {
-            loadAllTitles();
+    const getColumnText = (col) => {
+        switch(col) {
+            case "title": return "제목";
+            case "contents": return "컨텐츠";
+            case "writer": return "작성자";
+            default: return "제목";
         }
-    }, [boardList]);
+    };
 
     const formatWtime = (dateString) => {
         const date = new Date(dateString);
         const mm = String(date.getMonth() + 1).padStart(2, "0");
         const dd = String(date.getDate()).padStart(2, "0");
-        return `${mm}/${dd}`
+        return `${mm}/${dd}`;
     };
 
-    const loadBoard = useCallback(async () => {
-        const { data } = await axios.get(`/board/page/${page}`);
-        console.log(data);
-        const formattedData = data.list.map(board => ({
-            ...board,
-            boardWtime: formatWtime(board.boardWtime)
-        }));
-        setBoardList(formattedData);
-        setPageData(data.pageVO);
-    }, [page]);
+    const toggleDropdown = () => setIsOpen(!isOpen);
 
-    const loadAllTitles = async () => {
-        // 이미 제목을 가져온 ID는 건너뛰기 위해 (최적화)
+    const handleTypeSelect = (type) => {
+        setInputColumn(type); 
+        setIsOpen(false);
+    };
+
+    const loadAllTitles = useCallback(async (list) => {
+        if (!list || list.length === 0) {
+            return;
+        }
+
+
         const newTitles = { ...titles };
-
-        // 비동기 요청들을 배열에 담음
-        const promises = boardList.map(async (board) => {
+        let hasUpdate = false;
+        const promises = list.map(async (board) => {
             const id = board.boardContentsId;
-
-            // ID가 있고, 아직 제목을 안 불러왔다면 요청
-            if (id && !newTitles[id]) {
+            
+            if (id && newTitles[id] === undefined) { 
                 try {
                     const { data } = await axios.get(`/api/tmdb/title/${id}`);
-                    newTitles[id] = data; // { 12345: "아이언맨" } 식으로 저장
+                    newTitles[id] = data;
+
+                    hasUpdate = true;
                 } catch (e) {
-                    newTitles[id] = "알 수 없음";
+                    console.error(`제목 로딩 실패 (ID: ${id})`, e);
+                    newTitles[id] = "알 수 없음"; 
+                    hasUpdate = true;
                 }
             }
         });
 
-        // 모든 요청이 끝날 때까지 기다림
         await Promise.all(promises);
+        
+        if (hasUpdate) {
+            setTitles(prev => ({ ...prev, ...newTitles }));
+        }
+    }, [titles]); // titles가 바뀔 때마다 갱신
 
-        // 상태 한 번에 업데이트
-        setTitles(newTitles);
+
+    const loadBoard = useCallback(async () => {
+        try {
+            const { data } = await axios.get(`/board/page/${page}`, {
+                params: {
+                    column: searchParams.column,
+                    keyword: searchParams.keyword
+                }
+            });
+
+            const list = data.list || [];
+
+            const formattedData = list.map(board => ({
+                ...board,
+                boardWtime: formatWtime(board.boardWtime)
+            }));
+
+            // 1. 목록 업데이트
+            setBoardList(formattedData);
+            setPageData(data.pageVO);
+
+            // 2. 제목 업데이트 요청
+            loadAllTitles(formattedData);
+
+        } catch (e) {
+            console.error("데이터 로드 실패", e);
+        }
+    }, [page, searchParams, loadAllTitles]); 
+
+    const handleSearch = () => {
+        setPage(1); 
+        setSearchParams({
+            column: inputColumn,
+            keyword: inputKeyword
+        });
     };
 
+    useEffect(() => {
+        loadBoard();
+    }, [loadBoard]); 
 
-    //rendar
+
     return (
         <div className="container mt-5">
-
-            {/* 상단 타이틀 및 작성 버튼 */}
             <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
                 <h2 className="fw-bold text-white mb-0">자유게시판</h2>
             </div>
 
-            {/* 검색창 */}
+            {/* 검색창 영역 */}
             <div className="row mt-2 d-flex justify-content-center">
                 <div className="col-12 col-sm-6">
                     <div className="input-group">
-                        {/* 드롭다운 버튼 */}
                         <button
                             className="btn btn-outline-secondary dropdown-toggle text-white border-secondary"
-                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            type="button"
                             onClick={toggleDropdown}>
-                            {column}
+                            {getColumnText(inputColumn)}
                         </button>
 
-                        {/* 드롭다운 메뉴 */}
                         <ul className={`dropdown-menu dropdown-menu-dark ${isOpen ? "show" : ""}`}>
-                            <li>
-                                <button className="dropdown-item" type="button"
-                                    onClick={() => handleTypeSelect("제목")}>
-                                    제목
-                                </button>
-                            </li>
-                            <li>
-                                <button className="dropdown-item" type="button"
-                                    onClick={() => handleTypeSelect("컨텐츠")}>
-                                    컨텐츠
-                                </button>
-                            </li>
-                            <li>
-                                <button className="dropdown-item" type="button"
-                                    onClick={() => handleTypeSelect("작성자")}>
-                                    작성자
-                                </button>
-                            </li>
+                            <li><button className="dropdown-item" type="button" onClick={() => handleTypeSelect("title")}>제목</button></li>
+                            <li><button className="dropdown-item" type="button" onClick={() => handleTypeSelect("contents")}>컨텐츠</button></li>
+                            <li><button className="dropdown-item" type="button" onClick={() => handleTypeSelect("writer")}>작성자</button></li>
                         </ul>
 
-                        {/* 입력창 */}
                         <input
                             type="text"
                             className="form-control bg-dark text-white border-secondary"
-                            aria-label="Text input with dropdown button"
+                            placeholder="검색어를 입력하세요"
+                            value={inputKeyword}
+                            onChange={e => setInputKeyword(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
                         />
 
-                        {/* 검색 버튼 */}
-                        <button className="btn btn-outline-secondary text-light" type="button">검색</button>
+                        <button
+                            className="btn btn-outline-secondary text-light"
+                            type="button"
+                            onClick={handleSearch}>
+                            검색
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* 게시글 작성 버튼 */}
             <div className="row">
                 <div className="col text-end">
                     <Link className="btn btn-primary rounded-pill px-4 fw-bold" to="/board/insert">
@@ -151,7 +173,7 @@ export default function BoardList() {
                 </div>
             </div>
 
-            {/* 게시글 목록 */}
+            {/* 게시글 목록 테이블 */}
             <div className="shadow-sm border-0 rounded-4 overflow-hidden mt-4">
                 <div className="table-responsive">
                     <table className="table table-dark table-hover text-center align-middle mb-0 text-white text-nowrap" style={{ borderColor: "#495057" }}>
@@ -173,23 +195,19 @@ export default function BoardList() {
                                     className="board-row"
                                 >
                                     <td className="py-3 text-secondary">
+                                        {/* 컨텐츠 ID가 있을 때 제목 표시 */}
                                         {board.boardContentsId ? (
                                             <span className="badge bg-secondary bg-opacity-25 text-light fw-normal border border-secondary border-opacity-25">
+                                                {/* titles 객체에서 id에 해당하는 값 꺼내기 */}
                                                 {titles[board.boardContentsId] || "Loading..."}
                                             </span>
-                                        ) : (
-                                            <span className="text-muted">-</span>
-                                        )}
+                                        ) : <span className="text-muted">-</span>}
                                     </td>
                                     <td className="py-3 text-start ps-4 fw-medium">
                                         {board.boardTitle}
-                                        {/* 댓글 수 뱃지  */}
                                         {board.boardReplyCount > 0 && (
-                                            <span className="ms-2 text-primary small fw-bold">
-                                                [{board.boardReplyCount}]
-                                            </span>
+                                            <span className="ms-2 text-primary small fw-bold">[{board.boardReplyCount}]</span>
                                         )}
-                                        {/* 공지사항 뱃지 */}
                                         {board.boardNotice === 'Y' && (
                                             <span className="ms-2 badge bg-danger">공지</span>
                                         )}
@@ -201,7 +219,7 @@ export default function BoardList() {
                             ))}
                             {boardList.length === 0 && (
                                 <tr>
-                                    <td colSpan="4" className="py-5 text-muted">게시글이 없습니다.</td>
+                                    <td colSpan="5" className="py-5 text-muted">게시글이 없습니다.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -209,7 +227,6 @@ export default function BoardList() {
                 </div>
             </div>
 
-            {/* 페이지네이션 */}
             <div className="row mt-5">
                 <div className="col d-flex justify-content-center">
                     <Pagination

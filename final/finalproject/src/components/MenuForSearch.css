@@ -6,17 +6,7 @@
     background-color: #2c2c2c;
 }
 
-.sub-navbar {
-    position: fixed;
-    width: 100%;
-    /* 화면에 고정 */
-    top: 56px;
-    /* Menu 높이만큼 아래로 내림 */
-    left: 0;
-    z-index: 1020;
-    background-color: #212529;
 
-}
 
 .search.btn.btn-success {
     background-color: transparent !important;
@@ -35,12 +25,7 @@
     outline: none !important;
 }
 
-.sub-link {
-    font-family: 'Arial', 'Helvetica', sans-serif;
-    text-align: center;
-    font-weight: 400;
-    color: #ffffff;
-}
+
 
 .sub-link:hover {
     color: rgba(253, 101, 101, 0.918);
