@@ -19,6 +19,7 @@ import MemberMypage from "./member/MemberMypage";
 import MemberMyquiz from "./member/MemberMyquiz";
 import MemberMycontent from "./member/MemberMycontent";
 import MemberMyfavorite from "./member/MemberMyfavorite";
+import MemberMyBoard from "./member/MemberMyBoard";
 import MemberMyinfo from "./member/MemberMyinfo";
 import MemberMyreview from "./member/MemberMyreview";
 import MemberEdit from "./member/MemberEdit";
@@ -26,7 +27,7 @@ import MemberEditPassword from "./member/MemberEditPassword";
 import ReviewSearch from "./review/ReviewUpdate";
 import SearchResult from "./Contents/SearchResult";
 import PointMain from "./point/PointMain";
-
+import PointRanking from "./point/PointRanking";
 import QuizLanding from "./quiz/QuizLanding";
 
 import SlideContents from "./Contents/SlideContents";
@@ -97,6 +98,7 @@ export default function Content() {
                     <Route path="/member/mypage/" element={<MemberMypage/>}>
                         <Route path="/member/mypage/myinfo/:loginId" element={<MemberMyinfo/>}> </Route>
                         <Route path="/member/mypage/myquiz/:loginId" element={<MemberMyquiz/>}> </Route>
+                        <Route path="/member/mypage/myboard/:loginId" element={<MemberMyBoard/>}> </Route>
                         <Route path="/member/mypage/mycontent/:loginId" element={<MemberMycontent/>}> </Route>
                         <Route path="/member/mypage/myfavorite/:loginId" element={<MemberMyfavorite/>}> </Route>
                         <Route path="/member/mypage/myreview/:loginId" element={<MemberMyreview/>}> </Route>
