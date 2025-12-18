@@ -6,7 +6,7 @@ import axios from "axios";
 import './Menu.css'
 import { MdLiveTv, MdMovie } from "react-icons/md";
 import { FaHeart, FaGear, FaRankingStar } from "react-icons/fa6";
-import { FaClipboardList, FaHome } from "react-icons/fa";
+import { FaClipboardList, FaHome, FaShoppingCart } from "react-icons/fa";
 
 
 export default function Menu() {
@@ -138,7 +138,13 @@ return(<>
                             <FaRankingStar className="fs-4"/>
                             {/* <span>랭킹</span> */}
                         </Link>
-                    </li>          
+                    </li>
+                    <li className="nav-item" onClick={closeMenu}>
+                        <Link className="nav-link"  to="/point/main">
+                            <FaShoppingCart className="fs-4"/>
+                            {/* <span>랭킹</span> */}
+                        </Link>
+                    </li>                
                 </ul>
                  <ul className="navbar-nav ms-auto">
                 {/* 우측 메뉴 */}
