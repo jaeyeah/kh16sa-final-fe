@@ -44,7 +44,7 @@ export default function ManuForSearch() {
     return (<>
         <div className="sub-navbar p-4">
             
-
+                
                 {/* 검색영역 */}
                 <div className="row justify-content-center">
                     <div className="col-12 col-md-5 d-flex text-nowrap">
