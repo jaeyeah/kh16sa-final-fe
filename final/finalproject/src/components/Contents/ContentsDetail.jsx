@@ -369,19 +369,48 @@ export default function ContentsDetail() {
         const [otherReason, setOtherReason] = useState("");
 
 
-        const sendData2 = useCallback(() => {
+        const sendData2 = useCallback(async() => {
             if (!reportReason) {
                 toast.info("신고 사유를 선택해주세요");
                 return;
             }
-            if (reportReason === "other" && otherReason.trim() === "") {
+            if (reportReason === "OTHER" && otherReason.trim() === "") {
                 toast.info("기타 사유를 입력해주세요");
                 return;
             }
 
-            toast.success("신고가 접수되었습니다");
-            closeModal3();
-        }, [reportReason, otherReason])
+            //전송할 데이터 구성
+            const payload = {
+            reviewReportReviewId: review.reviewNo,       // 신고할 리뷰 번호
+            reviewReportType: reportReason,       // 신고 사유
+            reviewReportContent: reportReason === "OTHER" ? otherReason : null // 기타일 때만 내용 전송
+            };
+
+            try {
+            //API 호출
+            await axios.post("/review/report/");
+
+            //성공 처리
+            toast.success("신고가 정상적으로 접수되었습니다.");
+            setReportReason(""); // 선택 초기화
+            setOtherReason("");  // 내용 초기화
+            closeModal3();       // 모달 닫기
+
+        } catch (error) {
+            console.error("신고 전송 실패:", error);
+            
+            //에러 처리
+            if (error.response) {
+                if (error.response.status === 500) {
+                    toast.error("이미 신고하신 리뷰입니다.");
+                } else if (error.response.status === 401) {
+                    toast.error("로그인이 만료되었습니다.");
+                } else {
+                    toast.error("신고 접수 중 오류가 발생했습니다.");
+                }
+            }
+        }
+        }, [reportReason, otherReason, review.reviewNo, loginId]);
 
         // console.log("리뷰 데이터:", review);
         //신뢰도 레벨
@@ -422,7 +451,6 @@ export default function ContentsDetail() {
                                 {relHighLevel && (
                                     <span className="listRel2 ms-3">🔷 검증된 리뷰어 </span>
                                 )}
-
                             </h4>
 
                             {/* 오른쪽 - 자동으로 밀기 */}
@@ -459,8 +487,8 @@ export default function ContentsDetail() {
                                         </div>
                                         <div style={{ color: "white" }} className="mt-3 reportCheck">
                                             <div>
-                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="spoiler"
-                                                    checked={reportReason === "spoiler"}
+                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="SPOILER"
+                                                    checked={reportReason === "SPOILER"}
                                                     onChange={(e) => {
                                                         setReportReason(e.target.value)
                                                         setOtherReason("");
@@ -470,8 +498,8 @@ export default function ContentsDetail() {
 
                                             </div>
                                             <div className="mt-3">
-                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="no_watch"
-                                                    checked={reportReason === "no_watch"}
+                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="NOWATCH"
+                                                    checked={reportReason === "NOWATCH"}
                                                     onChange={(e) => {
                                                         setReportReason(e.target.value)
                                                         setOtherReason("");
@@ -479,8 +507,8 @@ export default function ContentsDetail() {
                                                     } /><span className="ms-3">작품을 보지 않고 쓴 내용</span>
                                             </div>
                                             <div className="mt-3">
-                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="ad"
-                                                    checked={reportReason === "ad"}
+                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="AD"
+                                                    checked={reportReason === "AD"}
                                                     onChange={(e) => {
                                                         setReportReason(e.target.value)
                                                         setOtherReason("");
@@ -490,8 +518,8 @@ export default function ContentsDetail() {
                                                 >홍보성 및 영리목적</span><br />
                                             </div>
                                             <div className="mt-3">
-                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="swear"
-                                                    checked={reportReason === "swear"}
+                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="SWEAR"
+                                                    checked={reportReason === "SWEAR"}
                                                     onChange={(e) => {
                                                         setReportReason(e.target.value)
                                                         setOtherReason("");
@@ -501,8 +529,8 @@ export default function ContentsDetail() {
                                                 >욕설 및 특정인 비방</span><br />
                                             </div>
                                             <div className="mt-3">
-                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="explicit"
-                                                    checked={reportReason === "explicit"}
+                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="EXPLICIT"
+                                                    checked={reportReason === "EXPLICIT"}
                                                     onChange={(e) => {
                                                         setReportReason(e.target.value)
                                                         setOtherReason("");
@@ -510,8 +538,8 @@ export default function ContentsDetail() {
                                                     } /><span className="ms-3">음란성 및 선정성</span><br />
                                             </div>
                                             <div className="mt-3">
-                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="biased"
-                                                    checked={reportReason === "biased"}
+                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="BIASED"
+                                                    checked={reportReason === "BIASED"}
                                                     onChange={(e) => {
                                                         setReportReason(e.target.value)
                                                         setOtherReason("");
@@ -519,8 +547,8 @@ export default function ContentsDetail() {
                                                     } /><span className="ms-3">편파적인 언행</span><br />
                                             </div>
                                             <div className="mt-3">
-                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="other"
-                                                    checked={reportReason === "other"}
+                                                <input type="radio" className="ms-3 form-check-input" name="reportReason" value="OTHER"
+                                                    checked={reportReason === "OTHER"}
                                                     onChange={(e) => {
                                                         setReportReason(e.target.value)
                                                         setOtherReason("");
@@ -532,11 +560,11 @@ export default function ContentsDetail() {
                                         <div style={{ color: "#acacbbff" }} className="mt-4 ms-2 mb-3"><span>더 자세한 의견</span></div>
 
                                         {/* 기타 아닐 시 비활성화 */}
-                                        {reportReason !== "other" && (
+                                        {reportReason !== "OTHER" && (
                                             <textarea name="" className="idea2 ms-3" disabled></textarea>
                                         )}
                                         {/* 기타 일 시, 활성화 */}
-                                        {reportReason === "other" && (
+                                        {reportReason === "OTHER" && (
                                             <textarea name="" className="idea ms-3" value={otherReason}
                                                 onChange={(e) => {
                                                     setOtherReason(e.target.value);

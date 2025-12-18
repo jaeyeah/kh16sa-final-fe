@@ -7,6 +7,7 @@ import './Menu.css'
 import { MdLiveTv, MdMovie } from "react-icons/md";
 import { FaHeart, FaGear, FaRankingStar } from "react-icons/fa6";
 import { FaClipboardList, FaHome } from "react-icons/fa";
+import { TbMoneybag } from "react-icons/tb";
 
 
 export default function Menu() {
@@ -142,28 +143,25 @@ return(<>
                 </ul>
                  <ul className="navbar-nav ms-auto">
                 {/* 우측 메뉴 */}
-                    {isAdmin === true ? (
-                        <li className="nav-item" onClick={closeMenu}>
-                        <Link className="nav-link" to={`/admin`}>
-                            <span><FaGear /></span>
-                        </Link>
-                    </li>
-                    ) : (
-                        <>
-                        </>
-                    )}
 
                     {isLogin === true ? (<>  {/* 로그인 시 나와야 하는 화면 */}
-
-                    {/* 하트 표시(누르면 포인트 상점으로 이동) */}
-                    {!isAdmin && (
-                        <li className="nav-item" onClick={closeMenu}>
-                            <Link className="nav-link"  to="/point/main">
-                                <FaHeart className="text-danger me-2" />
-                                <span className="fw-bold text-light">{heart} / 5</span>
+                        {isAdmin === true ? (
+                            <li className="nav-item" onClick={closeMenu}>
+                            <Link className="nav-link" to={`/admin`}>
+                                <span><FaGear /></span>
                             </Link>
                         </li>
-                    )}
+                        ) : (
+                            <>
+                            {/* 하트 표시(누르면 포인트 상점으로 이동) */}
+                            <li className="nav-item" onClick={closeMenu}>
+                                <Link className="nav-link"  to="/point/main">
+                                    <FaHeart className="text-danger me-2" />
+                                    <span className="fw-bold text-light">{heart} / 5</span>
+                                </Link>
+                            </li>
+                            </>
+                        )}
 
                     <li className="nav-item">
                         <Link className="nav-link" to={`/member/mypage/myinfo/${loginId}`} onClick={closeMenu}>

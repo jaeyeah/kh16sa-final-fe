@@ -19,6 +19,7 @@ import MemberMypage from "./member/MemberMypage";
 import MemberMyquiz from "./member/MemberMyquiz";
 import MemberMycontent from "./member/MemberMycontent";
 import MemberMyfavorite from "./member/MemberMyfavorite";
+import MemberMyBoard from "./member/MemberMyBoard";
 import MemberMyinfo from "./member/MemberMyinfo";
 import MemberMyreview from "./member/MemberMyreview";
 import MemberEdit from "./member/MemberEdit";
@@ -26,7 +27,7 @@ import MemberEditPassword from "./member/MemberEditPassword";
 import ReviewSearch from "./review/ReviewUpdate";
 import SearchResult from "./Contents/SearchResult";
 import PointMain from "./point/PointMain";
-
+import PointRanking from "./point/PointRanking";
 import QuizLanding from "./quiz/QuizLanding";
 
 import SlideContents from "./Contents/SlideContents";
@@ -35,6 +36,8 @@ import AdminQuizPage from "./admin/AdminQuizPage";
 import AdminMain from "./admin/AdminMain";
 import AdminMemberPage from "./admin/AdminMemberPage";
 import AdminMemberDetail from "./admin/AdminMemberDetail";
+import AdminPoint from "./admin/AdminPoint";
+import AdminDailyQuiz from "./admin/AdminDailyQuiz";
 import MyCreatedQuizDetail from "./quiz/MyCreatedQuizDetail";
 import BoardInsert from "./board/BoardInsert";
 import BoardList from "./board/BoardList";
@@ -47,6 +50,12 @@ import RankingMoviePage from "./ranking/RankingContentsPage";
 import RankingNewPage from "./ranking/RankingNewPage";
 import RankingContentsPage from "./ranking/RankingContentsPage";
 import BoardEdit from "./board/BoardEdit";
+import MemberProfile from "./member/MemberProfile";
+import MemberProfileFavorite from "./member/MemberProfileFavorite";
+import MemberProfileInfo from "./member/MemberPofileInfo";
+import MemberProfileReview from "./member/MemberProfileReview";
+import PointRankingPage from "./point/PointRanking";
+
 
 export default function Content() {
     return (<>
@@ -81,8 +90,8 @@ export default function Content() {
 
                     {/* 회원 페이지 */}
                     <Route path="/point/main" element={<PointMain/>}></Route>
-                    {/* pointRanking 오류 생겨서 잠깐 주석처리 */}
-                    {/* <Route path="/point/ranking" element={<PointRanking/>}></Route> */}
+                    <Route path="/point/ranking" element={<PointRankingPage />}></Route>
+
                     {/* 게시글 페이지 */}
                     <Route path="/board/list" element={<BoardList/>}></Route>
                     <Route path="/board/List/:contentsId" element={<BoardContentsList/>}></Route>
@@ -95,15 +104,21 @@ export default function Content() {
                     <Route path="/member/join" element={<MemberJoin/>}></Route>
                     <Route path="/member/joinFinish" element={<MemberJoinFinish/>}></Route>
                     <Route path="/member/login" element={<MemberLogin/>}></Route>
-                    <Route path="/member/mypage/" element={<MemberMypage/>}>
-                        <Route path="/member/mypage/myinfo/:loginId" element={<MemberMyinfo/>}> </Route>
-                        <Route path="/member/mypage/myquiz/:loginId" element={<MemberMyquiz/>}> </Route>
-                        <Route path="/member/mypage/mycontent/:loginId" element={<MemberMycontent/>}> </Route>
-                        <Route path="/member/mypage/myfavorite/:loginId" element={<MemberMyfavorite/>}> </Route>
-                        <Route path="/member/mypage/myreview/:loginId" element={<MemberMyreview/>}> </Route>
-                        <Route path="/member/mypage/edit/:loginId" element={<MemberEdit/>}></Route>
+                    <Route path="/member/mypage/" element={<Private><MemberMypage/></Private>}>
+                        <Route path="/member/mypage/myinfo/:loginId" element={<Private><MemberMyinfo/></Private>}> </Route>
+                        <Route path="/member/mypage/myquiz/:loginId" element={<Private><MemberMyquiz/></Private>}> </Route>
+                        <Route path="/member/mypage/myboard/:loginId" element={<Private><MemberMyBoard/></Private>}> </Route>
+                        <Route path="/member/mypage/mycontent/:loginId" element={<Private><MemberMycontent/></Private>}> </Route>
+                        <Route path="/member/mypage/myfavorite/:loginId" element={<Private><MemberMyfavorite/></Private>}> </Route>
+                        <Route path="/member/mypage/myreview/:loginId" element={<Private><MemberMyreview/></Private>}> </Route>
+                        <Route path="/member/mypage/edit/:loginId" element={<Private><MemberEdit/></Private>}></Route>
                         <Route path="/member/mypage/password/:loginId" element={<MemberEditPassword/>}></Route>
                         <Route path="/member/mypage/quiz/detail/:quizId" element={<MyCreatedQuizDetail />} />
+                    </Route>
+                    <Route path="/member/profile" element={<MemberProfile/>}>
+                        <Route path="/member/profile/info/:memberId" element={<MemberProfileInfo/>}> </Route>
+                        <Route path="/member/profile/favorite/:memberId" element={<MemberProfileFavorite/>}> </Route>
+                        <Route path="/member/profile/review/:memberId" element={<MemberProfileReview/>}> </Route>
                     </Route>
 
                     {/* 리뷰 페이지 */} 
@@ -137,13 +152,13 @@ export default function Content() {
                     <Route path="*" element={<TargetNotfound/>}></Route>
 
                     {/* 관리자 페이지 */}
-                    <Route path="/admin" element={<AdminMain />}>
-                        <Route index element={<AdminMemberPage/>}></Route>
-                        <Route path="/admin/member" element={<AdminMemberPage />} />
+                    <Route path="/admin" element={<Admin><AdminMain /></Admin>}>
+                        <Route index element={<Admin><AdminMemberPage/></Admin>}></Route>
+                        <Route path="/admin/member" element={<Admin><AdminMemberPage /></Admin>} />
                         {/* <Route path="review" element={<AdminReviewPage />} /> */}
-                        <Route path="/admin/member/:memberId" element={<AdminMemberDetail />} />
-                        <Route path="/admin/quiz" element={<AdminQuizPage />} />
-                        {/* <Route path="point" element={<AdminPointPage />} /> */}
+                        <Route path="/admin/member/:memberId" element={<Admin><AdminMemberDetail /></Admin>} />
+                        <Route path="/admin/quiz" element={<Admin><AdminQuizPage /></Admin>} />
+         
                     </Route>
                 </Routes>
             </div>

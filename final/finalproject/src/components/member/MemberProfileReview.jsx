@@ -1,30 +1,28 @@
-import { useAtom } from "jotai";
-import { loginIdState, loginNicknameState } from "../../utils/jotai";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
-import "./member.css";
+import { Link, useParams } from "react-router-dom"
+import "./Member.css"
 import { FaHeart, FaStar } from "react-icons/fa";
-export default function MemberMymovie() {
-    //통합 state
-    const [loginId, setLoginId] = useAtom(loginIdState);
-    const [loginNickname, setLoginNickname] = useAtom(loginNicknameState);
+import { useCallback, useEffect, useState } from "react";
+import axios from "axios";
 
+export default function MemberProfileReview() {
+
+    const { memberId } = useParams();
 
     //state
     const [hasReview, setHasReview] = useState(false);
-    const [myReview, setMyReview] = useState([]);
+    const [review, setReview] = useState([]);
     const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
+
 
     //callback
     const loadData = useCallback(async () => {
-         if (!loginId)  return; 
-        const { data } = await axios.get(`/member/myreview/${loginId}`)
-        setMyReview(data);
+        if (!memberId) return;
+        const { data } = await axios    .get(`/member/myreview/${memberId}`)
+        setReview(data);
         if (data.length !== 0) {
             setHasReview(true);
         }
-    }, [loginId]);
+    }, [memberId]);
 
     //effect
     useEffect(() => {
@@ -46,16 +44,16 @@ export default function MemberMymovie() {
 
     //render
     return (<>
-        <h1 className="text-center mt-4"> {loginNickname}님의 <span className="text-info">리뷰</span></h1>
+        <h1 className="text-center mt-4"> {memberId}님의 리뷰</h1>
 
         {hasReview === false && (
-                    <div className="col-12 text-center mt-5 text-secondary">
-                        <h3>아직 작성된 리뷰가 없습니다.</h3>
-                    </div>
+            <div className="col-12 text-center mt-5 text-secondary">
+                <h3>아직 작성된 리뷰가 없습니다.</h3>
+            </div>
         )}
 
         <div className="row mt-4">
-            {myReview.map((review) => (
+            {review.map((review) => (
                 <div className="col-6 col-sm-12 mx-2 my-2 mypage-review-card justify-content-between" key={review.reviewNo}>
                     <Link to={`/review/${review.reviewContents}/${review.reviewNo}`} className="reviewWrapper">
                         <div className="row mt-2">
@@ -73,7 +71,7 @@ export default function MemberMymovie() {
                                         ))}
                                     </div>
                                     <div className="d-flex flex-nowrap mt-2">
-                                        <span>평가가치 : 
+                                        <span>평가가치 :
                                             <span className="review-price-text me-2 ms-1">{getFormattedPrice(review.reviewPrice)}</span>
                                             원</span>
                                     </div>
