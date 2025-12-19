@@ -75,7 +75,7 @@ export default function StoreView({ loginLevel, refreshPoint }) {
     } catch (err) {
         toast.error(err.response?.data?.message || "구매 실패 😥");
     }
-};
+};  
 
     // [선물 핸들러]
     const handleGift = async (item) => {

@@ -168,4 +168,4 @@ export default function Roulette({ refreshPoint, setTab }) {
             </div>
         </div>
     );
-}
+}   
