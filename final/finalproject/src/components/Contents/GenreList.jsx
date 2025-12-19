@@ -50,10 +50,44 @@ export default function GenreList() {
     return (<>
         <div className="container mt-2">
 
+             <div className="row">
+                <div className="col d-flex justify-content-center text-nowrap">
+                    <Link className="text-decoration-none link-body-emphasis" to="/">
+                        <svg width="100%"
+                            height="auto"
+                            viewBox="0 0 750 150"
+                            style={{ maxWidth: "800px" }}
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(20, 25)">
+                                <path d="M10 0H110C115.523 0 120 4.47715 120 10V30C120 35.5228 124.477 40 130 40C135.523 40 140 35.5228 140 30V10C140 4.47715 144.477 0 150 0H210C215.523 0 220 4.47715 220 10V90C220 95.5228 215.523 100 210 100H150C144.477 100 140 95.5228 140 90V70C140 64.4772 135.523 60 130 60C124.477 60 120 64.4772 120 70V90C120 95.5228 115.523 100 110 100H10C4.47715 100 0 95.5228 0 90V10C0 4.47715 4.47715 0 10 0Z" fill="#E50914" />
+
+                                <circle cx="60" cy="20" r="5" fill="#141414" />
+                                <circle cx="60" cy="50" r="5" fill="#141414" />
+                                <circle cx="60" cy="80" r="5" fill="#141414" />
+                                <line x1="130" y1="5" x2="130" y2="35" stroke="#141414" strokeWidth="2" strokeDasharray="4 4" />
+                                <line x1="130" y1="65" x2="130" y2="95" stroke="#141414" strokeWidth="2" strokeDasharray="4 4" />
+
+                                <g transform="translate(125, 25) rotate(15)">
+                                    <path d="M0 25C0 11.1929 11.1929 0 25 0H85C90.5228 0 95 4.47715 95 10V40C95 45.5228 90.5228 50 85 50H25C11.1929 50 0 38.8071 0 25Z" fill="#D4AF37" />
+                                    <circle cx="25" cy="25" r="8" fill="#141414" />
+                                    <text x="60" y="35" fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif" fontWeight="bold" fontSize="28" fill="#141414" textAnchor="middle">₩</text>
+                                </g>
+                            </g>
+
+                            <text x="250" y="95" fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif" fontWeight="900" fontSize="80" letterSpacing="-2">
+                                <tspan fill="#FFFFFF">Review</tspan>
+                                <tspan fill="#D4AF37">Tag</tspan>
+                            </text>
+                        </svg>
+                    </Link>
+                </div>
+            </div>
+
             {/* 검색영역 */}
-            <div className="row justify-content-center">
+            <div className="row mt-4 justify-content-center">
                 <div className="col-12 col-md-5 d-flex text-nowrap">
-                    <div className="mt-3 input-group search-wrapper">
+                    <div className="input-group search-wrapper">
                         {/* 검색창 */}
                         <input type="text" className="search form-control search-bar text-light" value={query}
                             placeholder="제목" onChange={e => setQuery(e.target.value)}
@@ -67,7 +101,7 @@ export default function GenreList() {
                 </div>
             </div>
 
-            <div className="row mt-4 genre-form">
+            <div className="row mt-5 genre-form">
                 <div className="col p-4 rounded">
                     {genre.map(genreDto => (
                         <div className="btn me-2 mt-2" key={genreDto.genreId}>
