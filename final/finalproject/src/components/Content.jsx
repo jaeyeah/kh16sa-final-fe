@@ -54,17 +54,14 @@ import MemberProfile from "./member/MemberProfile";
 import MemberProfileFavorite from "./member/MemberProfileFavorite";
 import MemberProfileInfo from "./member/MemberPofileInfo";
 import MemberProfileReview from "./member/MemberProfileReview";
-<<<<<<< HEAD
+
 import PointRankingPage from "./point/PointRanking";
 import AdminBoard from "./admin/AdminBoard";
-
-
-=======
 import Private from "./guard/Private";
 import Admin from "./guard/Admin";
 import AdminInventory from "./admin/AdminInventory";
 import AdminReviewReport from "./admin/AdminReviewReport";
->>>>>>> origin/main
+
 export default function Content() {
     return (<>
 
