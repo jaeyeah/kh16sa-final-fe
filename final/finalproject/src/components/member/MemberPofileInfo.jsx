@@ -5,7 +5,6 @@ import axios from "axios";
 import { FaGift } from "react-icons/fa";
 import { useAtomValue } from "jotai";
 import { loginIdState } from "../../utils/jotai";
-import Donate from "../Point/Donate";
 import { toast } from "react-toastify";
 
 export default function MemberProfileInfo() {

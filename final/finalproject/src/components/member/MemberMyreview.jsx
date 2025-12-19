@@ -46,7 +46,7 @@ export default function MemberMymovie() {
 
     //render
     return (<>
-        <h1 className="text-center mt-4"> {loginNickname}님의 <span className="text-info">리뷰</span></h1>
+        <h1 className="text-center mt-4"> {loginNickname}님의 리뷰</h1>
 
         {hasReview === false && (
                     <div className="col-12 text-center mt-5 text-secondary">

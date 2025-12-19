@@ -44,7 +44,7 @@ export default function MemberMypage(){
     
     return(<>
 
-        <h1 className="text-center mt-4"> {loginNickname}님의 <span className="text-info">퀴즈</span></h1>
+        <h1 className="text-center mt-4"> {loginNickname}님의 퀴즈</h1>
         
         {/* 나의 퀴즈 기록 통계 */}
         <div className="quizCard border-0 shadow-sm quiz-dark-card">
