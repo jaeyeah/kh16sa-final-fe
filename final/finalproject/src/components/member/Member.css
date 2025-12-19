@@ -284,6 +284,7 @@
   background-color: #373b3e  !important;
   border-radius: 6px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .rate-fill {
@@ -294,6 +295,7 @@
   font-size: 0.9rem;
   font-weight: bold;
   transition: 0.3s ease;
+  overflow: hidden;
 }
 .rate-text {
   position: absolute;
@@ -304,7 +306,7 @@
   font-size: 0.9rem;
   font-weight: bold;
   color: #212529;
-  
+  overflow: hidden;
 }
 .mypage-review-card {
   border-radius: 0.8em !important;
@@ -313,7 +315,7 @@
   border: none !important;
   color: #fff !important;
   max-width: 700px !important;
-  min-width: 450px !important;
+  min-width: 300px !important;
 }
 .mypage-review-card:hover { 
   filter: brightness(0.9);
@@ -435,4 +437,3 @@
     color: #3078e4;
     font-size: 16px;
 }
-

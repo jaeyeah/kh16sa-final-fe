@@ -11,24 +11,24 @@ export default function MemberMypage() {
       {/* 상단 탭 네비게이션: 
           NavLink는 현재 경로와 일치할 때 자동으로 'active' 클래스를 부여합니다. 
       */}
-      <nav className="mypage-tabs">
+      <nav className="mypage-tabs d-flex justify-content-center flex-wrap">
         <NavLink to={`/member/mypage/myinfo/${loginId}`} className="mypage-tab">
-          내 정보
+          <span>내 정보</span>
         </NavLink>
         <NavLink to={`/member/mypage/myBoard/${loginId}`} className="mypage-tab">
-          게시글
+          <span>게시글</span>
         </NavLink>
         <NavLink to={`/member/mypage/mycontent/${loginId}`} className="mypage-tab">
-          찜목록
+          <span>찜목록</span>
         </NavLink>
         <NavLink to={`/member/mypage/myfavorite/${loginId}`} className="mypage-tab">
-          인생작
+          <span>인생작</span>
         </NavLink>
         <NavLink to={`/member/mypage/myquiz/${loginId}`} className="mypage-tab">
-          내 퀴즈
+          <span>내 퀴즈</span>
         </NavLink>
         <NavLink to={`/member/mypage/myreview/${loginId}`} className="mypage-tab">
-          내 리뷰
+          <span>내 리뷰</span>
         </NavLink>
       </nav>
 

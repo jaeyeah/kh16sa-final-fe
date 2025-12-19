@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, NavLink } from "react-router-dom";
 import { useAtom, useSetAtom } from "jotai";
 import axios from "axios";
 import { clearLoginState, loginNicknameState } from "../../utils/jotai";
@@ -8,6 +8,7 @@ import "./MemberCustom.css";
 export default function MemberMyinfo() {
     const { loginId } = useParams();
     const navigate = useNavigate();
+
 
     // 전역 상태
     const [loginNickname, setLoginNickname] = useAtom(loginNicknameState);
@@ -33,6 +34,7 @@ export default function MemberMyinfo() {
 
     useEffect(() => {
         loadData();
+        console.log(reliabilityInfo);
     }, [loadData]);
 
     // 2. 회원 탈퇴 로직
@@ -59,7 +61,7 @@ export default function MemberMyinfo() {
         if (rel >= 50) badge = { text: "🔷 검증된 리뷰어", class: "rel-high" };
         else if (rel >= 20) badge = { text: "🔵 신뢰 리뷰어", class: "rel-mid" };
         else if (rel >= 6) badge = { text: "🟢 활동 리뷰어", class: "rel-low" };
-
+        
         return { score: rel, status, badge };
     }, [data]);
 
@@ -78,54 +80,53 @@ export default function MemberMyinfo() {
             <div className={`profile-hero-v2 ${!isUrl ? point?.bgSrc : ""}`} style={heroStyle}>
                 <div className="hero-overlay-v2">
                     <img src={point?.iconSrc} alt="Icon" className="avatar-img-v2" />
-                    
                     <h1 className={`nickname-v2 ${point?.nickStyle || ''}`}>
                         {member.memberNickname}
+                    </h1>
                         {reliabilityInfo.badge && (
+                            <h3>
                             <span className={`reviewer-badge ${reliabilityInfo.badge.class}`}>
                                 {reliabilityInfo.badge.text}
                             </span>
+                            </h3>
                         )}
-                    </h1>
-
-                    <div className="reliability-section">
-                        <div className="reliability-bar-container">
-                            <div 
-                                className={`rel-fill ${reliabilityInfo.status}`} 
-                                style={{ width: `${reliabilityInfo.score}` }}
-                            ></div>
-                        </div>
-                        <span className={`rel-text ${reliabilityInfo.status}`}>
-                             {reliabilityInfo.status === 'danger' ? '⚠️ 위험: ' : '신뢰도: '} {reliabilityInfo.score}
-                        </span>
-                    </div>
                 </div>
             </div>
 
-            {/* 2. 활동 통계 카드 */}
+
+            {/* 2. 활동 통계 카드 (복구된 영역) */}
+
             <div className="activity-stats-row">
-                <div className="stat-card">
-                    <span className="stat-label">보유 포인트</span>
-                    <span className="stat-value text-gold">{member.memberPoint?.toLocaleString()} P</span>
-                </div>
-                <div className="stat-card">
-                    <span className="stat-label">작성한 리뷰</span>
-                    <span className="stat-value">{member.reviewCount || 0}</span>
-                </div>
-                <div className="stat-card">
-                    <span className="stat-label">찜한 목록</span>
-                    <span className="stat-value">{member.wishCount || 0}</span>
-                </div>
-                <div className="stat-card">
-                    <span className="stat-label">참여 퀴즈</span>
-                    <span className="stat-value">{member.quizCount || 0}</span>
-                </div>
+                <NavLink to={`/point/main`} >
+                    <div className="stat-card">
+                        <span className="stat-label text-truncate">보유 포인트</span>
+                        <span className="stat-value text-gold text-truncate">{member.memberPoint?.toLocaleString()} P</span>
+                    </div>
+                </NavLink>
+                <NavLink to={`/member/mypage/myreview/${loginId}`} >
+                    <div className="stat-card">
+                        <span className="stat-label  text-truncate">작성한 리뷰</span>
+                        <span className="stat-value  text-truncate">{member.reviewCount || 0}</span>
+                    </div>
+                </NavLink>
+                <NavLink to={`/member/mypage/mycontent/${loginId}`}>
+                    <div className="stat-card">
+                        <span className="stat-label  text-truncate">찜한 목록</span>
+                        <span className="stat-value  text-truncate">{member.wishCount || 0}</span>
+                    </div>
+                </NavLink>
+                <NavLink to={`/member/mypage/myquiz/${loginId}`} >
+                    <div className="stat-card">
+                        <span className="stat-label  text-truncate">참여 퀴즈</span>
+                        <span className="stat-value  text-truncate">{member.quizCount || 0}</span>
+                    </div>
+                </NavLink>
             </div>
 
             {/* 3. 상세 정보 관리 (표 형식을 카드 스타일로 개선) */}
             <div className="account-info-card">
                 <h3 className="card-title-v2">상세 정보 관리</h3>
-                <div className="info-list-v2">
+                <div className="info-list-v2 mt-4">
                     <div className="info-item-v2">
                         <span className="label-v2">아이디</span>
                         <span className="value-v2">{member.memberId}</span>

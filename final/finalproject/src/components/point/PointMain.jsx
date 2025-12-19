@@ -22,6 +22,10 @@ import StoreProfile from "./StoreProfile";
 export default function PointMain() {
     const loginId = useAtomValue(loginIdState);
     const loginLevel = useAtomValue(loginLevelState);
+    // ★ [수정] 관리자 제거 -> 랭킹 페이지 추가
+    import PointRankingPage from "./PointRanking"; 
+    import StoreProfile from "./StoreProfile";
+import IconListView from "./IconListView";
 
     // 탭 상태 (기본값: store)
     const [tab, setTab] = useState("store"); 
@@ -159,8 +163,23 @@ export default function PointMain() {
                                 {nav.label}
                             </a>
                         </li>
-                    ))}
-                </ul>
+                        <li className="nav-cinema-item">
+                            <a href="#!" className={`nav-cinema-link ${tab === 'inventory' ? 'active' : ''}`} onClick={(e) => {e.preventDefault(); setTab('inventory');}}>🎒 인벤토리</a>
+                        </li>
+                        <li className="nav-cinema-item">
+                            <a href="#!" className={`nav-cinema-link ${tab === 'history' ? 'active' : ''}`} onClick={(e) => {e.preventDefault(); setTab('history');}}>📜 기록</a>
+                        </li>
+                        {/* 관리자 탭 삭제됨 */}
+                    </ul>
+
+                    {/* 3. 콘텐츠 영역 */}
+                    <div className="cinema-content">
+                        {tab === "store" && <StoreView loginLevel={loginLevel} refreshPoint={refreshAll} />}
+                        {tab === "roulette" && <Roulette refreshPoint={refreshAll} />}
+                        {tab === "my_icon" && <><MyIconView refreshPoint={refreshAll} /> <IconListView refreshPoint={refreshAll}></IconListView></>} 
+           
+                        {/* ★ [추가] 랭킹 페이지 연결 */}
+                        {tab === "ranking" && <PointRankingPage />}
 
                 {/* 3. 콘텐츠 영역 (선택된 탭에 따른 컴포넌트 렌더링) */}
                 <div className="cinema-content">
