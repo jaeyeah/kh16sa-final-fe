@@ -167,10 +167,6 @@ export default function WriteReview() {
         const replacement = e.target.value.replace(regex, "");
         let number = replacement.length == 0 ? "" : parseInt(replacement);
         if(number > 50000) number = 50000;
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
         const formattedNumber = number === 0 ? "" : number.toLocaleString('ko-KR');
         setPrice(formattedNumber);
 
