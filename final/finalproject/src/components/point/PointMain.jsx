@@ -170,21 +170,11 @@ export default function PointMain() {
                     {tab === "store" && <StoreView loginLevel={loginLevel} refreshPoint={refreshAll} />}
                     {tab === "roulette" && <Roulette refreshPoint={refreshAll} />}
                     {tab === "my_icon" && <><MyIconView refreshPoint={refreshAll} /> <IconListView refreshPoint={refreshAll}></IconListView></>}
-
-                    {/* ★ [추가] 랭킹 페이지 연결 */}
                     {tab === "ranking" && <PointRankingPage />}
+                    {tab === "wish" && <WishlistView refreshPoint={refreshAll} />}
+                    {tab === "inventory" && <InventoryView refreshPoint={refreshAll} />}
+                    {tab === "history" && <HistoryView />}
 
-                    {/* 3. 콘텐츠 영역 (선택된 탭에 따른 컴포넌트 렌더링) */}
-                    <div className="cinema-content">
-                        {/* 각 뷰 컴포넌트에 포인트 갱신 함수를 전달하여 상호작용성 강화 */}
-                        {tab === "store" && <StoreView loginLevel={loginLevel} refreshPoint={refreshAll} />}
-                        {tab === "roulette" && <Roulette refreshPoint={refreshAll} />}
-                        {tab === "my_icon" && <MyIconView refreshPoint={refreshAll} />}
-                        {tab === "ranking" && <PointRankingPage />}
-                        {tab === "wish" && <WishlistView refreshPoint={refreshAll} />}
-                        {tab === "inventory" && <InventoryView refreshPoint={refreshAll} />}
-                        {tab === "history" && <HistoryView />}
-                    </div>
 
                     {/* 후원 모달 */}
                     {showDonate && (
