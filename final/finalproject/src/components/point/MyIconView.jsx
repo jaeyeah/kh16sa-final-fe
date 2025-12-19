@@ -49,7 +49,7 @@ export default function MyIconView({ refreshPoint }) {
     return (
         <div className="p-3">
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="fw-bold mb-0">🦸 내 이모티콘 보관함</h5>
+                <h5 className="fw-bold mb-0">🦸 내 아이콘 보관함</h5>
                 <button className="btn btn-sm btn-outline-secondary" onClick={handleUnequip}>
                     장착 해제
                 </button>

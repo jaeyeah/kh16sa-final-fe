@@ -20,6 +20,7 @@
     // ★ [수정] 관리자 제거 -> 랭킹 페이지 추가
     import PointRankingPage from "./PointRanking"; 
     import StoreProfile from "./StoreProfile";
+import IconListView from "./IconListView";
 
     export default function PointMain() {
         
@@ -171,7 +172,9 @@
                         {tab === "store" && <StoreView loginLevel={loginLevel} refreshPoint={refreshAll} />}
                         {tab === "roulette" && <Roulette refreshPoint={refreshAll} />}
                         {tab === "my_icon" && <MyIconView refreshPoint={refreshAll} />} 
-                        
+                        {/* {tab === "#" && */}
+                        <IconListView refreshPoint={refreshAll}></IconListView>
+           
                         {/* ★ [추가] 랭킹 페이지 연결 */}
                         {tab === "ranking" && <PointRankingPage />}
 
