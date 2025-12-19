@@ -21,6 +21,7 @@ export default function AdminReviewCard({ reviewData, refreshList }) {
         }
     };
 
+
     //신고내용
     {/* 스포일러, 작품 안 보고 쓴 내용 */ }
     const SpoilerAndNowatch =
@@ -42,30 +43,13 @@ export default function AdminReviewCard({ reviewData, refreshList }) {
         !AdAndExplicit &&
         !SwearAndBiased;
 
-////////////////////////////////////////////////////////////////////
+  // 기타 내용 가져오기
     const OtherText = useCallback(()=>{
         const text = reviewData.reviewReportContent;
         setOpenReviewId(prev =>
              prev === reviewData.reviewId ? null : reviewData.reviewId
     )
     },[reviewData.reviewId]);
-    
-    
-////////////////////////////////////////////////////////////////////
-    // 기타 내용 가져오기 (Lazy Loading)
-    const toggleEtcDetails = async () => {
-        if (!isEtcOpen && etcDetails.length === 0) {
-            try {
-                // API: 해당 퀴즈의 '기타' 신고 내용만 가져옴
-                const res = await axios.get(`/admin/quizzes/${quizData.quizId}/reports`);
-                setEtcDetails(res.data); // List<QuizReportDetailVO>
-            } catch (error) {
-                console.error("상세 내용 로드 실패");
-            }
-        }
-        setIsEtcOpen(!isEtcOpen);
-    };
-
 
 
     return (
@@ -77,7 +61,7 @@ export default function AdminReviewCard({ reviewData, refreshList }) {
                     [리뷰] {reviewData.contentsTitle}
                 </h5>
                 <span className="badge bg-warning fs-6">
-                    🚨 누적 신고: { }건
+                    🚨 누적 신고: {reviewData.reviewReportCount}건
                 </span>
             </div>
 
