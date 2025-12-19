@@ -1,55 +1,53 @@
 import { useState } from "react";
 import axios from "axios";
-// ★ [Toast 1] toast 임포트 (Container는 부모에 있으므로 필요 없음)
 import { toast } from "react-toastify"; 
 
 export default function ProductAdd({ closeModal, reload }) {
-    // 입력값 관리
+    // [1] 입력값 관리 (dailyLimit 필드 추가)
     const [input, setInput] = useState({
         pointItemName: "",
         pointItemPrice: 0,
         pointItemStock: 10,
-        pointItemType: "FOOD", // 기본값
-        pointItemReqLevel: "일반회원", // 기본값
+        pointItemType: "FOOD", 
+        pointItemReqLevel: "일반회원",
         pointItemContent: "",
         pointItemSrc: "",
-        pointItemIsLimitedPurchase: 0 // ★ 기본값: 0 (중복 구매 가능)
+        pointItemIsLimitedPurchase: "N", // Y/N으로 관리 권장 (DB 타입 확인)
+        pointItemDailyLimit: 0           // 일일 제한 개수 추가
     });
 
     const changeInput = (e) => {
-        setInput({ ...input, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setInput({ ...input, [name]: value });
     };
 
+    // [2] 등록 실행
     const handleAdd = async () => {
-        // ★ [Toast 2] 유효성 검사 경고 알림
         if (!input.pointItemName || !input.pointItemPrice) {
             return toast.warning("상품명과 가격은 필수입니다. 😫");
         }
 
         try {
-            // (권장) 숫자는 확실하게 숫자로 변환해서 전송
+            // 서버 전송 전 데이터 정제 (숫자 타입 변환)
             const payload = {
                 ...input,
                 pointItemPrice: Number(input.pointItemPrice),
                 pointItemStock: Number(input.pointItemStock),
-                pointItemIsLimitedPurchase : Number(input.pointItemIsLimitedPurchase )
+                pointItemDailyLimit: Number(input.pointItemDailyLimit)
             };
 
             const resp = await axios.post("/point/main/store/item/add", payload);
             
             if (resp.data === "success") {
-                // ★ [Toast 3] 성공 알림
                 toast.success("📦 상품 등록 완료!"); 
-                reload(); // 목록 새로고침
-                closeModal(); // 모달 닫기
+                reload(); 
+                closeModal(); 
             } else if (resp.data === "fail_auth") {
-                // ★ [Toast 4] 에러 알림
                 toast.error("관리자만 등록할 수 있습니다. 👮");
             } else {
                 toast.error("등록 실패: " + resp.data);
             }
         } catch (e) {
-            // ★ [Toast 5] 서버 에러 알림
             toast.error("서버 오류가 발생했습니다. ☠️");
             console.error(e);
         }
@@ -57,22 +55,22 @@ export default function ProductAdd({ closeModal, reload }) {
 
     return (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-            <div className="modal-dialog">
-                <div className="modal-content shadow">
-                    <div className="modal-header bg-primary bg-opacity-10">
-                        <h5 className="modal-title fw-bold text-primary">📦 신규 상품 등록</h5>
-                        <button type="button" className="btn-close" onClick={closeModal}></button>
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content shadow-lg border-0">
+                    <div className="modal-header bg-primary text-white">
+                        <h5 className="modal-title fw-bold">📦 신규 상품 등록</h5>
+                        <button type="button" className="btn-close btn-close-white" onClick={closeModal}></button>
                     </div>
-                    <div className="modal-body">
+                    <div className="modal-body p-4">
                         
                         {/* 상품명 */}
-                        <div className="mb-2">
+                        <div className="mb-3">
                             <label className="form-label fw-bold small">상품명</label>
-                            <input type="text" name="pointItemName" className="form-control" onChange={changeInput} placeholder="예: 황금 올리브 치킨" />
+                            <input type="text" name="pointItemName" className="form-control" onChange={changeInput} placeholder="예: 하트 5개 충전권" />
                         </div>
 
                         {/* 가격 & 재고 */}
-                        <div className="row mb-2">
+                        <div className="row mb-3">
                             <div className="col">
                                 <label className="form-label fw-bold small">가격(P)</label>
                                 <input type="number" name="pointItemPrice" className="form-control" onChange={changeInput} placeholder="0" />
@@ -84,33 +82,25 @@ export default function ProductAdd({ closeModal, reload }) {
                         </div>
 
                         {/* 유형 & 등급 */}
-                        <div className="row mb-2">
+                        <div className="row mb-3">
                             <div className="col">
                                 <label className="form-label fw-bold small">유형</label>
                                 <select name="pointItemType" className="form-select" onChange={changeInput} value={input.pointItemType}>
                                     <option value="">== 유형 선택 ==</option>
                                     <optgroup label="기능성 아이템">
+                                        <option value="HEART_RECHARGE">하트 충전권 (5개)</option>
                                         <option value="CHANGE_NICK">닉네임 변경권</option>
                                         <option value="LEVEL_UP">레벨업 부스터</option>
-                                        <option value="TICKET">기타 이용권</option>
                                     </optgroup>
                                     <optgroup label="치장/꾸미기">
                                         <option value="DECO_NICK">닉네임 치장</option>
                                         <option value="DECO_ICON">프로필 아이콘</option>
                                         <option value="DECO_BG">배경 스킨</option>
                                     </optgroup>
-                                    <optgroup label="현물/기프티콘">
-                                        <option value="FOOD">식품/카페</option>
-                                        <option value="GIFT">상품권</option>
-                                        <option value="GOODS">실물 굿즈</option>
-                                    </optgroup>
                                     <optgroup label="이벤트/기타">
                                         <option value="VOUCHER">포인트 충전권</option>
-                                        <option value="RANDOM_POINT">포인트뽑기</option>
                                         <option value="RANDOM_ICON">아이콘뽑기</option>
-                                        <option value="RANDOM_DECO">배경뽑기</option>   
                                         <option value="RANDOM_ROULETTE">룰렛이용권</option>
-                                         
                                     </optgroup>
                                 </select>
                             </div>
@@ -124,31 +114,42 @@ export default function ProductAdd({ closeModal, reload }) {
                             </div>
                         </div>
 
-                        {/* 희귀도 (중복 구매 설정) */}
-                        <div className="mb-2">
-                            <label className="form-label fw-bold small">구매 제한 (희귀도)</label>
-                            <select name="pointItemIsLimitedPurchase" className="form-select" onChange={changeInput} value={input.pointItemIsLimitedPurchase}>
-                                <option value="0">🟢 중복 구매 가능 (여러 개 소지 가능)</option>
-                                <option value="1">🔴 중복 구매 불가 (1인당 1개 한정)</option>
-                                <option value="2"> 하루 1인당 2개 구매가능 </option>
-                                <option value="3"> 하루 1인당 3개 구매가능</option>
-                            </select>
+                        {/* 구매 제한 설정 (중복구매 여부 & 일일 제한 개수) */}
+                        <div className="row mb-3">
+                            <div className="col-6">
+                                <label className="form-label fw-bold small">중복 구매 제한</label>
+                                <select name="pointItemIsLimitedPurchase" className="form-select" onChange={changeInput} value={input.pointItemIsLimitedPurchase}>
+                                    <option value="N">제한 없음 (계속 구매)</option>
+                                    <option value="Y">1인 1회 한정</option>
+                                </select>
+                            </div>
+                            <div className="col-6">
+                                <label className="form-label fw-bold small text-danger">일일 구매 제한 (개수)</label>
+                                <input 
+                                    type="number" 
+                                    name="pointItemDailyLimit" 
+                                    className="form-control" 
+                                    value={input.pointItemDailyLimit} 
+                                    onChange={changeInput} 
+                                    placeholder="0 (제한없음)"
+                                />
+                            </div>
                         </div>
 
                         {/* 이미지 & 설명 */}
-                        <div className="mb-2">
+                        <div className="mb-3">
                             <label className="form-label fw-bold small">이미지 URL</label>
                             <input type="text" name="pointItemSrc" className="form-control" placeholder="http://..." onChange={changeInput} />
                         </div>
-                        <div className="mb-2">
-                            <label className="form-label fw-bold small">설명</label>
+                        <div className="mb-0">
+                            <label className="form-label fw-bold small">설명 (하트 충전권의 경우 '5' 입력 권장)</label>
                             <textarea name="pointItemContent" className="form-control" rows="2" onChange={changeInput} placeholder="상품 설명을 입력하세요."></textarea>
                         </div>
 
                     </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={closeModal}>취소</button>
-                        <button type="button" className="btn btn-primary fw-bold" onClick={handleAdd}>등록하기</button>
+                    <div className="modal-footer bg-light">
+                        <button type="button" className="btn btn-outline-secondary" onClick={closeModal}>취소</button>
+                        <button type="button" className="btn btn-primary px-4 fw-bold" onClick={handleAdd}>상품 등록</button>
                     </div>
                 </div>
             </div>

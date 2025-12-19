@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-// ★ [Toast 1] toast 임포트
 import { toast } from "react-toastify";
 
 export default function ProductEdit({ target, closeModal, reload }) {
+    // [1] 입력값 관리 (pointItemDailyLimit 필드 추가)
     const [input, setInput] = useState({
         pointItemNo: 0,
         pointItemName: "",
@@ -13,74 +13,77 @@ export default function ProductEdit({ target, closeModal, reload }) {
         pointItemReqLevel: "일반회원",
         pointItemContent: "",
         pointItemSrc: "",
-        pointItemIsLimitedPurchase:0
+        pointItemIsLimitedPurchase: "N", // Y 또는 N (DB 타입에 맞춰 0/1로 쓰고 싶다면 Number 변환 필요)
+        pointItemDailyLimit: 0          // 일일 제한 추가
     });
 
     // 모달이 열리면 target 데이터를 input에 채워넣음
     useEffect(() => {
         if(target) {
-            setInput({ ...target });
+            setInput({ 
+                ...target,
+                // 혹시 DB에서 넘어온 값이 null일 경우를 대비해 기본값 세팅
+                pointItemDailyLimit: target.pointItemDailyLimit || 0
+            });
         }
     }, [target]);
 
     const changeInput = (e) => {
-        setInput({ ...input, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setInput({ ...input, [name]: value });
     };
 
+    // [2] 수정 실행
     const handleEdit = async () => {
-        // 유효성 검사 (선택 사항)
         if (!input.pointItemName || input.pointItemPrice < 0) {
             return toast.warning("상품명과 가격을 올바르게 입력해주세요. 🤔");
         }
 
         try {
-            // (권장) 숫자는 확실하게 숫자로 변환해서 전송
+            // 서버 전송 전 데이터 정제 (숫자 타입 변환)
             const payload = {
                 ...input,
                 pointItemPrice: Number(input.pointItemPrice),
                 pointItemStock: Number(input.pointItemStock),
-                pointItemIsLimitedPurchase : Number(input.pointItemIsLimitedPurchase) 
+                pointItemDailyLimit: Number(input.pointItemDailyLimit)
             };
 
             // 수정 API 호출
             const resp = await axios.post("/point/main/store/item/edit", payload);
             
             if (resp.data === "success") {
-                // ★ [Toast 2] 성공 알림
                 toast.success("🛠️ 상품 정보가 수정되었습니다!");
                 reload();
                 closeModal();
             } else {
-                // ★ [Toast 3] 실패 알림
                 toast.error("수정 실패: " + resp.data);
             }
         } catch (e) {
             console.error(e);
-            // ★ [Toast 4] 에러 알림
             toast.error("서버 오류가 발생했습니다. ☠️");
         }
     };
 
     return (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-            <div className="modal-dialog">
-                <div className="modal-content shadow">
-                    <div className="modal-header bg-warning bg-opacity-10">
-                        <h5 className="modal-title fw-bold text-dark">🛠️ 상품 정보 수정</h5>
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content shadow-lg border-0">
+                    <div className="modal-header bg-warning text-dark">
+                        <h5 className="modal-title fw-bold">🛠️ 상품 정보 수정 (No. {input.pointItemNo})</h5>
                         <button type="button" className="btn-close" onClick={closeModal}></button>
                     </div>
-                    <div className="modal-body">
+                    <div className="modal-body p-4">
                         
                         {/* 상품명 */}
-                        <div className="mb-2">
+                        <div className="mb-3">
                             <label className="form-label fw-bold small">상품명</label>
                             <input type="text" name="pointItemName" value={input.pointItemName || ""} className="form-control" onChange={changeInput} />
                         </div>
 
                         {/* 가격 & 재고 */}
-                        <div className="row mb-2">
+                        <div className="row mb-3">
                             <div className="col">
-                                <label className="form-label fw-bold small">가격</label>
+                                <label className="form-label fw-bold small">가격(P)</label>
                                 <input type="number" name="pointItemPrice" value={input.pointItemPrice} className="form-control" onChange={changeInput} />
                             </div>
                             <div className="col">
@@ -90,31 +93,25 @@ export default function ProductEdit({ target, closeModal, reload }) {
                         </div>
 
                         {/* 유형 & 등급 */}
-                        <div className="row mb-2">
+                        <div className="row mb-3">
                             <div className="col">
                                 <label className="form-label fw-bold small">유형</label>
                                 <select name="pointItemType" className="form-select" onChange={changeInput} value={input.pointItemType}>
                                     <option value="">== 유형 선택 ==</option>
                                     <optgroup label="기능성 아이템">
+                                        <option value="HEART_RECHARGE">하트 충전권 (5개)</option>
                                         <option value="CHANGE_NICK">닉네임 변경권</option>
                                         <option value="LEVEL_UP">레벨업 부스터</option>
-                                        <option value="TICKET">기타 이용권</option>
                                     </optgroup>
                                     <optgroup label="치장/꾸미기">
                                         <option value="DECO_NICK">닉네임 치장</option>
                                         <option value="DECO_ICON">프로필 아이콘</option>
                                         <option value="DECO_BG">배경 스킨</option>
                                     </optgroup>
-                                    <optgroup label="현물/기프티콘">
-                                        <option value="FOOD">식품/카페</option>
-                                        <option value="GIFT">상품권</option>
-                                        <option value="GOODS">실물 굿즈</option>
-                                    </optgroup>
                                     <optgroup label="이벤트/기타">
                                         <option value="VOUCHER">포인트 충전권</option>
-                                        <option value="RANDOM_POINT">랜덤 박스</option>
-                                              <option value="ICON_GACHA">랜덤 아이콘뽑기</option>
-                                  
+                                        <option value="RANDOM_ICON">아이콘뽑기</option>
+                                        <option value="RANDOM_ROULETTE">룰렛이용권</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -128,29 +125,41 @@ export default function ProductEdit({ target, closeModal, reload }) {
                             </div>
                         </div>
 
-                        {/* 희귀도 */}
-                        <div className="mb-2">
-                            <label className="form-label fw-bold small">구매 제한 (희귀도)</label>
-                            <select name="pointItemIsLimitedPurchase" className="form-select" value={input.pointItemIsLimitedPurchase} onChange={changeInput}>
-                                <option value="0">🟢 중복 구매 가능</option>
-                                <option value="1">🔴 1회 한정 (중복 불가)</option>
-                            </select>
+                        {/* 구매 제한 설정 (중복구매 여부 & 일일 제한 수량) */}
+                        <div className="row mb-3">
+                            <div className="col-6">
+                                <label className="form-label fw-bold small">1인 1회 제한</label>
+                                <select name="pointItemIsLimitedPurchase" className="form-select" value={input.pointItemIsLimitedPurchase} onChange={changeInput}>
+                                    <option value="N">N (중복 가능)</option>
+                                    <option value="Y">Y (1회 한정)</option>
+                                </select>
+                            </div>
+                            <div className="col-6">
+                                <label className="form-label fw-bold small text-danger">일일 구매 제한 개수</label>
+                                <input 
+                                    type="number" 
+                                    name="pointItemDailyLimit" 
+                                    className="form-control border-danger border-opacity-50" 
+                                    value={input.pointItemDailyLimit} 
+                                    onChange={changeInput} 
+                                />
+                            </div>
                         </div>
 
                         {/* 이미지 & 설명 */}
-                        <div className="mb-2">
+                        <div className="mb-3">
                             <label className="form-label fw-bold small">이미지 URL</label>
                             <input type="text" name="pointItemSrc" value={input.pointItemSrc || ""} className="form-control" onChange={changeInput} />
                         </div>
-                        <div className="mb-2">
+                        <div className="mb-0">
                             <label className="form-label fw-bold small">설명</label>
                             <textarea name="pointItemContent" value={input.pointItemContent || ""} className="form-control" rows="2" onChange={changeInput}></textarea>
                         </div>
 
                     </div>
-                    <div className="modal-footer">
+                    <div className="modal-footer bg-light">
                         <button type="button" className="btn btn-secondary" onClick={closeModal}>취소</button>
-                        <button type="button" className="btn btn-warning fw-bold" onClick={handleEdit}>수정하기</button>
+                        <button type="button" className="btn btn-warning fw-bold px-4" onClick={handleEdit}>수정 완료</button>
                     </div>
                 </div>
             </div>

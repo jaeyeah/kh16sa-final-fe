@@ -57,18 +57,25 @@ export default function StoreView({ loginLevel, refreshPoint }) {
     }, [loadItems, loadMyItems, loadWishList]);
 
     // [구매 핸들러]
-    const handleBuy = async (item) => {
-        if (!window.confirm(`[${item.pointItemName}] 을(를) 구매하시겠습니까?`)) return;
-        try {
-            await axios.post("/point/main/store/buy", { buyItemNo: item.pointItemNo });
+  const handleBuy = async (item) => {
+    if (!window.confirm(`[${item.pointItemName}] 을(를) 구매하시겠습니까?`)) return;
+    try {
+        await axios.post("/point/main/store/buy", { buyItemNo: item.pointItemNo });
+        
+        // 아이템 타입에 따른 성공 메시지 분기
+        if (item.pointItemType === "HEART_RECHARGE") {
+            toast.success("하트 5개가 즉시 충전되었습니다! ❤️");
+        } else {
             toast.success("구매 성공! 🎒보관함을 확인하세요.");
-            loadItems(); 
-            loadMyItems(); 
-            if (refreshPoint) refreshPoint(); 
-        } catch (err) {
-            toast.error(err.response?.data?.message || "구매 실패 😥");
         }
-    };
+
+        loadItems(); 
+        loadMyItems(); 
+        if (refreshPoint) refreshPoint(); // 상단 포인트/하트 정보 갱신
+    } catch (err) {
+        toast.error(err.response?.data?.message || "구매 실패 😥");
+    }
+};
 
     // [선물 핸들러]
     const handleGift = async (item) => {
@@ -116,7 +123,7 @@ export default function StoreView({ loginLevel, refreshPoint }) {
             {/* 상단 헤더 */}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="text-white fw-bold">
-                     popcorn 굿즈 스토어 <span className="text-secondary fs-6 ms-2">({items.length}개의 상품)</span>
+                    popcorn 굿즈 스토어 <span className="text-secondary fs-6 ms-2">({items.length}개의 상품)</span>
                 </h4>
                 {loginLevel === "관리자" && (
                     <button className="btn btn-outline-light btn-sm fw-bold" onClick={() => setShowAddModal(true)}>
@@ -175,16 +182,25 @@ export default function StoreView({ loginLevel, refreshPoint }) {
                                     <h5 className="goods-title" title={item.pointItemName}>{item.pointItemName}</h5>
                                     <p className="goods-desc">{item.pointItemContent}</p>
                                     
-                                    <div className="goods-meta">
-                                        {/* ★ [수정] 관리자에게만 재고 표시 */}
+                                    <div className="goods-meta d-flex flex-wrap gap-1 align-items-center">
+                                        {/* 관리자에게만 재고 표시 */}
                                         {loginLevel === "관리자" && (
-                                            <span className={item.pointItemStock < 5 ? "text-danger fw-bold" : ""}>
+                                            <span className={`small me-2 ${item.pointItemStock < 5 ? "text-danger fw-bold" : "text-secondary"}`}>
                                                 재고 {item.pointItemStock}
                                             </span>
                                         )}
+                                        
+                                        {/* 등급 배지 */}
                                         <span className="badge bg-dark border border-secondary text-secondary">
                                             Lv.{item.pointItemReqLevel}
                                         </span>
+
+                                        {/* ★ [추가] 일일 구매 제한 표시 */}
+                                        {item.pointItemDailyLimit > 0 && (
+                                            <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">
+                                                일일 {item.pointItemDailyLimit}개 한정
+                                            </span>
+                                        )}
                                     </div>
 
                                     <div className="goods-price mb-3">

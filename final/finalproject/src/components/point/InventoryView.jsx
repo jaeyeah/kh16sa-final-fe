@@ -7,6 +7,7 @@ import "./InventoryView.css";
 export default function InventoryView({ refreshPoint }) {
     const [myInven, setMyInven] = useState([]);
 
+    // [1] 인벤토리 목록 로드
     const loadInven = useCallback(async () => {
         try {
             const resp = await axios.get("/point/main/store/inventory/my");
@@ -20,13 +21,13 @@ export default function InventoryView({ refreshPoint }) {
         loadInven(); 
     }, [loadInven]);
 
-    // [2] 사용 및 장착 핸들러 (Swal 통합)
+    // [2] 사용 및 장착 핸들러
     const handleUse = async (item) => {
         const targetNo = item.inventoryNo; 
         const type = item.pointItemType;
         let extraValue = null;
 
-        // 1. 아이템 유형별 전처리 (Swal 입력 및 확인창)
+        // 아이템 유형별 전처리 (Swal 입력 및 확인창)
         if (type === "CHANGE_NICK") {
             const { value: text } = await Swal.fire({
                 title: '닉네임 변경',
@@ -45,6 +46,18 @@ export default function InventoryView({ refreshPoint }) {
             if (!text) return;
             extraValue = text;
         } 
+        // 하트 충전 아이템 처리 (고정 5개 충전 메시지)
+        else if (type === "HEART_RECHARGE") {
+            const result = await Swal.fire({
+                title: '하트 충전',
+                text: `[${item.pointItemName}]을 사용하여 하트 5개를 충전하시겠습니까?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '충전하기',
+                cancelButtonText: '취소'
+            });
+            if (!result.isConfirmed) return;
+        }
         else if (["DECO_NICK", "DECO_BG", "DECO_ICON", "DECO_FRAME"].includes(type)) { 
             if(item.inventoryEquipped === 'Y') {
                 toast.info("이미 착용 중인 아이템입니다.");
@@ -75,7 +88,6 @@ export default function InventoryView({ refreshPoint }) {
                 const drawResp = await axios.post("/point/icon/draw", { inventoryNo: targetNo });
                 const icon = drawResp.data; 
                 
-                // 뽑기 결과 Swal로 화려하게 출력
                 await Swal.fire({
                     title: `🎉 ${icon.iconRarity} 등급 획득!`,
                     text: `[${icon.iconName}] 아이콘을 얻었습니다.`,
@@ -107,7 +119,7 @@ export default function InventoryView({ refreshPoint }) {
             if (!result.isConfirmed) return;
         }
 
-        // 2. 실제 서버 통신
+        // 실제 서버 통신 (공통)
         try {
             const resp = await axios.post("/point/main/store/inventory/use", { 
                 inventoryNo: targetNo, 
@@ -233,7 +245,8 @@ export default function InventoryView({ refreshPoint }) {
                                 </div>
 
                                 <div className="inven-actions">
-                                    {["CHANGE_NICK", "LEVEL_UP", "RANDOM_POINT", "VOUCHER", "DECO_NICK", "DECO_BG", "DECO_ICON", "DECO_FRAME", "RANDOM_ICON"].includes(item.pointItemType) && (
+                                    {/* HEART_RECHARGE 포함하여 사용 버튼 활성화 */}
+                                    {["CHANGE_NICK", "LEVEL_UP", "RANDOM_POINT", "VOUCHER", "DECO_NICK", "DECO_BG", "DECO_ICON", "DECO_FRAME", "RANDOM_ICON", "HEART_RECHARGE"].includes(item.pointItemType) && (
                                         <button 
                                             className={`btn-inven use ${isEquipped ? 'disabled' : ''}`} 
                                             onClick={() => handleUse(item)}
