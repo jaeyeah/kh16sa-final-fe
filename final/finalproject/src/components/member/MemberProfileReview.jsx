@@ -52,9 +52,9 @@ export default function MemberProfileReview() {
             </div>
         )}
 
-        <div className="row mt-4">
+        <div className="row mt-4 d-flex justify-content-center">
             {review.map((review) => (
-                <div className="col-6 col-sm-12 mx-2 my-2 mypage-review-card justify-content-between" key={review.reviewNo}>
+                <div className="col-6 col-sm-12 mx-2 my-2 mypage-review-card" key={review.reviewNo}>
                     <Link to={`/review/${review.reviewContents}/${review.reviewNo}`} className="reviewWrapper">
                         <div className="row mt-2">
                             <div className="col-4 d-flex justify-content-center">

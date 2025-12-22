@@ -225,7 +225,8 @@ export default function boardInsert() {
                 });
 
                 const attachmentNo = res.data; // 서버에서 받은 파일 번호
-                const imageUrl = `http://localhost:8080/attachment/download?attachmentNo=${attachmentNo}`;
+                const baseUrl = import.meta.env.VITE_BASE_URL;
+                const imageUrl = `${baseUrl}/attachment/download?attachmentNo=${attachmentNo}`;
 
                 // 4. 에디터 객체 가져오기
                 const quill = quillRef.current.getEditor();
