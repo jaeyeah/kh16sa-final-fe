@@ -84,7 +84,7 @@ export default function MemberEditPassword() {
                 </label>
                 <input 
                     type={showPassword ? "text" : "password"} 
-                    className={`form-control ${memberClass.memberPw}`}
+                    className={`member form-control ${memberClass.memberPw}`}
                     name="memberPw" value={member.memberPw}
                     onChange={changeStrValue} onBlur={handleBlur}
                     placeholder="대/소문자, 숫자, 특수문자 포함 8~16자"
@@ -96,7 +96,7 @@ export default function MemberEditPassword() {
                 <label className="mb-2">비밀번호 확인</label>
                 <input 
                     type={showPassword ? "text" : "password"} 
-                    className={`form-control ${memberClass.memberPwCheck}`}
+                    className={`member form-control ${memberClass.memberPwCheck}`}
                     name="memberPwCheck" value={member.memberPwCheck}
                     onChange={changeStrValue} onBlur={handleBlur}
                     placeholder="비밀번호를 재입력하세요"

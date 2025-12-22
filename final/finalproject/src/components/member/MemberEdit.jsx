@@ -124,7 +124,7 @@ export default function MemberEdit() {
                     dateFormat="yyyy-MM-dd"
                     locale={ko}
                     placeholderText="날짜를 선택하세요"
-                    className={`form-control ${memberClass.memberBirth}`}
+                    className={`member form-control ${memberClass.memberBirth}`}
                     maxDate={new Date()}
                     showYearDropdown
                     scrollableYearDropdown
@@ -133,15 +133,15 @@ export default function MemberEdit() {
             </div>
 
             <label className="mb-2"><FaPhone className="me-2 text-info" /> 연락처</label>
-            <input name="memberContact" value={member.memberContact} onChange={e => setMember({...member, memberContact: e.target.value})} onBlur={handleBlur} className={`form-control mb-4 ${memberClass.memberContact}`} placeholder="01012345678" />
+            <input name="memberContact" value={member.memberContact} onChange={e => setMember({...member, memberContact: e.target.value})} onBlur={handleBlur} className={`member form-control mb-4 ${memberClass.memberContact}`} placeholder="01012345678" />
 
             <label className="mb-2">주소</label>
             <div className="d-flex gap-2 mb-2">
-                <input readOnly value={member.memberPost} className={`form-control w-50 ${memberClass.memberPost}`} placeholder="우편번호" />
+                <input readOnly value={member.memberPost} className={`member form-control w-50 ${memberClass.memberPost}`} placeholder="우편번호" />
                 <button type="button" onClick={handleAddressSearch} className="btn-address-tool"><FaMagnifyingGlass /></button>
             </div>
-            <input readOnly value={member.memberAddress1} className={`form-control mb-2 ${memberClass.memberAddress1}`} placeholder="기본주소" />
-            <input ref={memberAddress2Ref} name="memberAddress2" value={member.memberAddress2} onChange={e => setMember({...member, memberAddress2: e.target.value})} onBlur={handleBlur} className={`form-control ${memberClass.memberAddress2}`} placeholder="상세주소" />
+            <input readOnly value={member.memberAddress1} className={`member form-control mb-2 ${memberClass.memberAddress1}`} placeholder="기본주소" />
+            <input ref={memberAddress2Ref} name="memberAddress2" value={member.memberAddress2} onChange={e => setMember({...member, memberAddress2: e.target.value})} onBlur={handleBlur} className={`member form-control ${memberClass.memberAddress2}`} placeholder="상세주소" />
 
             <button className="btn-member-edit mt-5" disabled={!memberValid} onClick={sendData}>
                 <FaUser className="me-2"/> 정보 수정 완료
