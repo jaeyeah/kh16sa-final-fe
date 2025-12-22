@@ -323,7 +323,7 @@ export default function AdminPoint() {
                                         <input type="hidden" readOnly name="iconContents" value={contentsDetail.contentsId || ""} />
                                         {/* 선택된 컨텐츠가 있으면 뱃지 표시 */}
                                         {contentsDetail.contentsId && (
-                                            <span className="input-group-text bg-success text-white">선택됨</span>
+                                            <span className="search-btn bg-success text-white">선택됨</span>
                                         )}
                                     </div>
                                 </div>

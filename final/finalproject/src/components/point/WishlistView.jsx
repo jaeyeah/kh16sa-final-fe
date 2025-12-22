@@ -75,10 +75,10 @@ export default function WishlistView({ refreshPoint }) {
     if (!loginId) return <div className="alert-glass text-center mt-4 m-3">🔒 로그인이 필요한 서비스입니다.</div>;
     
     if (wishes.length === 0) return (
-        <div className="wish-empty-glass">
-            <span className="wish-empty-icon">💔</span>
-            <h5 className="text-white fw-bold mb-2">찜한 상품이 없습니다.</h5>
-            <p className="text-secondary small">스토어에서 마음에 드는 상품에 ❤️를 눌러보세요!</p>
+        <div className="wish-empty-glass text-center">
+            <span className="wish-empty-icon ">💔</span>
+            <h5 className="text-white fw-bold mb-2 ">찜한 상품이 없습니다.</h5>
+            <p className="text-secondary small ">스토어에서 마음에 드는 상품에 ❤️를 눌러보세요!</p>
         </div>
     );
 
