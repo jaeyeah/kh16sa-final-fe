@@ -163,7 +163,7 @@ export default function PointMain() {
                 {/* 3. 콘텐츠 영역 */}
                 <div className="cinema-content">
                     {tab === "store" && <StoreView loginLevel={loginLevel} refreshPoint={refreshAll} />}
-                    {tab === "roulette" && <Roulette refreshPoint={refreshAll} />}
+                    {tab === "roulette" && <Roulette refreshPoint={refreshAll} setTab={setTab}/>}
                     {tab === "ranking" && <PointRankingPage />}
                     {loginId && (
                         <>

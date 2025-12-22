@@ -77,7 +77,8 @@ export default function MemberMyinfo() {
     return (
         <div className="mypage-info-wrapper">
             {/* 1. 멤버십 카드 스타일의 프로필 히어로 */}
-            <div className={`profile-hero-v2 ${!isUrl ? (point.bgSrc || "") : ""} ${point.frameSrc || ""}`} style={heroStyle}>
+            {/* <div className={`profile-hero-v2 ${!isUrl ? (point.bgSrc || "") : ""} ${point.frameSrc || ""}`} style={heroStyle}> */}
+            <div className={`profile-hero-v2 ${!isUrl ? (point.bgSrc || "") : ""} `} style={heroStyle}>
                 <div className="hero-content-v2">
                     <div className="avatar-box-v2">
                         <img src={point.iconSrc || "/default-profile.png"} className="avatar-img-v2" alt="icon" />
@@ -93,22 +94,30 @@ export default function MemberMyinfo() {
 
             {/* 2. 활동 통계 그리드 */}
             <div className="activity-stats-row">
-                <div className="stat-card">
-                    <span className="stat-label">보유 포인트</span>
-                    <span className="stat-value text-gold">{(member.memberPoint || 0).toLocaleString()} P</span>
-                </div>
-                <div className="stat-card">
-                    <span className="stat-label">작성한 리뷰</span>
-                    <span className="stat-value">{reviewCount}</span>
-                </div>
-                <div className="stat-card">
-                    <span className="stat-label">찜한 목록</span>
-                    <span className="stat-value">{wishCount}</span>
-                </div>
-                <div className="stat-card">
-                    <span className="stat-label">참여 퀴즈</span>
-                    <span className="stat-value">{quizCount}</span>
-                </div>
+                <NavLink to="/point/main">
+                    <div className="stat-card">
+                        <span className="stat-label">보유 포인트</span>
+                        <span className="stat-value text-gold">{member.memberPoint?.toLocaleString()} P</span>
+                    </div>
+                </NavLink>
+                <NavLink to={`/member/mypage/myreview/${loginId}`}>
+                    <div className="stat-card">
+                        <span className="stat-label">작성한 리뷰</span>
+                        <span className="stat-value">{reviewCount || 0}</span>
+                    </div>
+                </NavLink>
+                <NavLink to={`/member/mypage/mycontent/${loginId}`}>
+                    <div className="stat-card">
+                        <span className="stat-label">찜한 목록</span>
+                        <span className="stat-value">{wishCount || 0}</span>
+                    </div>
+                </NavLink>
+                <NavLink to={`/member/mypage/myquiz/${loginId}`}>
+                    <div className="stat-card">
+                        <span className="stat-label">참여 퀴즈</span>
+                        <span className="stat-value">{quizCount || 0}</span>
+                    </div>
+                </NavLink>
             </div>
 
             {/* 3. 상세 정보 카드 */}
