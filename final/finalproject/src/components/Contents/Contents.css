@@ -97,6 +97,7 @@
 
 .search-bar {
     color: #ffffff;
+    padding: 10px !important;
     background-color: transparent;
     border: 2px solid transparent !important;
 }
@@ -115,4 +116,17 @@
 }
 .bg-purple{
     background-color: #6a0dad;
+}
+
+:root {
+    --gold-main: #ffd700;
+    --gold-glow: rgba(255, 215, 0, 0.4);
+}
+
+.review.avatar-img-v2 {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-main);
+    box-shadow: 0 0 15px var(--gold-glow);
 }

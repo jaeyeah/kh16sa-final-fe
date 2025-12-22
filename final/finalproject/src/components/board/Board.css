@@ -109,3 +109,16 @@
     border: none !important;
     color: #fff !important;
 }
+
+:root {
+    --gold-main: #ffd700;
+    --gold-glow: rgba(255, 215, 0, 0.4);
+}
+
+.board.avatar-img-v2 {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-main);
+    box-shadow: 0 0 15px var(--gold-glow);
+}

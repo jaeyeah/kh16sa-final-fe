@@ -58,6 +58,7 @@ export default function BoardDetail() {
     const [editReplyNo, setEditReplyNo] = useState(null); // 현재 수정 중인 댓글 번호
     const [editContent, setEditContent] = useState("");   // 수정 중인 내용
 
+    const [data, setData] = useState(null);
 
     // effect
     useEffect(() => {
@@ -386,6 +387,64 @@ export default function BoardDetail() {
         }
     }, [reportReason, otherReason, boardNo, loginId]);
 
+    //프로필 아이콘 불러오기
+    const loadProfile = useCallback(async () => {
+        if (!board.boardWriter) return;
+
+        try {
+            const { data } = await axios.get(`/member/profile/${board.boardWriter}`);
+            setData(data);
+        } catch (err) {
+            console.error("프로필 로드 실패", err);
+        }
+    }, [board.boardWriter]);
+
+    useEffect(() => {
+        loadProfile();
+    }, [board]);
+
+    const { profile, point } = data || {};
+
+    const [profileMap, setProfileMap] = useState({});
+
+    useEffect(() => {
+        if (replyList.length === 0) return;
+
+        const fetchProfileImages = async () => {
+            // 1. 댓글 목록에서 중복을 제거한 작성자 ID 목록 추출
+            const writers = [...new Set(replyList.map(r => r.replyWriter))];
+
+            // 2. 이미 불러온 작성자는 제외 (API 중복 호출 방지)
+            const writersToFetch = writers.filter(writer => !profileMap[writer]);
+
+            if (writersToFetch.length === 0) return;
+
+            const newProfiles = {};
+
+            // 3. 비동기로 이미지 요청 (Promise.all로 병렬 처리)
+            await Promise.all(
+                writersToFetch.map(async (writer) => {
+                    try {
+                        const res = await axios.get(`/member/profile/${writer}`);
+                        // 데이터 구조에 맞춰 수정 (res.data.point.iconSrc 가정)
+                        newProfiles[writer] = res.data.point?.iconSrc || "";
+                    } catch (err) {
+                        console.error(`${writer} 이미지 로드 실패`, err);
+                        newProfiles[writer] = ""; // 에러시 기본 이미지
+                    }
+                })
+            );
+
+            // 4. 상태 업데이트 (기존 맵에 새로운 작성자 정보 병합)
+            setProfileMap(prev => ({ ...prev, ...newProfiles }));
+        };
+
+        fetchProfileImages();
+    }, [replyList]);
+
+    if (!data) {
+        return <div className="text-white text-center mt-5">로딩중...</div>;
+    }
 
 
     //rendar
@@ -431,6 +490,7 @@ export default function BoardDetail() {
                 <div className="col text-light d-flex justify-content-between align-items-center">
                     <span onClick={() => navigate(`/member/profile/info/${board.boardWriter}`)}
                         style={{ cursor: "pointer" }} className="fs-4">
+                        <img src={point?.iconSrc} alt="Icon" className="board avatar-img-v2 me-2 mb-1" />
                         {board.boardWriter}
                     </span>
                     {/* 신고 버튼 */}
@@ -528,28 +588,30 @@ export default function BoardDetail() {
                 </div>
             </div>
             {/* 댓글 입력 창 */}
-            <div className="row mt-4">
-                <div className="col-12 d-flex align-items-stretch">
-                    <div className="flex-grow-1">
-                        <textarea
-                            className="reply-write w-100"
-                            name="replyContent"
-                            value={reply.replyContent}
-                            onChange={changeStrValue}
-                            placeholder="댓글을 입력하세요"
-                        />
-                    </div>
-                    <div className="ms-2">
-                        <button
-                            type="button"
-                            className="reply-btn h-100 text-nowrap"
-                            style={{ width: "80px" }}
-                            onClick={sendData}>
-                            등록
-                        </button>
+            {loginId && (<>
+                <div className="row mt-4">
+                    <div className="col-12 d-flex align-items-stretch">
+                        <div className="flex-grow-1">
+                            <textarea
+                                className="reply-write w-100"
+                                name="replyContent"
+                                value={reply.replyContent}
+                                onChange={changeStrValue}
+                                placeholder="댓글을 입력하세요"
+                            />
+                        </div>
+                        <div className="ms-2">
+                            <button
+                                type="button"
+                                className="reply-btn h-100 text-nowrap"
+                                style={{ width: "80px" }}
+                                onClick={sendData}>
+                                등록
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </>)}
 
             {/* 댓글 목록 */}
             <div className="row mt-4">
@@ -575,7 +637,13 @@ export default function BoardDetail() {
                                 // 일반 댓글 창
                                 <>
                                     <div className="d-flex justify-content-between align-items-center mb-2">
-                                        <h5 className="m-0 mt-2 fw-bold">{replyDto.replyWriter}</h5>
+
+                                        <h5 className="m-0 mt-2 fw-bold" onClick={() => navigate(`/member/profile/info/${replyDto.replyWriter}`)}
+                                            style={{ cursor: "pointer" }}>
+                                            <img src={profileMap[replyDto.replyWriter] || ""}
+                                                alt="profile" className="board avatar-img-v2 me-2" />
+                                            {replyDto.replyWriter}
+                                        </h5>
                                         <div className="m-0 d-flex text-nowarp">
                                             {replyDto.replyEtime ? (
                                                 <span className="d-flex"><p className="text-info me-2">(수정됨)</p> {getDisplayDate(replyDto.replyEtime)}</span>
@@ -614,7 +682,7 @@ export default function BoardDetail() {
 
             {/* 버튼 */}
             <div className="row mt-4 text-end">
-                {(loginId && loginId === board.boardWriter|| loginLevel === "관리자") ? (
+                {(loginId && loginId === board.boardWriter || loginLevel === "관리자") ? (
                     <div className="col">
                         <button type="button" className="btn btn-danger me-2" onClick={deleteBoard}>삭제</button>
                         {(loginId && loginId === board.boardWriter) && (

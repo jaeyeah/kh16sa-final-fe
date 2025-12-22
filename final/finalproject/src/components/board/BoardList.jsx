@@ -4,22 +4,27 @@ import { Link, useNavigate } from "react-router-dom";
 import "./Board.css";
 import Pagination from "../Pagination";
 import { FaPen } from "react-icons/fa";
+import { loginIdState } from "../../utils/jotai";
+import { useAtom } from "jotai";
 
 export default function BoardList() {
+    //통합 state
+    const [loginId, setLoginId] = useAtom(loginIdState);
+
     const navigate = useNavigate();
-    
+
     const [boardList, setBoardList] = useState([]);
     const [titles, setTitles] = useState({});
-    
+
     const [page, setPage] = useState(1);
     const [pageData, setPageData] = useState({
         page: 1, size: 10, totalCount: 0, totalPage: 0, blockStart: 1, blockFinish: 1
     });
 
     const [isOpen, setIsOpen] = useState(false);
-    const [inputColumn, setInputColumn] = useState("title"); 
-    const [inputKeyword, setInputKeyword] = useState("");    
-    
+    const [inputColumn, setInputColumn] = useState("title");
+    const [inputKeyword, setInputKeyword] = useState("");
+
     const [searchParams, setSearchParams] = useState({
         column: "title",
         keyword: ""
@@ -27,7 +32,7 @@ export default function BoardList() {
 
 
     const getColumnText = (col) => {
-        switch(col) {
+        switch (col) {
             case "title": return "제목";
             case "contents": return "컨텐츠";
             case "writer": return "작성자";
@@ -45,7 +50,7 @@ export default function BoardList() {
     const toggleDropdown = () => setIsOpen(!isOpen);
 
     const handleTypeSelect = (type) => {
-        setInputColumn(type); 
+        setInputColumn(type);
         setIsOpen(false);
     };
 
@@ -59,8 +64,8 @@ export default function BoardList() {
         let hasUpdate = false;
         const promises = list.map(async (board) => {
             const id = board.boardContentsId;
-            
-            if (id && newTitles[id] === undefined) { 
+
+            if (id && newTitles[id] === undefined) {
                 try {
                     const { data } = await axios.get(`/api/tmdb/title/${id}`);
                     newTitles[id] = data;
@@ -68,14 +73,14 @@ export default function BoardList() {
                     hasUpdate = true;
                 } catch (e) {
                     console.error(`제목 로딩 실패 (ID: ${id})`, e);
-                    newTitles[id] = "알 수 없음"; 
+                    newTitles[id] = "알 수 없음";
                     hasUpdate = true;
                 }
             }
         });
 
         await Promise.all(promises);
-        
+
         if (hasUpdate) {
             setTitles(prev => ({ ...prev, ...newTitles }));
         }
@@ -108,10 +113,10 @@ export default function BoardList() {
         } catch (e) {
             console.error("데이터 로드 실패", e);
         }
-    }, [page, searchParams, loadAllTitles]); 
+    }, [page, searchParams, loadAllTitles]);
 
     const handleSearch = () => {
-        setPage(1); 
+        setPage(1);
         setSearchParams({
             column: inputColumn,
             keyword: inputKeyword
@@ -120,16 +125,16 @@ export default function BoardList() {
 
     useEffect(() => {
         loadBoard();
-    }, [loadBoard]); 
+    }, [loadBoard]);
 
 
     return (
         <div className="container mt-5">
             <div className="d-flex align-items-center mb-4 mt-4">
-                <h2 className="fw-bold text-white mb-0" 
-                    onClick={()=>{navigate("/board/list")}}
-                    style={{cursor:"pointer"}}>
-                자유게시판
+                <h2 className="fw-bold text-white mb-0"
+                    onClick={() => { navigate("/board/list") }}
+                    style={{ cursor: "pointer" }}>
+                    자유게시판
                 </h2>
             </div>
 
@@ -169,6 +174,7 @@ export default function BoardList() {
                 </div>
             </div>
 
+            {loginId && (
             <div className="row">
                 <div className="col text-end">
                     <Link className="btn btn-primary rounded-pill px-4 fw-bold" to="/board/insert">
@@ -176,6 +182,7 @@ export default function BoardList() {
                     </Link>
                 </div>
             </div>
+            )}
 
             {/* 게시글 목록 테이블 */}
             <div className="shadow-sm border-0 rounded-4 overflow-hidden mt-4">

@@ -6,7 +6,8 @@ import { FaGift } from "react-icons/fa";
 import { useAtomValue } from "jotai";
 import { loginIdState } from "../../utils/jotai";
 import { toast } from "react-toastify";
-import Donate from "../point/Donate";
+import Donate from "../Point/Donate";
+
 
 export default function MemberProfileInfo() {
 
@@ -14,7 +15,8 @@ export default function MemberProfileInfo() {
 
     const { memberId } = useParams();
 
-    const [profile, setProfile] = useState({});
+    const [data, setData] = useState(null);
+
     const [showDonate, setShowDonate] = useState(false);
     // ★ 포인트 갱신 트리거 (하위 컴포넌트에서 포인트 변동 시 호출)
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -26,41 +28,47 @@ export default function MemberProfileInfo() {
 
     const loadData = useCallback(async () => {
         const { data } = await axios.get(`/member/profile/${memberId}`);
-        setProfile(data);
+        setData(data);
     }, [memberId]);
 
     useEffect(() => {
         loadData();
     }, [loadData]);
 
+    const { profile, point } = data || {};
+    
+    //신뢰도 레벨
+    const rel = profile?.memberReliability ?? 0;
+    
+    const relRowLevel = useMemo(() => {
+        return rel >= 6 && rel <= 19;
+    }, [rel])
+    
+    const relMiddleLevel = useMemo(() => {
+        return rel >= 20 && rel <= 49;
+    }, [rel])
+    
+    const relHighLevel = useMemo(() => {
+        return rel >= 50;
+    }, [rel])
+    
+    
     const formattedDate = useMemo(() => {
         if (!profile || !profile.memberJoin) return "";
         const date = profile.memberJoin;
         return date.substring(0, 16);
     }, [profile]);
-
-    //신뢰도 레벨
-    const rel = profile?.memberReliability ?? 0;
-
-    const relRowLevel = useMemo(() => {
-        return rel >= 6 && rel <= 19;
-    }, [rel])
-
-    const relMiddleLevel = useMemo(() => {
-        return rel >= 20 && rel <= 49;
-    }, [rel])
-
-    const relHighLevel = useMemo(() => {
-        return rel >= 50;
-    }, [rel])
-
-
+    
+    if (!data) {
+        return <div className="text-white text-center mt-5">로딩중...</div>;
+    }
+    
     return (<>
         <div className="mypage-info-wrapper">
             {/* 1. 상단 히어로 (배경 + 아이콘 + 신뢰도 게이지) */}
             <div className="profile-hero-v2">
                 <div className="hero-overlay-v2">
-
+                    <img src={point?.iconSrc} alt="Icon" className="avatar-img-v2" />
                     <h1 className="nickname-v2">
                         {relRowLevel && (
                             <span className="Rel2">🟢 활동 리뷰어</span>

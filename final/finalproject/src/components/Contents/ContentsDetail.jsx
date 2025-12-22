@@ -63,7 +63,7 @@ export default function ContentsDetail() {
     const loadContentsIcons = useCallback(async () => {
         if (!contentsId) return;
         try {
-            const {data} = await axios.get(`/icon/contents/${contentsId}`);
+            const { data } = await axios.get(`/icon/contents/${contentsId}`);
             setContentsIcon(data);
             console.log("내 아이콘 데이터:", data);
         } catch (e) { console.error(e); }
@@ -320,6 +320,7 @@ export default function ContentsDetail() {
         const [isLiked, setIsLiked] = useState(false);
         const [likeCount, setLikeCount] = useState(review.reviewLike || 0);
         const [showSpoiler, setShowSpoiler] = useState(false);
+        const [data, setData] = useState(null);
 
         // 좋아요 확인
         useEffect(() => {
@@ -331,6 +332,25 @@ export default function ContentsDetail() {
                 }).catch(err => console.error(err));
             }
         }, [loginId, review.reviewNo]);
+
+        useEffect(() => {
+            // 1. 작성자 ID가 없으면 로딩할 필요 없음
+            if (!review.reviewWriter) return;
+
+            const fetchProfile = async () => {
+                try {
+                    const res = await axios.get(`/member/profile/${review.reviewWriter}`);
+                    setData(res.data);
+                } catch (err) {
+                    console.error(`${review.reviewWriter} 이미지 로드 실패`, err);
+                    // 에러 발생 시에도 '로딩중'에 갇히지 않도록 기본값 설정
+                    setData({ profile: null, point: { iconSrc: 'default_icon_url' } });
+                }
+            };
+
+            fetchProfile();
+
+        }, [review.reviewWriter]);
 
         // 좋아요 토글
         const handleLikeToggle = async () => {
@@ -383,7 +403,7 @@ export default function ContentsDetail() {
         const [otherReason, setOtherReason] = useState("");
 
 
-        const sendData2 = useCallback(async() => {
+        const sendData2 = useCallback(async () => {
             if (!reportReason) {
                 toast.info("신고 사유를 선택해주세요");
                 return;
@@ -395,35 +415,35 @@ export default function ContentsDetail() {
 
             //전송할 데이터 구성
             const payload = {
-            reviewReportReviewId: review.reviewNo,       // 신고할 리뷰 번호
-            reviewReportType: reportReason,       // 신고 사유
-            reviewReportContent: reportReason === "OTHER" ? otherReason : null // 기타일 때만 내용 전송
+                reviewReportReviewId: review.reviewNo,       // 신고할 리뷰 번호
+                reviewReportType: reportReason,       // 신고 사유
+                reviewReportContent: reportReason === "OTHER" ? otherReason : null // 기타일 때만 내용 전송
             };
 
             try {
-            //API 호출
-            await axios.post("/review/report/", payload);
+                //API 호출
+                await axios.post("/review/report/", payload);
 
-            //성공 처리
-            toast.success("신고가 정상적으로 접수되었습니다.");
-            setReportReason(""); // 선택 초기화
-            setOtherReason("");  // 내용 초기화
-            closeModal3();       // 모달 닫기
+                //성공 처리
+                toast.success("신고가 정상적으로 접수되었습니다.");
+                setReportReason(""); // 선택 초기화
+                setOtherReason("");  // 내용 초기화
+                closeModal3();       // 모달 닫기
 
-        } catch (error) {
-            console.error("신고 전송 실패:", error);
-            
-            //에러 처리
-            if (error.response) {
-                if (error.response.status === 500) {
-                    toast.error("이미 신고하신 리뷰입니다.");
-                } else if (error.response.status === 401) {
-                    toast.error("로그인이 만료되었습니다.");
-                } else {
-                    toast.error("신고 접수 중 오류가 발생했습니다.");
+            } catch (error) {
+                console.error("신고 전송 실패:", error);
+
+                //에러 처리
+                if (error.response) {
+                    if (error.response.status === 500) {
+                        toast.error("이미 신고하신 리뷰입니다.");
+                    } else if (error.response.status === 401) {
+                        toast.error("로그인이 만료되었습니다.");
+                    } else {
+                        toast.error("신고 접수 중 오류가 발생했습니다.");
+                    }
                 }
             }
-        }
         }, [reportReason, otherReason, review.reviewNo, loginId]);
 
         // console.log("리뷰 데이터:", review);
@@ -442,6 +462,12 @@ export default function ContentsDetail() {
             return rel >= 50;
         }, [rel])
 
+        const { profile, point } = data || {};
+
+        if (!data) {
+            return <div className="text-white text-center mt-5">로딩중...</div>;
+        }
+
 
         //render
         return (
@@ -453,6 +479,7 @@ export default function ContentsDetail() {
                         <div className="d-flex align-items-center w-100 mt-2">
                             {/* 왼쪽 */}
                             <h4 className="text-light">
+                                <img src={point?.iconSrc} alt="Icon" className="review avatar-img-v2 me-2 mb-1" />
                                 <span style={{ fontSize: "21px", fontWeight: "bold" }}>{review.memberNickname}</span>
                                 <span style={{ fontSize: "20px", fontWeight: "700", color: "#acacacff" }}>{review.reviewEtime && " (수정됨)"}</span>
 
@@ -793,37 +820,36 @@ export default function ContentsDetail() {
                             {contentsIcon.map((icon) => {
                                 console.log(`[${icon.iconRarity}]`, icon.iconRarity.length);
                                 return (
-                                <div className="col-4 col-sm-3 col-md-2 text-center" key={icon.iconId}>
-                                <div 
-                                    className={`card h-100 shadow-sm icon-card  border-0}`}
-                                    style={{cursor: 'pointer', transition: 'transform 0.2s'}}
-                                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-                                >
+                                    <div className="col-4 col-sm-3 col-md-2 text-center" key={icon.iconId}>
+                                        <div
+                                            className={`card h-100 shadow-sm icon-card  border-0}`}
+                                            style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                                            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                                            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                                        >
 
-                                    <div className="card-body p-2 d-flex flex-column align-items-center justify-content-center">
-                                        <span className={`badge mb-1 ${
-                                            icon.iconRarity === 'LEGENDARY' ? 'bg-warning text-dark border border-dark' :
-                                            icon.iconRarity === 'UNIQUE'    ? 'bg-purple text-white' :
-                                            icon.iconRarity === 'EPIC'      ? 'bg-danger' :
-                                            icon.iconRarity === 'RARE'      ? 'bg-primary' :
-                                            icon.iconRarity === 'EVENT'     ? 'bg-event' : 
-                                            icon.iconRarity === 'COMMON'    ? 'bg-success' : 
-                                            'bg-secondary'
-                                        }`} style={{fontSize:'0.6rem'}}>
-                                            {icon.iconRarity}
-                                        </span>
-                                        <img 
-                                            src={icon.iconSrc}  className="mb-2"  style={{width: '50px', height: '50px', objectFit: 'contain'}} 
-                                            alt={icon.iconName} onError={(e)=>{e.target.src='https://placehold.co/50x50?text=IMG'}} 
-                                        />
-                                
-                                        <small className="text-dark fw-bold text-truncate w-100" style={{fontSize: '0.75rem'}}>
-                                            {icon.iconName}
-                                        </small>
-                                </div>
-                            </div>
-                            </div>
+                                            <div className="card-body p-2 d-flex flex-column align-items-center justify-content-center">
+                                                <span className={`badge mb-1 ${icon.iconRarity === 'LEGENDARY' ? 'bg-warning text-dark border border-dark' :
+                                                    icon.iconRarity === 'UNIQUE' ? 'bg-purple text-white' :
+                                                        icon.iconRarity === 'EPIC' ? 'bg-danger' :
+                                                            icon.iconRarity === 'RARE' ? 'bg-primary' :
+                                                                icon.iconRarity === 'EVENT' ? 'bg-event' :
+                                                                    icon.iconRarity === 'COMMON' ? 'bg-success' :
+                                                                        'bg-secondary'
+                                                    }`} style={{ fontSize: '0.6rem' }}>
+                                                    {icon.iconRarity}
+                                                </span>
+                                                <img
+                                                    src={icon.iconSrc} className="mb-2" style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+                                                    alt={icon.iconName} onError={(e) => { e.target.src = 'https://placehold.co/50x50?text=IMG' }}
+                                                />
+
+                                                <small className="text-dark fw-bold text-truncate w-100" style={{ fontSize: '0.75rem' }}>
+                                                    {icon.iconName}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
                                 );
                             })}
                         </div>

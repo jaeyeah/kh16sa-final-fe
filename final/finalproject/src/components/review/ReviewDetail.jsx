@@ -33,6 +33,7 @@ export default function ReviewDetail() {
     const [loginNickname, setLoginNickname] = useAtom(loginNicknameState);
     const [accessToken, setAccessToken] = useAtom(accessTokenState);
     const [refreshToken, setRefreshToken] = useAtom(refreshTokenState);
+    const [data, setData] = useState(null);
 
     const [review, setReview] = useState({
         reviewRating: 0,
@@ -452,7 +453,27 @@ export default function ReviewDetail() {
         return rel >= 50;
     }, [rel])
 
+     //프로필 아이콘 불러오기
+      const loadProfile = useCallback(async () => {
+        if (!review.reviewWriter) return; 
 
+        try {
+            const { data } = await axios.get(`/member/profile/${review.reviewWriter}`);
+            setData(data);
+        } catch (err) {
+            console.error("프로필 로드 실패", err);
+        }
+    }, [review.reviewWriter]);
+
+    useEffect(()=> {
+        loadProfile();
+    }, [review]);
+
+    const { profile, point } = data || {};
+
+     if (!data) {
+        return <div className="text-white text-center mt-5">로딩중...</div>;
+    }
 
 
 
@@ -477,6 +498,7 @@ export default function ReviewDetail() {
                         )}
                     </div>
                     <div className="mt-5 mb-4">
+                        <img src={point?.iconSrc} alt="Icon" className="review avatar-img-v2 me-2 mb-1" />
                         <span className="userId">{review.memberNickname}</span>
                         {relRowLevel && (
                             <span className="detailRel ms-3">🟢 활동 리뷰어</span>
