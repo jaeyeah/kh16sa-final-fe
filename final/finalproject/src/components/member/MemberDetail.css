@@ -14,7 +14,7 @@
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
 }
 
-.form-control {
+.member.form-control {
     background-color: #000 !important;
     border: 2px solid #333 !important;
     color: #fff !important;
