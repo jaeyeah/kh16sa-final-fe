@@ -48,7 +48,7 @@
 }
 
 .search-wrapper .search-bar {
-
+    padding: 10px !important;
     background-color: transparent;
     border: 2px solid transparent !important;
 }
