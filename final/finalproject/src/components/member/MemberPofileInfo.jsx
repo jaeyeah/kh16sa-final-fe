@@ -77,7 +77,8 @@ export default function MemberProfileInfo() {
     return (<>
         <div className="mypage-info-wrapper">
             {/* 1. 상단 히어로 (배경 + 아이콘 + 신뢰도 게이지) */}
-            <div className={`profile-hero-v2 ${!isUrl ? (point.bgSrc || "") : ""} ${point.frameSrc || ""}`} style={heroStyle}>
+            {/* <div className={`profile-hero-v2 ${!isUrl ? (point.bgSrc || "") : ""} ${point.frameSrc || ""}`} style={heroStyle}> */}
+            <div className={`profile-hero-v2 ${!isUrl ? (point.bgSrc || "") : ""} `} style={heroStyle}>
                 <div className="hero-content-v2">
                     <div className="avatar-box-v2">
                         <img src={point?.iconSrc} alt="Icon" className="avatar-img-v2" />
