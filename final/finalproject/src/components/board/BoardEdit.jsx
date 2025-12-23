@@ -136,7 +136,7 @@ export default function BoardEdit() {
 
     const loadData = useCallback(async () => {
         try {
-            const { data } = await axios.get(`/board/${boardNo}`);
+            const { data } = await axios.get(`/board/detail/${boardNo}`);
             setBeforeBoard(data);
         }
         catch (err) {

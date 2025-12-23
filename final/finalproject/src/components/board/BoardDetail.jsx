@@ -131,7 +131,7 @@ export default function BoardDetail() {
     //[게시글 상세 정보 조회]
     const loadData = useCallback(async () => {
         try {
-            const { data } = await axios.get(`/board/${boardNo}`);
+            const { data } = await axios.get(`/board/detail/${boardNo}`);
             setBoard(data);
             if (board.boardUnlike >= 10) setShowText(false);
         }
@@ -427,10 +427,10 @@ export default function BoardDetail() {
                     try {
                         const res = await axios.get(`/member/profile/${writer}`);
                         // 데이터 구조에 맞춰 수정 (res.data.point.iconSrc 가정)
-                        newProfiles[writer] = res.data.point?.iconSrc || "";
+                        newProfiles[writer] = res.data.point?.iconSrc || null;
                     } catch (err) {
                         console.error(`${writer} 이미지 로드 실패`, err);
-                        newProfiles[writer] = ""; // 에러시 기본 이미지
+                        newProfiles[writer] = null; 
                     }
                 })
             );
@@ -640,7 +640,7 @@ export default function BoardDetail() {
 
                                         <h5 className="m-0 fw-bold" onClick={() => navigate(`/member/profile/info/${replyDto.replyWriter}`)}
                                             style={{ cursor: "pointer" }}>
-                                            <img src={profileMap[replyDto.replyWriter] || ""}
+                                            <img src={profileMap[replyDto.replyWriter] || null}
                                                 alt="profile" className="board avatar-img-v2 me-2 mt-3" />
                                             <span>{replyDto.replyWriter}</span>
                                         </h5>
