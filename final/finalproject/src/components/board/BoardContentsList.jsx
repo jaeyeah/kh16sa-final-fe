@@ -54,7 +54,7 @@ export default function BoardContentsList() {
             
             if (id && newTitles[id] === undefined) {
                 try {
-                    const { data } = await axios.get(`/api/tmdb/title/${id}`);
+                    const { data } = await axios.get(`/tmdb/title/${id}`);
                     newTitles[id] = data;
                     
                     hasUpdate = true;

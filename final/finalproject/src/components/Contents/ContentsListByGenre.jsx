@@ -69,7 +69,7 @@ export default function ContentsListByGenre() {
         try {
             if (page === 1) setIsLoading(true);
 
-            const response = await axios.get(`/api/tmdb/contents/list/${genreName}`, { params: { page: page } });
+            const response = await axios.get(`/tmdb/contents/list/${genreName}`, { params: { page: page } });
 
             if (page === 1) {//첫페이지면
                 setContentsList(response.data);

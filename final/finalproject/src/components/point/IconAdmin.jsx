@@ -109,7 +109,7 @@ export default function IconAdmin() {
         setResultList([]);
 
         try {
-            const response = await axios.get("/api/tmdb/search", { params: { query } });
+            const response = await axios.get("/tmdb/search", { params: { query } });
             //검색결과 리스트 state에 저장
             setResultList(response.data);
             console.log(response.data);

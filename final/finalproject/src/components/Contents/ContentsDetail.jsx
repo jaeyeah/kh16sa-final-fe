@@ -115,7 +115,7 @@ export default function ContentsDetail() {
     //contents 상세 정보
     const loadData = useCallback(async () => {
         setIsLoading(true);
-        const { data } = await axios.get(`/api/tmdb/contents/detail/${contentsId}`);
+        const { data } = await axios.get(`/tmdb/contents/detail/${contentsId}`);
         // console.log("서버에서 받은 데이터:", data);
         setContentsDetail(data);
         setIsLoading(false);

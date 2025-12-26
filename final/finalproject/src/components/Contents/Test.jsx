@@ -13,7 +13,7 @@ export default function Test() {
     
     try {
       // Spring Boot의 REST API 호출
-      const response = await axios.get("/api/tmdb/genre/collect");
+      const response = await axios.get("/tmdb/genre/collect");
       
       setStatus('success');
       setMessage(response.data); // "장르 마스터 데이터 수집 및 저장 완료" 응답

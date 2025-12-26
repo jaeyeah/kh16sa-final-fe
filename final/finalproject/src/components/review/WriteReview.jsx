@@ -90,7 +90,7 @@ export default function WriteReview() {
     //callback
     const loadContentData = useCallback(async () => {
         setIsLoading(true);
-        const { data } = await axios.get(`/api/tmdb/contents/detail/${contentsId}`);
+        const { data } = await axios.get(`/tmdb/contents/detail/${contentsId}`);
         setContentsDetail(data);
         setIsLoading(false);
     }, []);

@@ -138,7 +138,7 @@ export default function ReviewDetail() {
             setStatusMessage("영화 정보를 불러오는 중...");
 
             const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
-            const { data } = await axios.get(`/api/tmdb/contents/detail/${contentsId}`, { headers });
+            const { data } = await axios.get(`/tmdb/contents/detail/${contentsId}`, { headers });
 
             setContentsDetail(data);
             setStatusMessage("");
