@@ -169,7 +169,7 @@ export default function BoardEdit() {
     const loadTitle = useCallback(async (contentsId) => {
         if (!contentsId) return;
         try {
-            const { data } = await axios.get(`/api/tmdb/title/${contentsId}`);
+            const { data } = await axios.get(`/tmdb/title/${contentsId}`);
             setContentsDetail(prev=>({...prev, contentsTitle: data}));
             setIsSelect(true);
             setBoardClass(prev => ({ ...prev, boardContentsId: "is-valid" }));
@@ -210,7 +210,7 @@ export default function BoardEdit() {
         setResultList([]);
 
         try {
-            const response = await axios.get("/api/tmdb/search", { params: { query } });
+            const response = await axios.get("/tmdb/search", { params: { query } });
             setResultList(response.data);
 
             if (response.data.length === 0) {
@@ -234,7 +234,7 @@ export default function BoardEdit() {
         setIsLoading(true);
 
         try {
-            const response = await axios.post("/api/tmdb/save", {
+            const response = await axios.post("/tmdb/save", {
                 contentsId: contents.contentsId,
                 type: contents.type
             });

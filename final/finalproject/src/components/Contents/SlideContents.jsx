@@ -49,7 +49,7 @@ export default function SlideContents() {
     const loadTVData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const { data } = await axios.get("/api/tmdb/contents/list/tv");
+            const { data } = await axios.get("/tmdb/contents/list/tv");
             const tvlist = [
                 ...data.map(tv => ({ ...tv }))
             ];
@@ -64,7 +64,7 @@ export default function SlideContents() {
     const loadMovieData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const { data } = await axios.get("/api/tmdb/contents/list/movie");
+            const { data } = await axios.get("/tmdb/contents/list/movie");
             const movielist = [
                 ...data.map(movie => ({ ...movie }))
             ];

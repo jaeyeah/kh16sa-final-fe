@@ -144,7 +144,7 @@ export default function BoardDetail() {
     const loadTitle = useCallback(async (id) => {
         if (!id) return;
         try {
-            const { data } = await axios.get(`/api/tmdb/title/${id}`);
+            const { data } = await axios.get(`/tmdb/title/${id}`);
             setContentsTitle(data);
         }
         catch (err) {
