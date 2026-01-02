@@ -29,7 +29,7 @@ export default function SearchResult() {
         setResultList([]);
 
         try {
-            const response = await axios.get("/api/tmdb/search", { params: { query: searchQuery } });
+            const response = await axios.get("/tmdb/search", { params: { query: searchQuery } });
             setResultList(response.data);
 
             if (response.data.length === 0) {
@@ -61,7 +61,7 @@ export default function SearchResult() {
 
         try {
             // (1) DB에 저장 (또는 업데이트) 요청
-            const response = await axios.post("/api/tmdb/save", {
+            const response = await axios.post("/tmdb/save", {
                 contentsId: contents.contentsId,
                 type: contents.type
             });

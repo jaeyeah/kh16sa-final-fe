@@ -73,7 +73,7 @@ export default function Home() {
     const loadTVData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const { data } = await axios.get("/api/tmdb/contents/list/tv");
+            const { data } = await axios.get("/tmdb/contents/list/tv");
             const tvlist = [
                 ...data.map(tv => ({ ...tv }))
             ];
@@ -88,7 +88,7 @@ export default function Home() {
     const loadMovieData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const { data } = await axios.get("/api/tmdb/contents/list/movie");
+            const { data } = await axios.get("/tmdb/contents/list/movie");
             const movielist = [
                 ...data.map(movie => ({ ...movie }))
             ];
@@ -102,7 +102,7 @@ export default function Home() {
     const loadRateData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const { data } = await axios.get("/api/tmdb/contents/rank/rate");
+            const { data } = await axios.get("/tmdb/contents/rank/rate");
             const ratelist = [
                 ...data.map(rate => ({ ...rate }))
             ];
@@ -117,7 +117,7 @@ export default function Home() {
     const loadPriceData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const { data } = await axios.get("/api/tmdb/contents/rank/price");
+            const { data } = await axios.get("/tmdb/contents/rank/price");
             const pricelist = [
                 ...data.map(price => ({ ...price }))
             ];

@@ -55,7 +55,7 @@ export default function SearchAndSave() {
         setResultList([]);
 
         try {
-            const response = await axios.get("/api/tmdb/search", { params: { query } });
+            const response = await axios.get("/tmdb/search", { params: { query } });
             //검색결과 리스트 state에 저장
             setResultList(response.data);
 
@@ -84,7 +84,7 @@ export default function SearchAndSave() {
 
         try {
             //데이터 restController로 전송
-            const response = await axios.post("/api/tmdb/save", {
+            const response = await axios.post("/tmdb/save", {
                 contentsId: contents.contentsId,
                 type: contents.type
             });

@@ -28,7 +28,7 @@ export default function GenreList() {
 
     //callback
     const loadData = useCallback(async () => {
-        const { data } = await axios.get("/api/tmdb/genre");
+        const { data } = await axios.get("/tmdb/genre");
         // 전체 추가
         const genreList = [
             { genreId: 0, genreName: "전체" },
